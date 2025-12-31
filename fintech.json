@@ -1,0 +1,18 @@
+{
+  "intents": [
+    {
+      "action": "transfer_funds",
+      "entity": {
+        "amount": 5000,
+        "currency": "INR"
+      }
+    },
+    {
+      "action": "transfer_funds",
+      "entity": {
+        "amount": 50000,
+        "currency": "INR"
+      }
+    }
+  ]
+}
