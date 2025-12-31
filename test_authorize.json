@@ -1,0 +1,11 @@
+{
+  "layer": "agent_execution",
+  "payload": {
+    "agent_id": "agent-1",
+    "tool": "transfer_money",
+    "args": {
+      "amount": 250000
+    },
+    "environment": "prod"
+  }
+}
