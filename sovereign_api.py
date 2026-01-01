@@ -1,35 +1,33 @@
-import uvicorn
-from fastapi import FastAPI
-from pydantic import BaseModel
+import stripe
+from fastapi import FastAPI, Header, HTTPException
 from indestructible_engine import IndestructibleEngine
 
+stripe.api_key = "sk_test_..." # Your Stripe Secret Key
 app = FastAPI()
 engine = IndestructibleEngine()
-mock_db = {}
 
-class Req(BaseModel):
-    client_id: str
-    metric_name: str
-    current_val: float
-    raw_gradient: float
-
-@app.get("/health")
-async def health():
-    return {"status": "online", "engine": "indestructible"}
+# In-memory usage buffer to avoid hitting Stripe on EVERY millisecond call
+usage_buffer = {} 
 
 @app.post("/optimize")
-async def optimize(req: Req):
-    # Quick state management
-    state_key = f"{req.client_id}:{req.metric_name}"
-    state = mock_db.get(state_key, {"v": 0.0, "e": 0.0})
+async def optimize(req: dict, x_api_key: str = Header(None)):
+    # 1. Authenticate (In production, check DB for valid api_key)
+    if not x_api_key:
+        raise HTTPException(status_code=401, detail="Valid API Key required.")
     
-    engine.velocity = state["v"]
-    engine.denoiser.estimate = state["e"]
+    # 2. Execute Neural Logic
+    val, info = engine.step(req['current_val'], req['raw_gradient'])
     
-    val, info = engine.step(req.current_val, req.raw_gradient)
+    # 3. Track Usage (Metered Billing)
+    client_id = x_api_key # Simplified for this demo
+    usage_buffer[client_id] = usage_buffer.get(client_id, 0) + 1
     
-    mock_db[state_key] = {"v": engine.velocity, "e": engine.denoiser.estimate}
+    # 4. Flush to Stripe every 1000 steps (Musk-style efficiency)
+    if usage_buffer[client_id] >= 1000:
+        stripe.billing.MeterEvent.create(
+            event_name="optimization_steps",
+            payload={"value": "1000", "stripe_customer_id": "cus_..."}
+        )
+        usage_buffer[client_id] = 0
+        
     return {"optimized_value": val}
-
-if __name__ == "__main__":
-    uvicorn.run(app, host="127.0.0.1", port=8000, log_level="info")
