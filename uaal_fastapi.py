@@ -3,13 +3,13 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 
 app = FastAPI()
-KERNEL_KEY = os.getenv("SOVEREIGN_KERNEL_KEY", "DEVELOPMENT_INSECURE_KEY").encode()
+KERNEL_KEY = os.getenv("SOVEREIGN_KERNEL_KEY", "MUMBAI_FORCE_2026").encode()
+LOG_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "audits.worm")
 
-def canonical_sign(data: dict):
-    # Fix 1: Sort keys and remove whitespace
-    # Fix 2: Ensure float precision is locked
-    clean_data = json.dumps(data, sort_keys=True, separators=(",", ":")).encode()
-    return hmac.new(KERNEL_KEY, clean_data, hashlib.sha256).hexdigest()
+def canonical_sign(actor, mode, gradient):
+    # 🎯 FORCE STRING NORMALIZATION
+    msg = f"{actor}|{mode}|{float(gradient):.6f}".encode()
+    return hmac.new(KERNEL_KEY, msg, hashlib.sha256).hexdigest()
 
 class IntentRequest(BaseModel):
     actor: str
@@ -19,20 +19,20 @@ class IntentRequest(BaseModel):
 
 @app.post("/authorize-intent")
 async def authorize(payload: IntentRequest):
-    # Normalize the data for signing
-    payload_dict = {
-        "actor": payload.actor,
-        "gradient": round(payload.raw_gradient, 6),
-        "mode": payload.mode
-    }
-    
     is_violation = payload.raw_gradient > 1.0
     allowed = not (is_violation and payload.mode == "ENFORCE")
     
-    evidence_hash = canonical_sign(payload_dict)
+    evidence_hash = canonical_sign(payload.actor, payload.mode, payload.raw_gradient)
     
-    return {
+    log_entry = {
+        "actor": payload.actor,
+        "mode": payload.mode,
+        "gradient": payload.raw_gradient,
+        "hash": evidence_hash,
         "allowed": allowed,
-        "evidence_hash": f"0x{evidence_hash}",
-        "reason": "Risk violation" if not allowed else "Authorized"
+        "timestamp": str(time.time())
     }
+    with open(LOG_PATH, "a") as f:
+        f.write(json.dumps(log_entry) + "\n")
+
+    return {"allowed": allowed, "evidence_hash": f"0x{evidence_hash}", "reason": "Authorized"}
