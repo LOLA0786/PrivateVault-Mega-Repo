@@ -1,0 +1,28 @@
+name: OAAS Stress Test CI
+
+on: [push, pull_request]
+
+jobs:
+  performance-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install Dependencies
+        run: |
+          pip install fastapi uvicorn httpx numpy torch
+
+      - name: Start OAAS Engine
+        run: |
+          python3 sovereign_api.py &
+          sleep 5  # Give the API time to warm up
+
+      - name: Run Lethal Stress Test
+        run: |
+          python3 stress_test.py
