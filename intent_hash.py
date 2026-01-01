@@ -1,20 +1,10 @@
-import json
 import hashlib
-from typing import Dict, Any
+import sys
 
-def canonical_intent(intent: Dict[str, Any]) -> Dict[str, Any]:
-    """
-    Canonicalize intent so approvals bind to economic reality,
-    not string formatting.
-    """
-    return {
-        "action": intent.get("action"),
-        "amount": int(intent.get("amount")),
-        "currency": intent.get("currency"),
-        "recipient": intent.get("recipient"),
-    }
+def hash_payload(payload):
+    h = hashlib.sha256(payload.encode()).hexdigest()
+    print(f'{{"intent_hash": "0x{h}"}}')
 
-def intent_hash(intent: Dict[str, Any]) -> str:
-    canonical = canonical_intent(intent)
-    payload = json.dumps(canonical, sort_keys=True, separators=(",", ":"))
-    return hashlib.sha256(payload.encode()).hexdigest()
+if __name__ == "__main__":
+    payload = sys.argv[1] if len(sys.argv) > 1 else "DEFAULT_INTENT"
+    hash_payload(payload)
