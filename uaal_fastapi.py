@@ -1,37 +1,38 @@
-import time, hashlib, json
+import os, time, hashlib, json, hmac
 from fastapi import FastAPI
 from pydantic import BaseModel
 
 app = FastAPI()
+KERNEL_KEY = os.getenv("SOVEREIGN_KERNEL_KEY", "DEVELOPMENT_INSECURE_KEY").encode()
+
+def canonical_sign(data: dict):
+    # Fix 1: Sort keys and remove whitespace
+    # Fix 2: Ensure float precision is locked
+    clean_data = json.dumps(data, sort_keys=True, separators=(",", ":")).encode()
+    return hmac.new(KERNEL_KEY, clean_data, hashlib.sha256).hexdigest()
 
 class IntentRequest(BaseModel):
-    actor: str = "unknown"
-    mode: str = "ENFORCE"
-    raw_gradient: float = 0.0
+    actor: str
+    mode: str
+    raw_gradient: float
+    current_val: float
 
 @app.post("/authorize-intent")
 async def authorize(payload: IntentRequest):
-    gradient = payload.raw_gradient
-    is_violation = gradient > 1.0
+    # Normalize the data for signing
+    payload_dict = {
+        "actor": payload.actor,
+        "gradient": round(payload.raw_gradient, 6),
+        "mode": payload.mode
+    }
     
-    # Logic: If violation AND mode is ENFORCE, we BLOCK.
-    # If violation AND mode is SHADOW, we ALLOW but log the warning.
+    is_violation = payload.raw_gradient > 1.0
     allowed = not (is_violation and payload.mode == "ENFORCE")
     
-    evidence_hash = hashlib.sha256(f"{time.time()}".encode()).hexdigest()
+    evidence_hash = canonical_sign(payload_dict)
     
-    # Write to the WORM log
-    with open("audits.worm", "a") as f:
-        log_entry = {"hash": evidence_hash, "actor": payload.actor, "mode": payload.mode, "gradient": gradient, "allowed": allowed}
-        f.write(json.dumps(log_entry) + "\n")
-
     return {
         "allowed": allowed,
         "evidence_hash": f"0x{evidence_hash}",
-        "mode": payload.mode,
-        "reason": "Risk violation blocked" if not allowed else "Authorized"
+        "reason": "Risk violation" if not allowed else "Authorized"
     }
-
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="127.0.0.1", port=8000)
