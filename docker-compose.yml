@@ -1,17 +1,11 @@
 version: '3.8'
 services:
-  intent-engine:
+  mumbai-protocol:
     build: .
     ports:
       - "8000:8000"
-    env_file: .env
-    depends_on:
-      - redis
-      - opa
-  redis:
-    image: redis:7
-  opa:
-    image: openpolicyagent/opa:0.68.0
-    command: run --server --addr :8181 policies/
+      - "8001:8001"
     volumes:
-      - ./policies:/policies
+      - .:/app
+    environment:
+      - SOVEREIGN_KERNEL_KEY=MUMBAI_FORCE_2026

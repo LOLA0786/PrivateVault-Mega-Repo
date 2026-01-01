@@ -1,3 +1,3 @@
-{"actor": "mumbai_founder", "mode": "SHADOW", "gradient": 99.9, "hash": "afeb2781706972db2a3004b201137be611d54df1944f061056d3ad539e5ca020", "allowed": true, "timestamp": "1767262888.055072"}
-{"actor": "mumbai_founder", "mode": "ENFORCE", "gradient": 99.9, "hash": "953d4d89a6102a28fb70de913c4a94689443334e4ecc5067d4a4e3582f432621", "allowed": false, "timestamp": "1767262888.06148"}
-{"actor": "mumbai_founder", "mode": "ENFORCE", "gradient": 0.05, "hash": "146c1f6b97503d1891cea97718b270ed55f83fe296324f0cb3b4fcb188a63150", "allowed": true, "timestamp": "1767262888.067662"}
+{"actor": "mumbai_founder", "mode": "SHADOW", "gradient": 99.9, "hash": "afeb2781706972db2a3004b201137be611d54df1944f061056d3ad539e5ca020", "allowed": true, "timestamp": "1767264586.9580002", "privacy": "\ud83d\udd13 TRANSPARENT"}
+{"actor": "mumbai_founder", "mode": "ENFORCE", "gradient": 0.05, "hash": "146c1f6b97503d1891cea97718b270ed55f83fe296324f0cb3b4fcb188a63150", "allowed": true, "timestamp": "1767264586.967832", "privacy": "\ud83d\udd13 TRANSPARENT"}
+{"actor": "mumbai_founder", "mode": "ENFORCE", "gradient": 99.9, "hash": "953d4d89a6102a28fb70de913c4a94689443334e4ecc5067d4a4e3582f432621", "allowed": false, "timestamp": "1767264586.9770591", "privacy": "\ud83d\udd13 TRANSPARENT"}

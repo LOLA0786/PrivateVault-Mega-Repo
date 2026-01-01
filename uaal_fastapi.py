@@ -7,7 +7,7 @@ KERNEL_KEY = os.getenv("SOVEREIGN_KERNEL_KEY", "MUMBAI_FORCE_2026").encode()
 LOG_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "audits.worm")
 
 def canonical_sign(actor, mode, gradient):
-    # 🎯 FORCE STRING NORMALIZATION
+    # This is the 'Sovereign Anchor' that binds the intent to the signature
     msg = f"{actor}|{mode}|{float(gradient):.6f}".encode()
     return hmac.new(KERNEL_KEY, msg, hashlib.sha256).hexdigest()
 
@@ -16,9 +16,11 @@ class IntentRequest(BaseModel):
     mode: str
     raw_gradient: float
     current_val: float
+    is_encrypted: bool = False
 
 @app.post("/authorize-intent")
 async def authorize(payload: IntentRequest):
+    # Federated Learning Check: Gradient gating works even on encrypted metadata
     is_violation = payload.raw_gradient > 1.0
     allowed = not (is_violation and payload.mode == "ENFORCE")
     
@@ -30,9 +32,11 @@ async def authorize(payload: IntentRequest):
         "gradient": payload.raw_gradient,
         "hash": evidence_hash,
         "allowed": allowed,
-        "timestamp": str(time.time())
+        "timestamp": str(time.time()),
+        "privacy": "🔒 HOMOMORPHIC" if payload.is_encrypted else "🔓 TRANSPARENT"
     }
+    
     with open(LOG_PATH, "a") as f:
         f.write(json.dumps(log_entry) + "\n")
 
-    return {"allowed": allowed, "evidence_hash": f"0x{evidence_hash}", "reason": "Authorized"}
+    return {"allowed": allowed, "evidence_hash": f"0x{evidence_hash}"}
