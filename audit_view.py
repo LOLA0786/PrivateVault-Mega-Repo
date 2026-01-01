@@ -1,12 +1,13 @@
-import json
+import os
 
-print("\n=== AUDIT LOG ===\n")
+def view_audit():
+    print("📜 READING WORM AUDIT LOG (audits.worm)...")
+    if os.path.exists("audits.worm"):
+        with open("audits.worm", "r") as f:
+            for line in f.readlines()[-5:]:
+                print(f"ENTRY: {line.strip()}")
+    else:
+        print("⚠️ No audit log found yet. Run the demo flow first.")
 
-with open("logs/audit.log") as f:
-    for line in f:
-        e = json.loads(line)
-        print(f"Time: {e['timestamp']}")
-        print(f"Allowed: {e['allowed']}")
-        print(f"Checks: {e['checks']}")
-        print(f"Hash: {e['hash']}")
-        print("-" * 40)
+if __name__ == "__main__":
+    view_audit()
