@@ -49,3 +49,12 @@ def consume_approvals(approval_ids: List[str]) -> None:
     for aid in approval_ids:
         if aid in _APPROVALS:
             _APPROVALS[aid]["consumed"] = True
+
+# --- Control Plane Stub ---
+def store_approval_request(*args, **kwargs):
+    """
+    Stub for shadow-mode approval persistence.
+    Does nothing intentionally.
+    Required for control-plane imports.
+    """
+    return {"status": "stubbed", "stored": False}

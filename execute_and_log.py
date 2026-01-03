@@ -1,20 +1,44 @@
-from execute_sim import simulate_execution
-from reward import compute_reward
-from logs.logger import log_routing
+import time
+import hashlib
+import json
 
-def execute_and_log(router_name, state, provider):
-    outcome = simulate_execution(provider)
-    reward = compute_reward(outcome)
+def execute_and_log(intent: dict):
+    try:
+        intent_hash = hashlib.sha256(
+            json.dumps(intent, sort_keys=True).encode()
+        ).hexdigest()
 
-    log_routing({
-        "router": router_name,
-        "state": state,
-        "outcome": outcome,
-        "reward": reward
-    })
+        decision = "ALLOW"
+        policy = "NONE"
 
-    return outcome, reward
+        # VERY SIMPLE DEMO RULES (NO CRASH)
+        if intent["domain"] == "fintech" and intent.get("amount", 0) >= 200000:
+            decision = "BLOCK"
+            policy = "FINTECH_v1.0"
 
-# --- INTENT BINDING ENFORCEMENT ---
-from intent_binding import assert_intent_binding
-# ---------------------------------
+        if intent["domain"] == "medtech" and intent.get("patient_age", 99) < 18:
+            decision = "BLOCK"
+            policy = "MEDTECH_v2.1"
+
+        record = {
+            "timestamp": time.strftime("%Y-%m-%dT%H:%M:%S"),
+            "domain": intent["domain"],
+            "actor": intent.get("actor"),
+            "action": intent.get("action"),
+            "mode": intent.get("mode"),
+            "decision": decision,
+            "policy": policy,
+            "intent_hash": intent_hash,
+        }
+
+        # append audit safely
+        with open("audit.log", "a") as f:
+            f.write(json.dumps(record) + "\n")
+
+        return record
+
+    except Exception as e:
+        return {
+            "decision": "ERROR",
+            "error": str(e)
+        }
