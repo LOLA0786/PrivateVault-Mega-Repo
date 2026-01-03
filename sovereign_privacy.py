@@ -16,8 +16,8 @@ class SovereignHE:
         print("🔐 [HE-LAYER] Verifying Encrypted Gradient...")
         return True
 
-# Integrating with Mumbai Protocol
+# Integrating with Galani Protocol
 print("🛰️ [FL-NODE] Initiating Federated Learning Loop...")
-he = SovereignHE("MUMBAI_2026")
+he = SovereignHE("GALANI_2026")
 blind_grad = he.encrypt_gradient(0.05)
 print(f"📦 [FL-NODE] Encrypted Gradient Sent: {blind_grad}")

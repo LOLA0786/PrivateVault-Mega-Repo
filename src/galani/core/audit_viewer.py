@@ -6,7 +6,7 @@ def get_key():
             for line in f:
                 if "SOVEREIGN_KERNEL_KEY=" in line:
                     return line.split("=")[1].strip().encode()
-    return os.getenv("SOVEREIGN_KERNEL_KEY", "MUMBAI_FORCE_2026").encode()
+    return os.getenv("SOVEREIGN_KERNEL_KEY", "GALANI_FORCE_2026").encode()
 
 KEY = get_key()
 

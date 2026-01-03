@@ -1,11 +1,11 @@
 # Sovereign SDK: Security & Cryptographic Attestation Protocol
 
-This document outlines the security architecture of the **Mumbai Protocol**. It is designed for high-stakes environments where AI intent must be governed by deterministic laws rather than probabilistic filters.
+This document outlines the security architecture of the **Galani Protocol**. It is designed for high-stakes environments where AI intent must be governed by deterministic laws rather than probabilistic filters.
 
 ## 🛡️ The Zero-Trust Architecture
 
 ### 1. Cryptographic Canonicalization (Pipe-Delimited)
-Most systems fail because of "JSON Drift" (slight variations in spacing or floating points). The Mumbai Protocol uses **Immutable Pipe-Delimited Normalization**:
+Most systems fail because of "JSON Drift" (slight variations in spacing or floating points). The Galani Protocol uses **Immutable Pipe-Delimited Normalization**:
 * **Format:** `actor|mode|gradient`
 * **Signature:** `HMAC-SHA256(Key, Normal-String)`
 * **Benefit:** This ensures that the Auditor and the Gateway are always looking at the exact same mathematical representation of intent.
@@ -32,4 +32,4 @@ The `SOVEREIGN_KERNEL_KEY` is never exposed to the AI model itself. It resides o
 | **Unauthorized Key Access** | Kernel Key is managed via encrypted `.env` or Hardware Security Modules (HSM). |
 
 ---
-*Created by the Sovereign SDK Team | Mumbai 2026*
+*Created by the Sovereign SDK Team | Galani 2026*

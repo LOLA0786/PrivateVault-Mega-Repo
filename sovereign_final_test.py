@@ -8,7 +8,7 @@ def run_test(name, mode, gradient, is_encrypted=False):
         "current_val": 100.0, 
         "raw_gradient": gradient, 
         "mode": mode, 
-        "actor": "mumbai_founder",
+        "actor": "galani_founder",
         "is_encrypted": is_encrypted
     }
     

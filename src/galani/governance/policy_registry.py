@@ -46,3 +46,14 @@ def get_active_policy():
 def rollback(to_version: str):
     activate_policy(to_version)
     return f"Rolled back to policy {to_version}"
+
+# --- Control Plane Adapter ---
+def get_active_policy_version():
+    """
+    Control-plane safe accessor.
+    Returns a string version identifier without mutating state.
+    """
+    for key in ["POLICY_VERSION", "ACTIVE_POLICY_VERSION", "version"]:
+        if key in globals():
+            return str(globals()[key])
+    return "unknown"

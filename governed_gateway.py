@@ -3,7 +3,7 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
 app = FastAPI()
-KERNEL_KEY = os.getenv("SOVEREIGN_KERNEL_KEY", "MUMBAI_FORCE_2026").encode()
+KERNEL_KEY = os.getenv("SOVEREIGN_KERNEL_KEY", "GALANI_FORCE_2026").encode()
 UAAL_ENDPOINT = "http://127.0.0.1:8000/authorize-intent"
 
 def canonical_sign(actor, mode, gradient):

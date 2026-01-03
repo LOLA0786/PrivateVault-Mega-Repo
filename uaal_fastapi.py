@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 
 app = FastAPI()
-KERNEL_KEY = os.getenv("SOVEREIGN_KERNEL_KEY", "MUMBAI_FORCE_2026").encode()
+KERNEL_KEY = os.getenv("SOVEREIGN_KERNEL_KEY", "GALANI_FORCE_2026").encode()
 LOG_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "audits.worm")
 
 def canonical_sign(actor, mode, gradient):
