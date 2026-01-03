@@ -1,18 +1,19 @@
-from nacl.signing import SigningKey
-from nacl.exceptions import BadSignatureError
-from .interfaces import SignatureEngine
+from nacl.signing import SigningKey, VerifyKey
+from .backend import CryptoBackend
 
-class Ed25519Signer(SignatureEngine):
-    def __init__(self, private_key: bytes | None = None):
-        self.signing_key = SigningKey(private_key) if private_key else SigningKey.generate()
-        self.verify_key = self.signing_key.verify_key
+class Ed25519Backend(CryptoBackend):
+    name = "ed25519"
 
-    def sign(self, payload: bytes) -> bytes:
-        return self.signing_key.sign(payload).signature
+    def __init__(self):
+        self._sk = SigningKey.generate()
+        self._vk = self._sk.verify_key
 
-    def verify(self, payload: bytes, signature: bytes) -> bool:
+    def sign(self, data: bytes) -> bytes:
+        return self._sk.sign(data).signature
+
+    def verify(self, data: bytes, signature: bytes) -> bool:
         try:
-            self.verify_key.verify(payload, signature)
+            self._vk.verify(data, signature)
             return True
-        except BadSignatureError:
+        except Exception:
             return False
