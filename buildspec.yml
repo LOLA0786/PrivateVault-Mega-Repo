@@ -1,32 +1,16 @@
 version: 0.2
 
-env:
-  variables:
-    AWS_REGION: ap-south-1
-    ECR_REPO: galani-enterprise
-
 phases:
   pre_build:
     commands:
-      - echo Logging in to Amazon ECR...
-      - aws --version
-      - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin 209483893123.dkr.ecr.$AWS_REGION.amazonaws.com
-      - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
-
+      - echo Logging in to Amazon ECR
+      - aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 209483893123.dkr.ecr.ap-south-1.amazonaws.com
   build:
     commands:
-      - echo Build started on `date`
-      - docker build -t $ECR_REPO:$IMAGE_TAG .
-      - docker tag $ECR_REPO:$IMAGE_TAG 209483893123.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO:$IMAGE_TAG
-      - docker tag $ECR_REPO:$IMAGE_TAG 209483893123.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO:latest
-
+      - echo Build started
+      - docker build -t galani-enterprise:v3 .
+      - docker tag galani-enterprise:v3 209483893123.dkr.ecr.ap-south-1.amazonaws.com/galani-enterprise:v3
   post_build:
     commands:
-      - echo Pushing Docker images...
-      - docker push 209483893123.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO:$IMAGE_TAG
-      - docker push 209483893123.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO:latest
-      - echo Build completed on `date`
-
-artifacts:
-  files:
-    - '**/*'
+      - echo Build completed
+      - docker push 209483893123.dkr.ecr.ap-south-1.amazonaws.com/galani-enterprise:v3
