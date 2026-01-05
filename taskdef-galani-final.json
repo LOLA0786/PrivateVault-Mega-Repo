@@ -1,0 +1,38 @@
+{
+  "family": "default-galani-enterprise",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "1024",
+  "memory": "2048",
+  "executionRoleArn": "arn:aws:iam::209483893123:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::209483893123:role/galani-task-role",
+  "containerDefinitions": [
+    {
+      "name": "Main",
+      "image": "209483893123.dkr.ecr.ap-south-1.amazonaws.com/galani-enterprise:a7186be",
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 8000,
+          "protocol": "tcp"
+        }
+      ],
+      "command": [
+        "uvicorn",
+        "galani.api.app_v3:app",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8000"
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/aws/ecs/default/galani-enterprise-9f3e",
+          "awslogs-region": "ap-south-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      }
+    }
+  ]
+}
