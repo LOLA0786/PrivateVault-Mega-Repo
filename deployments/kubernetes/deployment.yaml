@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: galani-api
+  namespace: galani-system
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: galani-api
+  template:
+    metadata:
+      labels:
+        app: galani-api
+    spec:
+      containers:
+        - name: galani-api
+          image: ghcr.io/lola0786/privatevault-mega-repo:latest
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - secretRef:
+                name: galani-secrets
+          readinessProbe:
+            httpGet:
+              path: /api/v3/health
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10

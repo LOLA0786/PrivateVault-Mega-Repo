@@ -1,0 +1,29 @@
+{
+  "family": "galani-api-debug",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "512",
+  "memory": "1024",
+  "executionRoleArn": "arn:aws:iam::209483893123:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::209483893123:role/ecsTaskRole",
+  "containerDefinitions": [
+    {
+      "name": "Main",
+      "image": "PASTE_IMAGE_STRING_HERE",
+      "essential": true,
+      "command": [
+        "sh",
+        "-c",
+        "pwd && echo '---' && ls -la && echo '---' && find / -maxdepth 4 -type f -name 'uaal_fastapi.py' 2>/dev/null && echo '---' && python3 -c \"import sys; print(sys.path)\" && sleep 3600"
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/galani-api",
+          "awslogs-region": "ap-south-1",
+          "awslogs-stream-prefix": "debug"
+        }
+      }
+    }
+  ]
+}
