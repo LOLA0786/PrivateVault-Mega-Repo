@@ -33,7 +33,7 @@ steps:
     args:
       - -c
       - |
-        aws ecr get-login-password --region $AWS_REGION \
+        aws ecr get-login-password --region "$AWS_REGION" \
         | docker login --username AWS --password-stdin \
           209483893123.dkr.ecr.ap-south-1.amazonaws.com
 
