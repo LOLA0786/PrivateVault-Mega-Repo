@@ -60,3 +60,5 @@ node_modules/
 .terraform/
 *.tfstate
 *.tfstate.backup
+audit.log
+datasets/
