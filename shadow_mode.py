@@ -1,14 +1,41 @@
-import json
-from approval_store import store_approval_request  # you'll add this
+"""
+Shadow mode evaluation with metrics capture.
+"""
 
-def shadow_evaluate(intent: dict, real_decision: dict):
-    shadow_decision = {}  # run alternative policy/ML risk
-    if real_decision["allowed"] != shadow_decision.get("allowed", True):
-        print(f"SHADOW ALERT: Divergence on intent {intent}")
-        # Log to audit
-    
-    if real_decision.get("risk_score", 0) > 0.8:
-        ticket = store_approval_request(intent, real_decision)
-        return {"escalated": True, "ticket_id": ticket}
-    
-    return real_decision
+SHADOW_METRICS = {
+    "divergence_count": 0,
+    "prevented_total": 0.0,
+    "high_risk_examples": []
+}
+
+def shadow_evaluate(intent: dict):
+    amount = float(intent.get("amount", 0))
+    intent_hash = intent.get("intent_hash")
+
+    shadow_decision = {
+        "allowed": True,
+        "policy": "SHADOW_NONE"
+    }
+
+    # Stricter shadow policy
+    if intent.get("domain") == "fintech" and amount >= 20000:
+        shadow_decision = {
+            "allowed": False,
+            "policy": "SHADOW_FINTECH_STRICT"
+        }
+
+        SHADOW_METRICS["divergence_count"] += 1
+        SHADOW_METRICS["prevented_total"] += amount
+
+        if amount > 10000:
+            SHADOW_METRICS["high_risk_examples"].append({
+                "amount": amount,
+                "intent_hash": intent_hash,
+                "policy": shadow_decision["policy"]
+            })
+
+    return shadow_decision
+
+
+def shadow_summary():
+    return SHADOW_METRICS

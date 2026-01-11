@@ -1,2 +1,0 @@
-{"timestamp": "2026-01-02T17:34:09", "domain": "fintech", "actor": "demo-agent", "action": "transfer_money", "mode": "ENFORCE", "decision": "BLOCK", "policy": "FINTECH_v1.0", "intent_hash": "5381298f6aa56bb491b00235a415274a946431a502552acfbbf45507b1806e84"}
-{"timestamp": "2026-01-02T17:34:16", "domain": "medtech", "actor": "demo-agent", "action": "prescribe_morphine", "mode": "ENFORCE", "decision": "BLOCK", "policy": "MEDTECH_v2.1", "intent_hash": "7d11f7200f851c1d555a7b643c8aeb1730ffb6dec2b2efcc1d3a43b2a873673e"}

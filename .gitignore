@@ -62,3 +62,7 @@ node_modules/
 *.tfstate.backup
 audit.log
 datasets/
+
+# logs
+*.log
+audit.log
