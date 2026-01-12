@@ -1,0 +1,17 @@
+static_resources:
+  clusters:
+  - name: privatevault_sovereign_cloud
+    connect_timeout: 0.25s
+    type: LOGICAL_DNS
+    lb_policy: ROUND_ROBIN
+    load_assignment:
+      cluster_name: privatevault_sovereign_cloud
+      endpoints:
+      - lb_endpoints:
+        - endpoint:
+            address:
+              socket_address:
+                address: api.privatevault.ai
+                port_value: 443
+    transport_socket:
+      name: envoy.transport_sockets.tls
