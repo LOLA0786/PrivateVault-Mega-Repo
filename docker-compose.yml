@@ -1,11 +1,91 @@
 version: '3.8'
+
 services:
-  mumbai-protocol:
-    build: .
-    ports:
-      - "8000:8000"
-      - "8001:8001"
-    volumes:
-      - .:/app
+  postgres:
+    image: postgres:15
     environment:
-      - SOVEREIGN_KERNEL_KEY=MUMBAI_FORCE_2026
+      POSTGRES_DB: privatevault
+      POSTGRES_USER: pvuser
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./migrations:/docker-entrypoint-initdb.d
+
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+
+  license-service:
+    build: ./services/license-service
+    ports:
+      - "3001:3001"
+    environment:
+      DATABASE_URL: postgresql://pvuser:${DB_PASSWORD}@postgres:5432/privatevault
+      JWT_SECRET: ${JWT_SECRET}
+      PORT: 3001
+    depends_on:
+      - postgres
+
+  usage-tracker:
+    build: ./services/usage-tracker
+    ports:
+      - "3002:3002"
+    environment:
+      DATABASE_URL: postgresql://pvuser:${DB_PASSWORD}@postgres:5432/privatevault
+      KAFKA_BROKER: kafka:9092
+      SIGNING_KEY: ${SIGNING_KEY}
+      PORT: 3002
+    depends_on:
+      - postgres
+      - kafka
+
+  billing-service:
+    build: ./services/billing-service
+    ports:
+      - "3003:3003"
+    environment:
+      DATABASE_URL: postgresql://pvuser:${DB_PASSWORD}@postgres:5432/privatevault
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY}
+      PORT: 3003
+    depends_on:
+      - postgres
+
+  opa:
+    image: openpolicyagent/opa:latest
+    ports:
+      - "8181:8181"
+    command:
+      - "run"
+      - "--server"
+      - "--addr=0.0.0.0:8181"
+      - "/policies"
+    volumes:
+      - ./config/opa:/policies
+
+  envoy:
+    image: envoyproxy/envoy:v1.28-latest
+    ports:
+      - "8080:8080"
+      - "9901:9901"
+    volumes:
+      - ./config/envoy/envoy.yaml:/etc/envoy/envoy.yaml
+    depends_on:
+      - opa
+
+volumes:
+  postgres_data:
