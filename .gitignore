@@ -69,3 +69,9 @@ audit.log
 *.rego
 policy-v2.rego
 .rego
+
+# --- secrets / runtime-only ---
+sovereign.env
+*.env
+capability_token.py
+capability_token*.py
