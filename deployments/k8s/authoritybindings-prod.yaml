@@ -1,0 +1,55 @@
+apiVersion: governance.privatevault.io/v1alpha1
+kind: AuthorityBinding
+metadata:
+  name: pv-owner-prod
+  namespace: governance
+spec:
+  subject:
+    type: user
+    id: chandan
+  roles: ["Owner"]
+  scope:
+    env: prod
+    system: privatevault
+---
+apiVersion: governance.privatevault.io/v1alpha1
+kind: AuthorityBinding
+metadata:
+  name: pv-approver-prod
+  namespace: governance
+spec:
+  subject:
+    type: user
+    id: chandan
+  roles: ["Approver"]
+  scope:
+    env: prod
+    system: privatevault
+---
+apiVersion: governance.privatevault.io/v1alpha1
+kind: AuthorityBinding
+metadata:
+  name: pv-auditor-prod
+  namespace: governance
+spec:
+  subject:
+    type: user
+    id: chandan
+  roles: ["Auditor"]
+  scope:
+    env: prod
+    system: privatevault
+---
+apiVersion: governance.privatevault.io/v1alpha1
+kind: AuthorityBinding
+metadata:
+  name: pv-incident-prod
+  namespace: governance
+spec:
+  subject:
+    type: user
+    id: chandan
+  roles: ["IncidentCommander"]
+  scope:
+    env: prod
+    system: privatevault
