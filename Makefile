@@ -135,3 +135,24 @@ demo: ## Quick demo (core + tool + drift)
 	@$(MAKE) test-core
 	@$(MAKE) test-tools
 	@$(MAKE) test-drift
+
+# ----- API verify (CI ready) -----
+verify-api: env ## Start API (bg) -> run API tests -> stop API
+	$(call banner,"🧪 VERIFY API: start -> test -> stop")
+	@echo "==> Starting API on port $(PORT) in background..."
+	@$(MAKE) stop PORT=$(PORT) >/dev/null 2>&1 || true
+	@cd $(DEMO_DIR) && nohup env PORT=$(PORT) ./start_api.sh > api.log 2>&1 &
+	@sleep 1
+	@echo "==> Waiting for /health..."
+	@for i in {1..25}; do \
+		if curl -fsS http://localhost:$(PORT)/health >/dev/null 2>&1; then \
+			echo "✅ API is healthy"; \
+			break; \
+		fi; \
+		sleep 0.4; \
+	done
+	@echo "==> Running API tests..."
+	@cd $(DEMO_DIR) && $(PY) test_api.py
+	@echo "==> Stopping API..."
+	@$(MAKE) stop PORT=$(PORT) >/dev/null 2>&1 || true
+	@echo "✅ verify-api complete"
