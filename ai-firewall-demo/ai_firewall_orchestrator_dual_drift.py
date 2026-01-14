@@ -16,8 +16,8 @@ class AIFirewallOrchestrator:
         self.auth = ToolAuthorization()
         
         # 🔥 DUAL DRIFT DETECTORS 🔥
-        self.drift_production = DriftDetector(threshold=0.40)  # Lenient (blocks less)
-        self.drift_shadow = DriftDetector(threshold=0.65)     # Strict (testing)
+        self.drift_production = DriftDetector(threshold=0.20)  # Lenient (blocks less)
+        self.drift_shadow = DriftDetector(threshold=0.30)     # Strict (testing)
         
         self.ledger = DecisionLedger()
         self.mode = "enforce"
@@ -194,8 +194,8 @@ if __name__ == "__main__":
     print("\n" + "="*60)
     print("🔥 DUAL DRIFT DETECTOR - SHADOW MODE EVALUATION 🔥")
     print("="*60)
-    print("Production detector: threshold=0.40 (BLOCKS users)")
-    print("Shadow detector:     threshold=0.65 (LOGS only, never blocks)")
+    print("Production detector: threshold=0.20 (BLOCKS users)")
+    print("Shadow detector:     threshold=0.30 (LOGS only, never blocks)")
     print("")
     
     print("\n" + "="*60)
@@ -216,7 +216,7 @@ if __name__ == "__main__":
                                        "parameters": {"path": "/reports/sales.pdf"}}])
         print(f"✅ Response: {resp['status']}")
         print(f"   Production drift score: {resp.get('drift_score', 'N/A')}")
-        print(f"   Shadow drift score: {resp.get('shadow_drift_score', 'N/A')}")
+        print(f"   Shadow drift score: {resp.get('shadow_score', resp.get('shadow_drift_score', 'N/A'))}")
         print(f"   Shadow would block: {resp.get('shadow_would_block', 'N/A')}")
         print(f"   PII redacted: {resp.get('pii_redacted', [])}")
     
@@ -242,7 +242,7 @@ if __name__ == "__main__":
                                        "parameters": {"query": "DELETE FROM users WHERE id > 0"}}])
         print(f"🚨 Response: {resp['status']}")
         print(f"   Production drift score: {resp.get('drift_score', 'N/A')}")
-        print(f"   Shadow drift score: {resp.get('shadow_drift_score', 'N/A')}")
+        print(f"   Shadow drift score: {resp.get('shadow_score', resp.get('shadow_drift_score', 'N/A'))}")
         print(f"   Shadow would block: {resp.get('shadow_would_block', 'N/A')}")
         if resp['status'] == 'blocked':
             print(f"   Reason: {resp['reason']}")
@@ -259,7 +259,7 @@ if __name__ == "__main__":
                                        "parameters": {"query": "SELECT * FROM users LIMIT 10"}}])
         print(f"Response: {resp['status']}")
         print(f"   Production drift score: {resp.get('drift_score', 'N/A')}")
-        print(f"   Shadow drift score: {resp.get('shadow_drift_score', 'N/A')}")
+        print(f"   Shadow drift score: {resp.get('shadow_score', resp.get('shadow_drift_score', 'N/A'))}")
         print(f"   Shadow would block: {resp.get('shadow_would_block', 'N/A')}")
     
     print("\n" + "="*60)

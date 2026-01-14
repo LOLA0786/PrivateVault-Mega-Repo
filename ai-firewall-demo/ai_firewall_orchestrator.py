@@ -3,9 +3,17 @@ import json
 from typing import Dict, List
 from ai_firewall_core import AIFirewall
 from tool_authorization import ToolAuthorization
-from drift_detection import DriftDetector
 from decision_ledger import DecisionLedger
 import logging
+
+# --- Drift detector selection (safe fallback) ---
+try:
+    from drift_detection_fixed import DriftDetector
+    DRIFT_IMPL = "fixed"
+except ImportError:
+    from drift_detection import DriftDetector
+    DRIFT_IMPL = "legacy"
+
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -14,7 +22,7 @@ class AIFirewallOrchestrator:
     def __init__(self):
         self.firewall = AIFirewall()
         self.auth = ToolAuthorization()
-        self.drift = DriftDetector(threshold=0.70)
+        self.drift = DriftDetector(threshold=0.200)
         self.ledger = DecisionLedger()
         self.mode = "enforce"
     
