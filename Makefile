@@ -1,34 +1,19 @@
-.PHONY: install test lint format clean docker-build docker-up
+.PHONY: verify docs guard test gold
 
-install:
-	pip install -r requirements.txt
-	pip install -e .
+verify: docs guard test
+	@echo "✅ VERIFY PASSED"
+
+docs:
+	@test -f docs/ARCHITECTURE.md || (echo "❌ Missing docs/ARCHITECTURE.md" && exit 1)
+	@test -f docs/FAILURE_MODES.md || (echo "❌ Missing docs/FAILURE_MODES.md" && exit 1)
+	@test -f docs/runbooks/RUNBOOK_E2E.md || (echo "❌ Missing docs/runbooks/RUNBOOK_E2E.md" && exit 1)
+	@echo "✅ Docs OK"
+
+guard:
+	@./scripts/security-guard.sh
 
 test:
-	pytest
+	go test ./... -count=1
 
-lint:
-	black --check src/ tests/
-	isort --check-only src/ tests/
-	mypy src/
-
-format:
-	black src/ tests/
-	isort src/ tests/
-
-clean:
-	find . -type d -name __pycache__ -exec rm -rf {} +
-	find . -type f -name "*.pyc" -delete
-	rm -rf .pytest_cache htmlcov .coverage
-
-docker-build:
-	docker-compose build
-
-docker-up:
-	docker-compose up -d
-
-run-fintech:
-	python examples/fintech_demo.py
-
-run-medtech:
-	python examples/medtech_demo.py
+gold:
+	@./scripts/test-gold.sh

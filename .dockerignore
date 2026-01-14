@@ -1,0 +1,10 @@
+.git
+.github
+**/*.rego
+**/*bundle*
+**/policy-v2.rego
+config/opa/policy.rego
+pkg/enforcement/policies/*.rego
+*.pem
+*.key
+*.env

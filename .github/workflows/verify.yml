@@ -1,5 +1,4 @@
 name: verify
-
 on:
   push:
     branches: [ "main" ]
@@ -13,5 +12,5 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version: "1.22"
-      - name: Verify
+      - name: Verify (docs + guardrails + unit tests)
         run: make verify
