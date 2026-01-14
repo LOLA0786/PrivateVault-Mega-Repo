@@ -1,7 +1,7 @@
 """Immutable Decision Log Ledger"""
 import json
 import hashlib
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Dict, List
 import logging
 
@@ -21,7 +21,7 @@ class DecisionLedger:
     def log_interaction(self, event_type: str, data: Dict) -> Dict:
         entry = {
             "index": len(self.chain),
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "event_type": event_type,
             "data": data,
             "previous_hash": self.previous_hash

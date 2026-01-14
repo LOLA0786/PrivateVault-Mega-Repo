@@ -1,0 +1,29 @@
+version: "3.9"
+
+services:
+  ai_firewall_api:
+    build:
+      context: ./ai-firewall-demo
+    container_name: ai_firewall_api
+    env_file:
+      - ./ai-firewall-demo/.env
+    ports:
+      - "5000:5000"
+
+  opa:
+    build:
+      context: ./governance/opa
+    container_name: opa
+    ports:
+      - "8181:8181"
+
+  envoy:
+    image: envoyproxy/envoy:v1.29.4
+    container_name: envoy
+    volumes:
+      - ./governance/envoy/envoy.yaml:/etc/envoy/envoy.yaml:ro
+    ports:
+      - "9191:9191"
+    depends_on:
+      - opa
+      - ai_firewall_api
