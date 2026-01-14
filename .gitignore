@@ -75,3 +75,11 @@ sovereign.env
 *.env
 capability_token.py
 capability_token*.py
+
+# ---- AI firewall demo temp/backups ----
+ai-firewall-demo/*.bak.*
+ai-firewall-demo/*.log
+ai-firewall-demo/*.jsonl
+ai-firewall-demo/*.patch
+ai-firewall-demo/stop
+ai-firewall-demo/test
