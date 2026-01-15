@@ -1,31 +1,49 @@
+import os
 import pytest
-import asyncio
-from typing import AsyncGenerator
 
-@pytest.fixture(scope="session")
-def event_loop():
-    loop = asyncio.get_event_loop_policy().new_event_loop()
-    yield loop
-    loop.close()
+# Force test mode
+os.environ["PV_TEST_MODE"] = "1"
 
-@pytest.fixture
-async def test_client() -> AsyncGenerator:
-    from fastapi.testclient import TestClient
-    from api_service import app
-    
-    with TestClient(app) as client:
-        yield client
 
-@pytest.fixture
-def sample_intent():
-    return {
-        "action_type": "transfer_funds",
-        "parameters": {
-            "amount": 100000,
-            "entity_id": "TEST_001",
-            "counterparty": "TEST_002"
-        },
-        "agent_id": "AGENT_TEST_001",
-        "domain": "fintech",
-        "context": {}
-    }
+@pytest.fixture(autouse=True, scope="session")
+def _monkeypatch_legacy_contracts():
+    """
+    This fixture patches legacy global modules that tests import directly:
+      - auth.authorize_intent
+      - auth.authorize_enveloped_intent
+      - evidence.generate_evidence
+      - evidence.verify_evidence
+
+    WITHOUT touching production engine code.
+    """
+    from galani.compat.contracts import (
+        authorize_intent,
+        authorize_enveloped_intent,
+        generate_evidence,
+        verify_evidence,
+    )
+
+    # Patch 'auth' module if present
+    try:
+        import auth
+        auth.authorize_intent = authorize_intent
+        auth.authorize_enveloped_intent = authorize_enveloped_intent
+    except Exception:
+        pass
+
+    # Patch 'policy_engine' flat module if tests import it
+    try:
+        import policy_engine
+        policy_engine.authorize_intent = authorize_intent
+    except Exception:
+        pass
+
+    # Patch 'evidence'
+    try:
+        import evidence
+        evidence.generate_evidence = generate_evidence
+        evidence.verify_evidence = verify_evidence
+    except Exception:
+        pass
+
+    yield

@@ -1,0 +1,142 @@
+from __future__ import annotations
+from typing import Any, Dict
+import hashlib, json
+from datetime import datetime, timezone
+
+def _stable_json(obj: Any) -> str:
+    return json.dumps(obj, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+
+def _sha256(s: str) -> str:
+    return hashlib.sha256(s.encode("utf-8")).hexdigest()
+
+def _decision_allowed(decision: Any) -> bool:
+    if isinstance(decision, dict):
+        return bool(decision.get("allowed", False))
+    return bool(decision)
+
+def _decision_reason(decision: Any) -> str:
+    if isinstance(decision, dict):
+        return str(decision.get("reason", ""))
+    return ""
+
+def generate_evidence(intent: Dict[str, Any], decision: Any, policy_version: str = "fintech-v1.1") -> Dict[str, Any]:
+    ts = datetime.now(timezone.utc).isoformat()
+
+    intent_for_hash = dict(intent or {})
+    # timestamp should not affect hash
+    intent_for_hash.pop("timestamp", None)
+
+    allowed = _decision_allowed(decision)
+    reason = _decision_reason(decision)
+
+    base = _stable_json({
+        "intent": intent_for_hash,
+        "decision": allowed,
+        "policy_version": policy_version,
+    })
+    evidence_hash = _sha256(base)
+
+    return {
+        "policy_version": policy_version,
+        "decision": allowed,
+        "reason": reason,
+        "evidence_hash": evidence_hash,
+        "timestamp": ts,
+    }
+
+def verify_evidence(intent: Dict[str, Any], decision: Any, policy_version: str, evidence_hash: str) -> bool:
+    ev = generate_evidence(intent, decision, policy_version)
+    return ev.get("evidence_hash") == evidence_hash
+
+
+# PV_VERIFY_REGEN_PATCH
+
+
+# ============================
+# PV_VERIFY_SINGLE_SOURCE_TRUTH
+# ============================
+
+def verify_evidence(intent, decision, policy_version, evidence_hash):
+    """
+    Contract: verification MUST match generate_evidence() evidence_hash exactly.
+    DEBUG MODE: print internals.
+    """
+    try:
+        ev = generate_evidence(intent, decision, policy_version)
+        got = ev.get("evidence_hash")
+        print("DEBUG verify_evidence()")
+        print(" policy_version:", policy_version)
+        print(" expected:", evidence_hash)
+        print(" got     :", got)
+        print(" ev keys :", list(ev.keys()))
+        return got == evidence_hash
+    except Exception as e:
+        print("DEBUG verify_evidence() EXCEPTION:", repr(e))
+        return False
+
+
+# ===================== PV_CANONICAL_DECISION_V1 =====================
+def _pv_canonical_decision(decision):
+    """
+    Canonicalize decision for hashing:
+    - dict decision -> use decision["allowed"]
+    - bool decision -> use directly
+    """
+    if isinstance(decision, dict):
+        return bool(decision.get("allowed", False))
+    return bool(decision)
+
+def _pv_hash(intent, decision, policy_version):
+    import hashlib, json
+    payload = {
+        "intent": intent,
+        "decision": _pv_canonical_decision(decision),
+        "policy_version": policy_version,
+    }
+    b = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    return hashlib.sha256(b).hexdigest()
+
+def generate_evidence(intent, decision, policy_version=None):
+    """
+    Evidence contract:
+    Returns a stable evidence_hash regardless of decision shape.
+    """
+    from datetime import datetime, timezone
+    pv = policy_version or (decision.get("policy_version") if isinstance(decision, dict) else None) or "unknown"
+
+    # reason is included in output, NOT part of hash contract
+    reason = None
+    if isinstance(decision, dict):
+        reason = decision.get("reason")
+
+    ev = {
+        "intent": intent,
+        "decision": _pv_canonical_decision(decision),
+        "policy_version": pv,
+        "evidence_hash": _pv_hash(intent, decision, pv),
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    }
+    if reason is not None:
+        ev["reason"] = reason
+    return ev
+
+def verify_evidence(intent, decision, policy_version, evidence_hash):
+    """
+    Verify by regenerating using SAME canonical contract.
+    """
+    try:
+        ev = generate_evidence(intent, decision, policy_version)
+        return ev.get("evidence_hash") == evidence_hash
+    except Exception:
+        return False
+# =================== /PV_CANONICAL_DECISION_V1 ======================
+
+
+# ---- PV_FORCE_VERIFY_REDIRECT ----
+try:
+    from evidence import verify_evidence as _pv_verify_evidence
+    def verify_evidence(*args, **kwargs):
+        return _pv_verify_evidence(*args, **kwargs)
+except Exception:
+    pass
+# ---- /PV_FORCE_VERIFY_REDIRECT ----
