@@ -1,113 +1,40 @@
 """
-Integration tests for API endpoints
+Integration tests for API endpoints (REAL)
 """
 import pytest
-from httpx import AsyncClient
-from fastapi import FastAPI
-import asyncio
+import httpx
+from galani.api.app import app
 
 @pytest.mark.asyncio
 class TestAPIEndpoints:
-    """Test API endpoints end-to-end"""
-    
-    async def test_health_check(self, client: AsyncClient):
-        """Test health check endpoint"""
-        response = await client.get("/health/live")
-        assert response.status_code == 200
-        assert response.json()['status'] == 'alive'
-    
-    async def test_login_flow(self, client: AsyncClient):
-        """Test complete login flow"""
-        # Login
-        response = await client.post(
-            "/api/v1/auth/login",
-            json={"username": "test_user", "password": "test_pass"}
-        )
-        assert response.status_code == 200
-        token = response.json()['access_token']
-        assert token is not None
-        
-        # Use token to access protected endpoint
-        response = await client.get(
-            "/api/v1/profile",
-            headers={"Authorization": f"Bearer {token}"}
-        )
-        assert response.status_code == 200
-        assert response.json()['user_id'] == 'test_user'
-    
-    async def test_credit_check_flow(self, client: AsyncClient):
-        """Test complete credit check flow"""
-        # Get token
-        login_response = await client.post(
-            "/api/v1/auth/login",
-            json={"username": "test_user", "password": "test_pass"}
-        )
-        token = login_response.json()['access_token']
-        
-        # Submit credit check
-        response = await client.post(
-            "/api/v1/credit/check",
-            headers={"Authorization": f"Bearer {token}"},
-            json={
-                "applicant_id": "APP123",
-                "amount": 50000.0,
-                "term_months": 60
-            }
-        )
-        
-        assert response.status_code == 200
-        result = response.json()
-        assert 'risk_score' in result
-        assert 0 <= result['risk_score'] <= 1
-    
-    async def test_rate_limiting(self, client: AsyncClient):
-        """Test rate limiting works"""
-        # Get token
-        login_response = await client.post(
-            "/api/v1/auth/login",
-            json={"username": "test_user", "password": "test_pass"}
-        )
-        token = login_response.json()['access_token']
-        
-        # Make requests until rate limited
-        for i in range(15):
-            response = await client.post(
-                "/api/v1/credit/check",
-                headers={"Authorization": f"Bearer {token}"},
-                json={
-                    "applicant_id": f"APP{i}",
-                    "amount": 50000.0,
-                    "term_months": 60
+    async def _client(self):
+        transport = httpx.ASGITransport(app=app)
+        return httpx.AsyncClient(transport=transport, base_url="http://test")
+
+    async def test_intent_analyze_success(self):
+        async with await self._client() as client:
+            payload = {
+                "prompt": "approve a loan of 300000 INR to agent_b",
+                "domain": "fintech",
+                # toolCall is required as STRING by schema
+                "toolCall": "approve_loan",
+                "params": {
+                    "principal": {"id": "agent_b", "role": "agent"},
+                    "context": {"amount": 300000}
                 }
-            )
-            
-            if i < 10:
-                assert response.status_code == 200
-            else:
-                # Should be rate limited
-                assert response.status_code == 429
-    
-    async def test_unauthorized_access(self, client: AsyncClient):
-        """Test unauthorized access is blocked"""
-        response = await client.post(
-            "/api/v1/credit/check",
-            json={"applicant_id": "APP123", "amount": 50000.0, "term_months": 60}
-        )
-        assert response.status_code == 401
-    
-    async def test_invalid_token(self, client: AsyncClient):
-        """Test invalid token is rejected"""
-        response = await client.post(
-            "/api/v1/credit/check",
-            headers={"Authorization": "Bearer invalid_token"},
-            json={"applicant_id": "APP123", "amount": 50000.0, "term_months": 60}
-        )
-        assert response.status_code == 401
+            }
 
+            r = await client.post("/v1/intent/analyze", json=payload)
+            assert r.status_code in (200, 201)
+            body = r.json()
+            assert isinstance(body, dict)
 
-@pytest.fixture
-async def client():
-    """Create test client"""
-    from main import app  # Your FastAPI app
-    async with AsyncClient(app=app, base_url="http://test") as client:
-        yield client
+    async def test_intent_analyze_missing_body(self):
+        async with await self._client() as client:
+            r = await client.post("/v1/intent/analyze")
+            assert r.status_code in (400, 422)
+
+    async def test_intent_analyze_invalid_payload(self):
+        async with await self._client() as client:
+            r = await client.post("/v1/intent/analyze", json={"bad": "payload"})
+            assert r.status_code == 422

@@ -1,0 +1,66 @@
+name: PrivateVault VERIFY2
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  verify2:
+    name: VERIFY2 Production Readiness
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install base tools
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y jq
+
+      - name: Run VERIFY2
+        env:
+          STRICT: "1"
+          API_BASE_URL: "http://localhost:8000"
+          DATABASE_URL: "postgresql://localhost/privatevault"
+          REDIS_URL: "redis://localhost:6379"
+        run: |
+          chmod +x /tmp/verify2.sh || true
+
+          # If verify2 script exists in repo use it, else fallback to /tmp
+          if [ -f "./scripts/verify2.sh" ]; then
+            chmod +x ./scripts/verify2.sh
+            STRICT=1 ./scripts/verify2.sh
+          elif [ -f "./verify2.sh" ]; then
+            chmod +x ./verify2.sh
+            STRICT=1 ./verify2.sh
+          else
+            echo "❌ verify2.sh not found. Put it in ./scripts/verify2.sh or ./verify2.sh"
+            exit 1
+          fi
+
+      - name: Locate latest verify2 results
+        id: latest
+        run: |
+          LATEST="$(ls -dt verify2-results-* | head -1)"
+          echo "latest=$LATEST" >> $GITHUB_OUTPUT
+          echo "Latest results dir: $LATEST"
+
+      - name: Upload VERIFY2 artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: verify2-results
+          path: ${{ steps.latest.outputs.latest }}
+
+      - name: Show verify2 summary
+        run: |
+          cat "${{ steps.latest.outputs.latest }}/VERIFY2_REPORT.md" || true
+          cat "${{ steps.latest.outputs.latest }}/verify2.json" || true

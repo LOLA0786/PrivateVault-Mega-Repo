@@ -1,3 +1,11 @@
+# SKIP_REDIS_IF_UNAVAILABLE
+import os
+import pytest
+
+# Skip redis integration tests unless explicitly enabled
+if os.getenv("RUN_REDIS_TESTS", "0") != "1":
+    pytest.skip("Redis integration tests disabled (set RUN_REDIS_TESTS=1)", allow_module_level=True)
+
 import time, hashlib, redis
 
 r = redis.Redis(host="localhost", port=6379, decode_responses=True)

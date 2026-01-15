@@ -2,10 +2,20 @@
 Integration tests for database operations
 """
 import pytest
+import socket
+
+def _postgres_running(host="127.0.0.1", port=5432, timeout=0.2):
+    try:
+        with socket.create_connection((host, port), timeout=timeout):
+            return True
+    except Exception:
+        return False
+
 import asyncpg
 from decimal import Decimal
 
 @pytest.mark.asyncio
+@pytest.mark.skipif(not _postgres_running(), reason="Postgres not running on localhost:5432")
 class TestDatabaseOperations:
     """Test database operations"""
     

@@ -51,7 +51,7 @@ class FraudDetectRequest(BaseModel):
     transaction_id: str
     amount: float = Field(gt=0)
     merchant: str = Field(max_length=200)
-    card_last4: str = Field(regex=r'^\d{4}$')
+    card_last4: str = Field(pattern=r'^\d{4}$')
     
     @validator('card_last4')
     def validate_card(cls, v):

@@ -1,0 +1,19 @@
+./governed-optimization-engine/autonomous_prospector.py:class SalesAgent:
+./privatevault_comprehensive_test_suite.py:class TestMultiAgentWorkflows:
+./tests/integration/test_database.py:    async def test_create_agent(self, db_pool):
+./tests/test_temporal.py:async def test_agent_suspension_lifecycle():
+./pkg/governance/temporal_workflow.py:class AgentGovernanceWorkflow:
+./pkg/governance/temporal_workflow.py:    async def run(self, agent_id: str) -> str:
+./security/auth/jwt_auth.py:    def create_token(user_id: str, agent_id: str, permissions: list) -> str:
+./security/validation/validators.py:class AgentRequest(BaseModel):
+./security/validation/validators.py:    def validate_agent_id(cls, v):
+./demo_all_in_one.py:def agent_proposes(action, args, context):
+./agent_identity.py:def authenticate_agent(agent_id):
+./examples/use_input_validation.py:def get_agent(agent_id: str):
+./.venv-tests/lib/python3.12/site-packages/pip/_internal/network/session.py:def user_agent() -> str:
+./.venv-tests/lib/python3.12/site-packages/pip/_vendor/requests/utils.py:def default_user_agent(name="python-requests"):
+./.venv-tests/lib/python3.12/site-packages/pip/_vendor/requests/utils.py:    Return a string representing the default user agent.
+./.venv-tests/lib/python3.12/site-packages/pip/_vendor/requests/utils.py:            "User-Agent": default_user_agent(),
+./.venv-tests/lib/python3.12/site-packages/pip/_vendor/urllib3/connection.py:            headers["User-Agent"] = _get_default_user_agent()
+./.venv-tests/lib/python3.12/site-packages/pip/_vendor/urllib3/connection.py:            self.putheader("User-Agent", _get_default_user_agent())
+./.venv-tests/lib/python3.12/site-packages/pip/_vendor/urllib3/connection.py:def _get_default_user_agent():
