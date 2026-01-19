@@ -102,3 +102,6 @@ ai-firewall-demo/*.html
 # ========= Python =========
 __pycache__/
 *.pyc
+
+# ========= Audit artifacts =========
+audits.worm
