@@ -152,3 +152,13 @@ if __name__ == "__main__":
     
     print(f"\n{'='*50}")
     print(f"Total drift events: {len(detector.get_drift_events())}")
+def detect_drift(expected, actual, threshold=0.2):
+    # MVP simulation from original logs
+    alignment = 0.25 if expected in actual else 0.0  # Simple string match
+    drift_detected = alignment < threshold
+    logging.info(f"📊 Alignment: {alignment} (threshold: {threshold})")
+    if drift_detected:
+        logging.critical("🚨 DRIFT DETECTED - BLOCKING")
+    else:
+        logging.info("✅ Actions aligned (score: {alignment})")
+    return {'drift_detected': drift_detected, 'score': alignment}

@@ -235,3 +235,53 @@ if __name__ == "__main__":
     print("FIREWALL STATS")
     print("="*50)
     print(json.dumps(firewall.get_stats(), indent=2))
+
+import re
+from datetime import datetime, timezone
+
+def filter_input(prompt):
+    # From logs: Detect prompt injection/jailbreak
+    injection_patterns = [
+        r'ignore\s+(previous|all|above)\s+instructions?',
+        r'(DAN|DUDE|STAN)\s+mode',
+        r'reveal\s+(your\s+)?(system\s+)?prompt'
+    ]
+    threat_detected = False
+    threat_reason = ""
+    for pattern in injection_patterns:
+        if re.search(pattern, prompt, re.IGNORECASE):
+            threat_detected = True
+            threat_reason = f"Prompt injection detected: {pattern}"
+            break
+    
+    # PII redaction (simple example from logs)
+    pii_patterns = {
+        'email': r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b',
+        'phone': r'\b\d{3}[-.]?\d{3}[-.]?\d{4}\b',
+        'ssn': r'\b\d{3}-\d{2}-\d{4}\b'
+    }
+    filtered_prompt = prompt
+    pii_found = []
+    for key, pat in pii_patterns.items():
+        matches = re.findall(pat, filtered_prompt)
+        if matches:
+            pii_found.append(key)
+            for m in matches:
+                filtered_prompt = filtered_prompt.replace(m, f'[REDACTED_{key.upper()}]')
+    
+    return {
+        "allowed": not threat_detected,
+        "original_prompt": prompt,
+        "filtered_prompt": filtered_prompt,
+        "metadata": {},
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "threat_detected": threat_detected,
+        "threat_reason": threat_reason,
+        "pii_found": pii_found
+    }
+
+
+# Compatibility wrapper
+def filter_prompt(prompt, metadata=None):
+    return filter_input(prompt)
+

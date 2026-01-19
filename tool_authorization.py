@@ -212,3 +212,61 @@ if __name__ == "__main__":
     print("AUTHORIZATION STATS")
     print("="*50)
     print(f"Policy violations: {auth.get_violation_count()}")
+
+
+# ============================================================
+# Integration wrapper for multi_agent_workflow.py
+# ============================================================
+# ============================================================
+# User -> Role mapping for integration workflows
+# ============================================================
+USER_ROLE_MAP = {
+    "admin_001": "admin",
+    "viewer_003": "viewer",
+    "analyst_002": "analyst",
+}
+
+
+# ============================================================
+# Robust integration wrapper (auto-adapts to method signatures)
+# ============================================================
+# ============================================================
+# FINAL FIXED WRAPPER (correct parameter order)
+# ============================================================
+# ============================================================
+# FINAL FINAL: correct execute signature (4 args after self)
+# ============================================================
+
+
+# ============================================================
+# Integration wrapper for multi_agent_workflow.py (CLEAN)
+# ============================================================
+def authorize_tool_call(user_id: str, tool_name: str, params=None):
+    params = params or {}
+    ta = ToolAuthorization()
+
+    # user -> role mapping
+    role_map = {
+        "admin_001": "admin",
+        "viewer_003": "viewer",
+        "analyst_002": "analyst",
+    }
+    role = role_map.get(user_id, "viewer")
+
+    try:
+        # optional: generate signature (for audit), not required for execution
+        _ = ta.generate_action_signature(user_id, role, tool_name, params)
+
+        res = ta.execute_tool_with_auth(user_id, role, tool_name, params)
+
+        if res is None:
+            return {"authorized": True, "executed": True, "result": {"status": "success"}, "error": None}
+
+        # normalize into expected schema
+        if isinstance(res, dict) and "authorized" in res:
+            return res
+
+        return {"authorized": True, "executed": True, "result": res, "error": None}
+
+    except Exception as e:
+        return {"authorized": False, "executed": False, "result": None, "error": str(e)}

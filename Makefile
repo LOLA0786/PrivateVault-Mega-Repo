@@ -1,158 +1,50 @@
-SHELL := /bin/bash
-.DEFAULT_GOAL := help
+run:
+	@echo "============================================================="
+	@echo "🔎 Lint (syntax check)"
+	@echo "============================================================="
+	python3 -m py_compile \
+		ai_firewall_core.py \
+		tool_authorization.py \
+		drift_detection_fixed.py \
+		decision_ledger.py \
+		multi_agent_workflow.py \
+		sandbox_simulation.py \
+		compliance_mapper.py \
+		ciso_dashboard_report.py
 
-# Repo paths
-DEMO_DIR := ai-firewall-demo
-
-PY := python3
-PIP := pip3
-
-PORT ?= 5000
-
-# ----- Helpers -----
-define banner
-	@echo ""
-	@echo "============================================================"
-	@printf "%s\n" "$(1)"
-	@echo "============================================================"
-endef
-
-help: ## Show commands
-	@echo ""
-	@echo "PrivateVault AI Firewall - Make Targets"
-	@echo ""
-	@grep -E '^[a-zA-Z0-9_-]+:.*?## ' Makefile | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-22s\033[0m %s\n", $$1, $$2}'
-	@echo ""
-	@echo "Examples:"
-	@echo "  make install"
-	@echo "  make test"
-	@echo "  make verify"
-	@echo "  make start PORT=5001"
-	@echo "  make docker-up"
-	@echo ""
-
-# ----- Environment -----
-install: ## Install python dependencies for ai-firewall-demo
-	$(call banner,📦 Installing dependencies)
-	cd $(DEMO_DIR) && $(PIP) install -r requirements.txt
-
-env: ## Create .env from example if missing
-	$(call banner,🔐 Ensuring .env exists)
-	cd $(DEMO_DIR) && test -f .env || cp .env.example .env
-	@echo "✅ .env ready at $(DEMO_DIR)/.env"
-
-# ----- Lint / formatting (optional) -----
-lint: ## Basic syntax checks
-	$(call banner,🔎 Lint (syntax check))
-	cd $(DEMO_DIR) && $(PY) -m py_compile *.py
 	@echo "✅ Python compile OK"
 
-# ----- Unit tests / feature tests -----
-test-core: ## Test core firewall features
-	$(call banner,🔥 TEST: Core firewall)
-	cd $(DEMO_DIR) && $(PY) ai_firewall_core.py
+	@echo "============================================================="
+	@echo "🔥 TEST: Core firewall"
+	@echo "============================================================="
+	python3 ai_firewall_core.py
 
-test-tools: ## Test tool authorization + signing
-	$(call banner,🔐 TEST: Tool authorization)
-	cd $(DEMO_DIR) && $(PY) tool_authorization.py
+	@echo "============================================================="
+	@echo "🔐 TEST: Tool authorization"
+	@echo "============================================================="
+	python3 tool_authorization.py
 
-test-drift: ## Test drift detection fixed module
-	$(call banner,📊 TEST: Drift detection)
-	cd $(DEMO_DIR) && $(PY) drift_detection_fixed.py
+	@echo "============================================================="
+	@echo "📊 TEST: Drift detection"
+	@echo "============================================================="
+	python3 drift_detection_fixed.py
 
-test-ledger: ## Test decision ledger integrity
-	$(call banner,📝 TEST: Decision ledger)
-	cd $(DEMO_DIR) && $(PY) decision_ledger.py
+	@echo "============================================================="
+	@echo "📝 TEST: Decision ledger"
+	@echo "============================================================="
+	python3 decision_ledger.py
 
-test-orchestrator: ## Test full orchestration (E2E)
-	$(call banner,🎯 TEST: Orchestrator E2E)
-	cd $(DEMO_DIR) && $(PY) ai_firewall_orchestrator.py
+	@echo "============================================================="
+	@echo "🔄 TEST: Multi-Agent Workflow"
+	@echo "============================================================="
+	python3 multi_agent_workflow.py
 
-test-orchestrator-dual: ## Test dual drift orchestrator (shadow vs prod)
-	$(call banner,🎯 TEST: Dual drift orchestrator)
-	cd $(DEMO_DIR) && $(PY) ai_firewall_orchestrator_dual_drift.py
+	@echo "============================================================="
+	@echo "🧪 TEST: Sandbox Simulation"
+	@echo "============================================================="
+	python3 sandbox_simulation.py
 
-test-api: ## Run API tests (requires API running)
-	$(call banner,🧪 TEST: API client)
-	cd $(DEMO_DIR) && $(PY) test_api.py
-
-test: test-core test-tools test-drift test-ledger test-orchestrator ## Run all module tests (non-API)
-	$(call banner,✅ ALL TESTS COMPLETE)
-
-verify: lint test ## Verify build: lint + tests
-
-# ----- Run API -----
-start: env ## Start Flask API locally (PORT=5000 by default)
-	$(call banner,🚀 Starting API on port $(PORT))
-	cd $(DEMO_DIR) && PORT=$(PORT) ./start_api.sh
-
-start-bg: env ## Start API in background, logs to ai-firewall-demo/api.log
-	$(call banner,🚀 Starting API in background on port $(PORT))
-	cd $(DEMO_DIR) && nohup env PORT=$(PORT) ./start_api.sh > api.log 2>&1 &
-	@sleep 2
-	@echo "✅ API started. Tail logs:"
-	@echo "   tail -f $(DEMO_DIR)/api.log"
-
-stop: ## Stop API on PORT (default 5000)
-	$(call banner,🛑 Stopping API on port $(PORT))
-	-@sudo fuser -k $(PORT)/tcp 2>/dev/null || true
-	@echo "✅ Stopped (if it was running)"
-
-curl-health: ## Curl health endpoint
-	$(call banner,🏥 Health check)
-	@curl -s http://localhost:$(PORT)/health | $(PY) -m json.tool
-
-# ----- Docker -----
-docker-build: ## Build docker image
-	$(call banner,🐳 Docker build)
-	cd $(DEMO_DIR) && docker build -t privatevault-ai-firewall:local .
-
-docker-up: ## Start docker compose stack
-	$(call banner,🐳 Docker compose up)
-	cd $(DEMO_DIR) && docker-compose up -d
-	@echo "✅ Running containers:"
-	cd $(DEMO_DIR) && docker-compose ps
-
-docker-down: ## Stop docker compose stack
-	$(call banner,🐳 Docker compose down)
-	cd $(DEMO_DIR) && docker-compose down
-
-# ----- Cleanup -----
-clean: ## Remove python caches + logs
-	$(call banner,🧹 Cleanup)
-	@find . -type d -name "__pycache__" -prune -exec rm -rf {} + 2>/dev/null || true
-	@find . -type f -name "*.pyc" -delete 2>/dev/null || true
-	@rm -f $(DEMO_DIR)/*.log $(DEMO_DIR)/*.json $(DEMO_DIR)/*.jsonl 2>/dev/null || true
-	@echo "✅ Clean complete"
-
-# ----- Full demo flows -----
-run: verify ## Verify + run dual orchestrator (best demo)
-	$(call banner,🏁 RUN: Verify then Dual Drift Demo)
-	cd $(DEMO_DIR) && $(PY) ai_firewall_orchestrator_dual_drift.py
-
-demo: ## Quick demo (core + tool + drift)
-	$(call banner,🎬 DEMO)
-	@$(MAKE) test-core
-	@$(MAKE) test-tools
-	@$(MAKE) test-drift
-
-# ----- API verify (CI ready) -----
-verify-api: env ## Start API (bg) -> run API tests -> stop API
-	$(call banner,"🧪 VERIFY API: start -> test -> stop")
-	@echo "==> Starting API on port $(PORT) in background..."
-	@$(MAKE) stop PORT=$(PORT) >/dev/null 2>&1 || true
-	@cd $(DEMO_DIR) && nohup env PORT=$(PORT) ./start_api.sh > api.log 2>&1 &
-	@sleep 1
-	@echo "==> Waiting for /health..."
-	@for i in {1..25}; do \
-		if curl -fsS http://localhost:$(PORT)/health >/dev/null 2>&1; then \
-			echo "✅ API is healthy"; \
-			break; \
-		fi; \
-		sleep 0.4; \
-	done
-	@echo "==> Running API tests..."
-	@cd $(DEMO_DIR) && $(PY) test_api.py
-	@echo "==> Stopping API..."
-	@$(MAKE) stop PORT=$(PORT) >/dev/null 2>&1 || true
-	@echo "✅ verify-api complete"
+	@echo "============================================================="
+	@echo "📈 GENERATE: CISO Dashboard"
+	@echo "============================================================="
+	python3 -c "from ciso_dashboard_report import generate_report; generate_report(); print('✅ Dashboard generated')"

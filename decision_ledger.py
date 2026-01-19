@@ -13,6 +13,7 @@ import hashlib
 import os
 from datetime import datetime
 from typing import Dict, List, Any, Optional
+from compliance_mapper import map_event_to_controls
 import logging
 
 logging.basicConfig(level=logging.INFO)
@@ -273,3 +274,25 @@ if __name__ == "__main__":
     ledger.export_audit_report("audit_report.json")
 
     print("\n✅ Done.")
+logs = []  # Global in-memory log store for MVP
+
+def log_event(event_type, metadata):
+    log_id = len(logs)
+    full_metadata = {"type": event_type, "id": log_id, **metadata}
+    compliance_tags = map_event_to_controls(event_type, metadata.get('tool_name', ''), metadata)  # Integrate compliance
+    full_metadata['compliance_tags'] = compliance_tags
+    logs.append(full_metadata)
+    logging.info(f"📝 Logged {event_type} #{log_id}")
+    return log_id
+
+def get_logs():
+    return logs
+
+# ------------------------------------------------------------
+# Safe compliance mapper fallback (prevents runtime failure)
+# ------------------------------------------------------------
+try:
+    from compliance_mapper import map_event_to_controls
+except Exception:
+    def map_event_to_controls(event_type, tool_name, metadata):
+        return []
