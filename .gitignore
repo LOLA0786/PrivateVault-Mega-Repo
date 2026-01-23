@@ -108,3 +108,8 @@ audits.worm
 
 # never commit git bundles / backups
 *.bundle
+
+# never commit virtualenvs
+.venv/
+.venv-tests/
+venv/
