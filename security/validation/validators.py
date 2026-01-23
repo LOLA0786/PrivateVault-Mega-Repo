@@ -1,71 +1,75 @@
 """
 Input validation to prevent injection attacks
 """
+
 import re
-from typing import Any, Dict
+from typing import Any
+
 from pydantic import BaseModel, Field, validator
+
 
 class AgentRequest(BaseModel):
     """Validated agent request"""
+
     agent_id: str = Field(..., min_length=8, max_length=64)
     action: str = Field(..., max_length=100)
-    parameters: Dict[str, Any]
+    parameters: dict[str, Any]
 
-    @validator('agent_id')
+    @validator("agent_id")
     def validate_agent_id(cls, v):
         """Only allow alphanumeric, underscore, hyphen"""
-        if not re.match(r'^[a-zA-Z0-9_-]+$', v):
-            raise ValueError('Invalid agent_id: only alphanumeric, _, - allowed')
+        if not re.match(r"^[a-zA-Z0-9_-]+$", v):
+            raise ValueError("Invalid agent_id: only alphanumeric, _, - allowed")
         return v
 
-    @validator('action')
+    @validator("action")
     def validate_action(cls, v):
         """Whitelist allowed actions"""
-        allowed_actions = [
-            'credit_check',
-            'fraud_detect',
-            'kyc_verify',
-            'risk_assess'
-        ]
+        allowed_actions = ["credit_check", "fraud_detect", "kyc_verify", "risk_assess"]
         if v not in allowed_actions:
-            raise ValueError(f'Invalid action: must be one of {allowed_actions}')
+            raise ValueError(f"Invalid action: must be one of {allowed_actions}")
         return v
+
 
 class CreditCheckRequest(BaseModel):
     """Validated credit check request"""
+
     applicant_id: str = Field(..., min_length=1, max_length=100)
     amount: float = Field(..., gt=0, lt=10_000_000)
     term_months: int = Field(..., ge=1, le=360)
 
-    @validator('amount')
+    @validator("amount")
     def validate_amount(cls, v):
         """Ensure amount is reasonable"""
         if v <= 0:
-            raise ValueError('Amount must be positive')
+            raise ValueError("Amount must be positive")
         if v > 10_000_000:
-            raise ValueError('Amount exceeds maximum loan limit')
+            raise ValueError("Amount exceeds maximum loan limit")
         return round(v, 2)  # Round to 2 decimal places
+
 
 class FraudDetectRequest(BaseModel):
     """Validated fraud detection request"""
+
     transaction_id: str
     amount: float = Field(gt=0)
     merchant: str = Field(max_length=200)
-    card_last4: str = Field(pattern=r'^\d{4}$')
+    card_last4: str = Field(pattern=r"^\d{4}$")
 
-    @validator('card_last4')
+    @validator("card_last4")
     def validate_card(cls, v):
         """Ensure card is 4 digits"""
         if not v.isdigit() or len(v) != 4:
-            raise ValueError('card_last4 must be exactly 4 digits')
+            raise ValueError("card_last4 must be exactly 4 digits")
         return v
+
 
 # SQL Injection Prevention
 class SafeQueryBuilder:
     """Build SQL queries safely with parameterization"""
 
     @staticmethod
-    def build_query(table: str, conditions: Dict[str, Any]) -> tuple:
+    def build_query(table: str, conditions: dict[str, Any]) -> tuple:
         """
         Build parameterized SQL query
 
@@ -82,16 +86,16 @@ class SafeQueryBuilder:
             #  {'agent_id': 'abc123', 'status': 'active'})
         """
         # Whitelist table names (prevent SQL injection via table name)
-        allowed_tables = ['agents', 'decisions', 'audit_log', 'users']
+        allowed_tables = ["agents", "decisions", "audit_log", "users"]
         if table not in allowed_tables:
-            raise ValueError(f'Invalid table name: {table}')
+            raise ValueError(f"Invalid table name: {table}")
 
         # Build WHERE clause
         where_clauses = []
         for key in conditions.keys():
             # Sanitize column names
-            if not re.match(r'^[a-zA-Z0-9_]+$', key):
-                raise ValueError(f'Invalid column name: {key}')
+            if not re.match(r"^[a-zA-Z0-9_]+$", key):
+                raise ValueError(f"Invalid column name: {key}")
             where_clauses.append(f"{key} = %({key})s")
 
         where_sql = " AND ".join(where_clauses)
@@ -99,18 +103,19 @@ class SafeQueryBuilder:
 
         return query, conditions
 
+
 # Prompt Injection Prevention
 class PromptSanitizer:
     """Sanitize AI prompts to prevent injection attacks"""
 
     DANGEROUS_PATTERNS = [
-        r'ignore previous instructions',
-        r'ignore all previous',
-        r'new instructions:',
-        r'system:',
-        r'system prompt',
-        r'<\|endoftext\|>',
-        r'<\|im_end\|>',
+        r"ignore previous instructions",
+        r"ignore all previous",
+        r"new instructions:",
+        r"system:",
+        r"system prompt",
+        r"<\|endoftext\|>",
+        r"<\|im_end\|>",
     ]
 
     @staticmethod
@@ -128,13 +133,13 @@ class PromptSanitizer:
         # Remove dangerous patterns
         sanitized = prompt
         for pattern in PromptSanitizer.DANGEROUS_PATTERNS:
-            sanitized = re.sub(pattern, '', sanitized, flags=re.IGNORECASE)
+            sanitized = re.sub(pattern, "", sanitized, flags=re.IGNORECASE)
 
         # Enforce length limit
         if len(sanitized) > max_length:
             sanitized = sanitized[:max_length]
 
         # Remove excessive whitespace
-        sanitized = ' '.join(sanitized.split())
+        sanitized = " ".join(sanitized.split())
 
         return sanitized.strip()

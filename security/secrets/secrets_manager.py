@@ -1,66 +1,67 @@
 """
 Production-grade secrets management with HashiCorp Vault
 """
-import os
-import hvac
+
 import logging
-from typing import Optional, Dict
+import os
+
+import hvac
 
 logger = logging.getLogger(__name__)
 
+
 class SecretsManager:
     """Centralized secrets management"""
-    
+
     def __init__(self):
-        vault_addr = os.getenv('VAULT_ADDR', 'http://localhost:8200')
-        vault_token = os.getenv('VAULT_TOKEN', 'galani-dev-token')
-        
+        vault_addr = os.getenv("VAULT_ADDR", "http://localhost:8200")
+        vault_token = os.getenv("VAULT_TOKEN", "galani-dev-token")
+
         self.client = hvac.Client(url=vault_addr, token=vault_token)
-        
+
         if not self.client.is_authenticated():
             raise Exception("Failed to authenticate with Vault")
-        
+
         logger.info("Successfully connected to Vault")
-    
-    def get_secret(self, path: str) -> Optional[Dict]:
+
+    def get_secret(self, path: str) -> dict | None:
         """
         Retrieve secret from Vault
-        
+
         Example:
             secret = secrets_manager.get_secret('openai/api_key')
             api_key = secret['data']['key']
         """
         try:
             secret = self.client.secrets.kv.v2.read_secret_version(
-                path=path,
-                mount_point='galani-secrets'
+                path=path, mount_point="galani-secrets"
             )
             logger.info(f"Retrieved secret: {path}")
             return secret
         except Exception as e:
             logger.error(f"Failed to retrieve secret {path}: {e}")
             return None
-    
-    def set_secret(self, path: str, secret_data: Dict):
+
+    def set_secret(self, path: str, secret_data: dict):
         """
         Store secret in Vault
-        
+
         Example:
             secrets_manager.set_secret('openai/api_key', {'key': 'sk-...'})
         """
         try:
             self.client.secrets.kv.v2.create_or_update_secret(
-                path=path,
-                secret=secret_data,
-                mount_point='galani-secrets'
+                path=path, secret=secret_data, mount_point="galani-secrets"
             )
             logger.info(f"Stored secret: {path}")
         except Exception as e:
             logger.error(f"Failed to store secret {path}: {e}")
             raise
 
+
 # Singleton instance
 _secrets_manager = None
+
 
 def get_secrets_manager() -> SecretsManager:
     """Get or create secrets manager instance"""
