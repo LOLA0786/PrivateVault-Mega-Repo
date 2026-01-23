@@ -120,3 +120,8 @@ venv/
 .venv-tests/
 venv/
 dist/
+
+# never commit venvs
+.venv/
+.venv-tests/
+venv/
