@@ -10,14 +10,14 @@ class AgentRequest(BaseModel):
     agent_id: str = Field(..., min_length=8, max_length=64)
     action: str = Field(..., max_length=100)
     parameters: Dict[str, Any]
-    
+
     @validator('agent_id')
     def validate_agent_id(cls, v):
         """Only allow alphanumeric, underscore, hyphen"""
         if not re.match(r'^[a-zA-Z0-9_-]+$', v):
             raise ValueError('Invalid agent_id: only alphanumeric, _, - allowed')
         return v
-    
+
     @validator('action')
     def validate_action(cls, v):
         """Whitelist allowed actions"""
@@ -36,7 +36,7 @@ class CreditCheckRequest(BaseModel):
     applicant_id: str = Field(..., min_length=1, max_length=100)
     amount: float = Field(..., gt=0, lt=10_000_000)
     term_months: int = Field(..., ge=1, le=360)
-    
+
     @validator('amount')
     def validate_amount(cls, v):
         """Ensure amount is reasonable"""
@@ -52,7 +52,7 @@ class FraudDetectRequest(BaseModel):
     amount: float = Field(gt=0)
     merchant: str = Field(max_length=200)
     card_last4: str = Field(pattern=r'^\d{4}$')
-    
+
     @validator('card_last4')
     def validate_card(cls, v):
         """Ensure card is 4 digits"""
@@ -63,21 +63,21 @@ class FraudDetectRequest(BaseModel):
 # SQL Injection Prevention
 class SafeQueryBuilder:
     """Build SQL queries safely with parameterization"""
-    
+
     @staticmethod
     def build_query(table: str, conditions: Dict[str, Any]) -> tuple:
         """
         Build parameterized SQL query
-        
+
         Returns:
             (query_string, parameters_dict)
-        
+
         Example:
             query, params = SafeQueryBuilder.build_query(
                 'agents',
                 {'agent_id': 'abc123', 'status': 'active'}
             )
-            # Returns: 
+            # Returns:
             # ("SELECT * FROM agents WHERE agent_id = %(agent_id)s AND status = %(status)s",
             #  {'agent_id': 'abc123', 'status': 'active'})
         """
@@ -85,7 +85,7 @@ class SafeQueryBuilder:
         allowed_tables = ['agents', 'decisions', 'audit_log', 'users']
         if table not in allowed_tables:
             raise ValueError(f'Invalid table name: {table}')
-        
+
         # Build WHERE clause
         where_clauses = []
         for key in conditions.keys():
@@ -93,16 +93,16 @@ class SafeQueryBuilder:
             if not re.match(r'^[a-zA-Z0-9_]+$', key):
                 raise ValueError(f'Invalid column name: {key}')
             where_clauses.append(f"{key} = %({key})s")
-        
+
         where_sql = " AND ".join(where_clauses)
         query = f"SELECT * FROM {table} WHERE {where_sql}"
-        
+
         return query, conditions
 
 # Prompt Injection Prevention
 class PromptSanitizer:
     """Sanitize AI prompts to prevent injection attacks"""
-    
+
     DANGEROUS_PATTERNS = [
         r'ignore previous instructions',
         r'ignore all previous',
@@ -112,16 +112,16 @@ class PromptSanitizer:
         r'<\|endoftext\|>',
         r'<\|im_end\|>',
     ]
-    
+
     @staticmethod
     def sanitize(prompt: str, max_length: int = 10000) -> str:
         """
         Sanitize AI prompt
-        
+
         Args:
             prompt: User-provided prompt
             max_length: Maximum allowed length
-        
+
         Returns:
             Sanitized prompt
         """
@@ -129,12 +129,12 @@ class PromptSanitizer:
         sanitized = prompt
         for pattern in PromptSanitizer.DANGEROUS_PATTERNS:
             sanitized = re.sub(pattern, '', sanitized, flags=re.IGNORECASE)
-        
+
         # Enforce length limit
         if len(sanitized) > max_length:
             sanitized = sanitized[:max_length]
-        
+
         # Remove excessive whitespace
         sanitized = ' '.join(sanitized.split())
-        
+
         return sanitized.strip()

@@ -7,12 +7,12 @@ help:
 	@echo "  make verify2  - verify + multi-agent + sandbox"
 	@echo "  make verify3  - verify2 + dashboard"
 	@echo "  make clean    - delete generated artifacts"
-
- lint:
+lint:
 	 "✅ lint"
 	python3 -m pip install -r requirements.txt
 	python3 -m pip install ruff
 	ruff check security --output-format=github
+	ruff format --check security
 
 test:
 	@echo "============================================================="
@@ -75,12 +75,12 @@ install:
 	python3 -m pip install --upgrade pip
 	python3 -m pip install -r requirements.txt
 
- lint:
-	 "✅ lint"
+lint:
+	@echo "✅ lint"
 	python3 -m pip install -r requirements.txt
 	python3 -m pip install ruff
 	ruff check security --output-format=github
-
+	ruff format --check security
 test:
 	@echo "✅ test"
 	python3 -m pip install -r requirements.txt
