@@ -2,8 +2,10 @@ import json, hashlib, time, re
 
 MAX_CONTROLLED_FREQUENCY = 3  # per day
 
+
 def hash_evidence(obj):
     return hashlib.sha256(json.dumps(obj, sort_keys=True).encode()).hexdigest()
+
 
 def parse_frequency(freq):
     """
@@ -16,6 +18,7 @@ def parse_frequency(freq):
     if freq == "daily":
         return 1
     return None  # invalid
+
 
 def evaluate_policy(intent):
     decisions = []
@@ -56,6 +59,7 @@ def evaluate_policy(intent):
     allowed = age_ok and allergy_ok and freq_ok
     return allowed, decisions
 
+
 def main():
     drug = input("Enter drug: ").strip().lower()
     age = int(input("Enter patient_age: "))
@@ -63,7 +67,9 @@ def main():
     frequency = input("Enter frequency (daily / 2x_daily / 4x_daily): ").strip().lower()
     controlled = input("Controlled substance? (true/false): ").strip().lower() == "true"
 
-    allergy_list = [] if allergies == "none" else [a.strip() for a in allergies.split(",")]
+    allergy_list = (
+        [] if allergies == "none" else [a.strip() for a in allergies.split(",")]
+    )
 
     intent = {
         "action": "prescribe_medication",
@@ -71,7 +77,7 @@ def main():
         "patient_age": age,
         "allergies": allergy_list,
         "frequency": frequency,
-        "controlled": controlled
+        "controlled": controlled,
     }
 
     print("\n--- INTENT ---")
@@ -83,11 +89,7 @@ def main():
     for d in decisions:
         print(d)
 
-    evidence = {
-        "intent": intent,
-        "decisions": decisions,
-        "timestamp": time.time()
-    }
+    evidence = {"intent": intent, "decisions": decisions, "timestamp": time.time()}
 
     print("\n--- EVIDENCE HASH ---")
     print(hash_evidence(evidence))
@@ -97,6 +99,7 @@ def main():
     else:
         print("\n❌ BLOCKED - Controlled substance violation")
         print("Legal: DEA reporting triggered")
+
 
 if __name__ == "__main__":
     main()

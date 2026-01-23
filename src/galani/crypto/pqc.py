@@ -1,9 +1,11 @@
 from .interfaces import PQCKeyExchange
 
+
 class KyberKEM(PQCKeyExchange):
     def __init__(self):
         try:
             from pqcrypto.kem import kyber512
+
             self._kyber = kyber512
             self.public_key, self.secret_key = kyber512.generate_keypair()
         except Exception as e:

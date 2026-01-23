@@ -1,5 +1,6 @@
 import random
 
+
 class ShadowPPORouter:
     """
     Shadow PPO router.

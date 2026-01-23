@@ -14,27 +14,31 @@ from datetime import datetime
 
 GEO_PRIVATE_KEY, GEO_PUBLIC_KEY = generate_keypair()
 
-PROVIDER_PUBLIC_KEYS = {
-    "geo_service_v1": GEO_PUBLIC_KEY
-}
+PROVIDER_PUBLIC_KEYS = {"geo_service_v1": GEO_PUBLIC_KEY}
+
+
 # --------------------------------------------------
 # Utilities
 # --------------------------------------------------
 def sha(x):
     return hashlib.sha256(json.dumps(x, sort_keys=True).encode()).hexdigest()
 
+
 def now():
     return datetime.utcnow().isoformat() + "Z"
+
 
 # --------------------------------------------------
 # Replay Protection (Idempotency Store)
 # --------------------------------------------------
 PROCESSED_DECISIONS = set()
 
+
 def check_replay(decision_id):
     if decision_id in PROCESSED_DECISIONS:
         raise Exception("REPLAY_DETECTED: Decision already executed")
     PROCESSED_DECISIONS.add(decision_id)
+
 
 # --------------------------------------------------
 # Mock External Services (Async)
@@ -43,13 +47,16 @@ async def ofac_feed():
     await asyncio.sleep(0.09)  # SLA breach
     raise asyncio.TimeoutError("OFAC timeout")
 
+
 async def pep_feed():
     await asyncio.sleep(0.04)
     return {"service": "PEP", "risk": "HIGH"}
 
+
 async def geo_feed():
     await asyncio.sleep(0.06)
     return {"service": "GEO", "risk": "MEDIUM"}
+
 
 # --------------------------------------------------
 # Risk-Based Escalation
@@ -61,6 +68,7 @@ def escalation_action(confidence):
         return "ALLOW_WITH_DAILY_REPORT"
     else:
         return "ALLOW_WITH_MONTHLY_AUDIT"
+
 
 # --------------------------------------------------
 # Policy Engine
@@ -77,29 +85,25 @@ async def evaluate_transaction():
     try:
         await asyncio.wait_for(ofac_feed(), timeout=0.085)
     except asyncio.TimeoutError:
-        evidence_chain.append({
-            "trace_id": trace_id,
-            "service": "OFAC",
-            "result": "TIMEOUT",
-            "timestamp": now()
-        })
+        evidence_chain.append(
+            {
+                "trace_id": trace_id,
+                "service": "OFAC",
+                "result": "TIMEOUT",
+                "timestamp": now(),
+            }
+        )
 
     # ---- PEP + GEO ----
     pep, geo = await asyncio.gather(pep_feed(), geo_feed())
 
-    evidence_chain.append({
-        "trace_id": trace_id,
-        "service": "PEP",
-        "result": pep,
-        "timestamp": now()
-    })
+    evidence_chain.append(
+        {"trace_id": trace_id, "service": "PEP", "result": pep, "timestamp": now()}
+    )
 
-    evidence_chain.append({
-        "trace_id": trace_id,
-        "service": "GEO",
-        "result": geo,
-        "timestamp": now()
-    })
+    evidence_chain.append(
+        {"trace_id": trace_id, "service": "GEO", "result": geo, "timestamp": now()}
+    )
 
     # ---- Confidence Calculation ----
     confidence = 70  # degraded mode (OFAC missing)
@@ -121,7 +125,6 @@ async def evaluate_transaction():
         geo_signal,
     ]
 
-
     verify_policy_signals(policy, PROVIDER_PUBLIC_KEYS)
     action = escalation_action(confidence)
 
@@ -129,10 +132,7 @@ async def evaluate_transaction():
     chained_hash = None
     for step in evidence_chain:
         step_hash = sha(step)
-        chained_hash = sha({
-            "previous": chained_hash,
-            "current": step_hash
-        })
+        chained_hash = sha({"previous": chained_hash, "current": step_hash})
 
     total_latency = int((time.time() - start) * 1000)
 
@@ -144,7 +144,7 @@ async def evaluate_transaction():
         "confidence": f"{confidence}%",
         "escalation_action": action,
         "latency_ms": total_latency,
-        "evidence_chain_hash": chained_hash
+        "evidence_chain_hash": chained_hash,
     }
 
     # ---- Output ----
@@ -165,6 +165,7 @@ async def evaluate_transaction():
     print(f"{total_latency} ms")
 
     print("\n✅ Decision is REPLAY-SAFE and AUDIT-READY")
+
 
 # --------------------------------------------------
 # Run

@@ -4,14 +4,17 @@ import json
 import hashlib
 from datetime import datetime
 
+
 # --------------------------------------------------
 # Utilities
 # --------------------------------------------------
 def h(x):
     return hashlib.sha256(json.dumps(x, sort_keys=True).encode()).hexdigest()
 
+
 def now():
     return datetime.utcnow().isoformat() + "Z"
+
 
 # --------------------------------------------------
 # Circuit Breaker
@@ -31,6 +34,7 @@ class CircuitBreaker:
         self.count = 0
         self.open = False
 
+
 # --------------------------------------------------
 # Mock Feeds
 # --------------------------------------------------
@@ -38,13 +42,16 @@ async def ofac_feed(timeout_ms=85):
     await asyncio.sleep(timeout_ms / 1000)
     raise asyncio.TimeoutError("OFAC timeout")
 
+
 async def pep_feed():
     await asyncio.sleep(0.05)
     return {"feed": "PEP", "risk": "HIGH"}
 
+
 async def geo_feed():
     await asyncio.sleep(0.08)
     return {"feed": "GEO", "risk": "MEDIUM"}
+
 
 # --------------------------------------------------
 # Policy Engine
@@ -65,12 +72,14 @@ async def evaluate(fail_mode="FAIL_CLOSED", hot_policy=True):
             await asyncio.wait_for(ofac_feed(), timeout=0.085)
         except asyncio.TimeoutError:
             breaker.record_failure()
-            evidence_chain.append({
-                "attempt": attempt,
-                "feed": "OFAC",
-                "result": "TIMEOUT",
-                "timestamp": now()
-            })
+            evidence_chain.append(
+                {
+                    "attempt": attempt,
+                    "feed": "OFAC",
+                    "result": "TIMEOUT",
+                    "timestamp": now(),
+                }
+            )
 
     # ---------------- CIRCUIT BREAKER ----------------
     if breaker.open:
@@ -88,7 +97,7 @@ async def evaluate(fail_mode="FAIL_CLOSED", hot_policy=True):
     policy = [
         ofac_status,
         ("PEP_RISK", False, "Politically exposed person"),
-        ("GEO_SANCTIONS", True, "Medium risk jurisdiction")
+        ("GEO_SANCTIONS", True, "Medium risk jurisdiction"),
     ]
 
     decision = "BLOCK"
@@ -108,7 +117,7 @@ async def evaluate(fail_mode="FAIL_CLOSED", hot_policy=True):
         "degraded_mode": degraded,
         "policy": policy,
         "evidence_chain": evidence_chain,
-        "latency_ms": total_latency
+        "latency_ms": total_latency,
     }
 
     # ---------------- OUTPUT ----------------
@@ -128,6 +137,7 @@ async def evaluate(fail_mode="FAIL_CLOSED", hot_policy=True):
 
     print("\n--- EVIDENCE HASH ---")
     print(h(evidence))
+
 
 # --------------------------------------------------
 # Run Demo

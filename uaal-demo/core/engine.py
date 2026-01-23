@@ -2,6 +2,7 @@ from core.policy import evaluate_policy
 from core.audit import log_decision
 from core.intent import canonical_hash
 
+
 def authorize(executed_intent, approvals=None, declared_intent=None):
     # 🔐 Intent binding check
     if declared_intent:
@@ -9,7 +10,7 @@ def authorize(executed_intent, approvals=None, declared_intent=None):
             audit = log_decision(
                 executed_intent,
                 False,
-                "Declared intent does not match executed intent (possible prompt injection)"
+                "Declared intent does not match executed intent (possible prompt injection)",
             )
             return False, audit
 

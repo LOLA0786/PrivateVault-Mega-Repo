@@ -1,9 +1,11 @@
 """
 Integration tests for API endpoints (REAL)
 """
+
 import pytest
 import httpx
 from galani.api.app import app
+
 
 @pytest.mark.asyncio
 class TestAPIEndpoints:
@@ -20,8 +22,8 @@ class TestAPIEndpoints:
                 "toolCall": "approve_loan",
                 "params": {
                     "principal": {"id": "agent_b", "role": "agent"},
-                    "context": {"amount": 300000}
-                }
+                    "context": {"amount": 300000},
+                },
             }
 
             r = await client.post("/v1/intent/analyze", json=payload)

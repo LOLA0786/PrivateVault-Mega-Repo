@@ -6,6 +6,7 @@ UAAL_GATEWAY = "http://localhost:8000"
 # The Muscle (Terminal 2)
 OAAS_GATEWAY = "http://localhost:8001"
 
+
 async def run_integration():
     print("\n🛡️  INITIATING SOVEREIGN STACK TEST...")
     async with httpx.AsyncClient() as client:
@@ -30,7 +31,10 @@ async def run_integration():
             else:
                 print(f"⚠️  Blocked/Error: {resp.text}")
         except Exception as e:
-            print(f"❌ OAAS Gateway OFFLINE at {OAAS_GATEWAY}. Ensure Tab 2 is running.")
+            print(
+                f"❌ OAAS Gateway OFFLINE at {OAAS_GATEWAY}. Ensure Tab 2 is running."
+            )
+
 
 if __name__ == "__main__":
     asyncio.run(run_integration())

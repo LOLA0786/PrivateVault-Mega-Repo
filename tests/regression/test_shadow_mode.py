@@ -1,5 +1,6 @@
 from auth import authorize_intent, shadow_decide_intent
 
+
 def test_shadow_policy_does_not_block_execution():
     intent = {"action": "process_payment", "amount": 9000, "country": "India"}
 

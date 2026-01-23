@@ -1,4 +1,9 @@
-from policy_registry import register_policy, activate_policy, get_active_policy, rollback
+from policy_registry import (
+    register_policy,
+    activate_policy,
+    get_active_policy,
+    rollback,
+)
 from policy_diff_and_dryrun import policy_diff, dry_run
 
 # 1️⃣ Register policies
@@ -6,7 +11,7 @@ policy_v1 = {
     "approve_loan": {
         "allowed_roles": ["human"],
         "max_amount": 500000,
-        "require_human": True
+        "require_human": True,
     }
 }
 
@@ -14,7 +19,7 @@ policy_v2 = {
     "approve_loan": {
         "allowed_roles": ["human", "agent"],
         "max_amount": 1000000,
-        "require_human": False
+        "require_human": False,
     }
 }
 

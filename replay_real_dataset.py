@@ -3,6 +3,7 @@ from execute_and_log import execute_and_log
 
 DATASET = "datasets/creditcard.csv"
 
+
 def replay():
     with open(DATASET) as f:
         reader = csv.DictReader(f)
@@ -20,6 +21,7 @@ def replay():
 
             if i % 1000 == 0:
                 print(f"Processed {i} events")
+
 
 if __name__ == "__main__":
     replay()

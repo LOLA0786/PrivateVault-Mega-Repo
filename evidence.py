@@ -57,8 +57,14 @@ def _pv_hash(intent: Dict[str, Any], decision: Any, policy_version: str) -> str:
     return hashlib.sha256(b).hexdigest()
 
 
-def generate_evidence(intent: Dict[str, Any], decision: Any, policy_version: Optional[str] = None) -> Dict[str, Any]:
-    policy_version = policy_version or (decision.get("policy_version") if isinstance(decision, dict) else "unknown") or "unknown"
+def generate_evidence(
+    intent: Dict[str, Any], decision: Any, policy_version: Optional[str] = None
+) -> Dict[str, Any]:
+    policy_version = (
+        policy_version
+        or (decision.get("policy_version") if isinstance(decision, dict) else "unknown")
+        or "unknown"
+    )
     canon = _canonicalize_decision(decision)
 
     evidence_hash = _pv_hash(intent, decision, policy_version)
@@ -72,7 +78,9 @@ def generate_evidence(intent: Dict[str, Any], decision: Any, policy_version: Opt
     }
 
 
-def verify_evidence(intent: Dict[str, Any], decision: Any, policy_version: str, evidence_hash: str) -> bool:
+def verify_evidence(
+    intent: Dict[str, Any], decision: Any, policy_version: str, evidence_hash: str
+) -> bool:
     try:
         expected = _pv_hash(intent, decision, policy_version)
         return expected == evidence_hash

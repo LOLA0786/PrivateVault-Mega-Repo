@@ -18,6 +18,7 @@ _APPROVALS = {}
 # Models
 # --------------------
 
+
 class IntentRequest(BaseModel):
     intent: dict
     actor: dict
@@ -36,6 +37,7 @@ class ApprovalRequest(BaseModel):
 # --------------------
 # Routes
 # --------------------
+
 
 @app.get("/health")
 def health():
@@ -58,9 +60,8 @@ def approve(req: ApprovalRequest):
         "approval_id": approval_id,
         "approved_by": req.approved_by,
         "expires_in_seconds": req.valid_for_seconds,
-        "single_use": True
+        "single_use": True,
     }
-
 
 
 @app.post("/authorize-intent")
@@ -100,17 +101,6 @@ def authorize_intent(payload: dict):
         "execution": "PERFORMED",
     }
 
-@app.post("/approve-intent")
-def approve_intent(payload: dict):
-    approval_id = issue_approval(
-        scope=payload["scope"],
-        approved_by=payload["approved_by"],
-        valid_for_seconds=payload.get("valid_for_seconds", 300),
-    )
-    return {
-        "approval_id": approval_id,
-        "status": "ACTIVE"
-    }
 
 @app.post("/approve-intent")
 def approve_intent(payload: dict):
@@ -119,8 +109,17 @@ def approve_intent(payload: dict):
         approved_by=payload["approved_by"],
         valid_for_seconds=payload.get("valid_for_seconds", 300),
     )
-    return {
-        "approval_id": approval_id,
-        "status": "ACTIVE"
-    }
+    return {"approval_id": approval_id, "status": "ACTIVE"}
+
+
+@app.post("/approve-intent")
+def approve_intent(payload: dict):
+    approval_id = issue_approval(
+        scope=payload["scope"],
+        approved_by=payload["approved_by"],
+        valid_for_seconds=payload.get("valid_for_seconds", 300),
+    )
+    return {"approval_id": approval_id, "status": "ACTIVE"}
+
+
 # --- Approval Store ---

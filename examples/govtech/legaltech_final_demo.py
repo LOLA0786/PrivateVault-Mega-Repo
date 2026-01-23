@@ -2,23 +2,28 @@ import json
 import hashlib
 from datetime import datetime
 
+
 # -------------------------------------------------
 # Utilities
 # -------------------------------------------------
 def h(x):
     return hashlib.sha256(json.dumps(x, sort_keys=True).encode()).hexdigest()
 
+
 def now():
     return datetime.utcnow().isoformat() + "Z"
+
 
 def section(title):
     print("\n" + "=" * 78)
     print(title)
     print("=" * 78)
 
+
 def show(policy):
     for p in policy:
         print(list(p))
+
 
 # -------------------------------------------------
 # DEMO 1: CONFLICT OF INTEREST
@@ -29,7 +34,7 @@ policy = [
     ("CONFLICT_OF_INTEREST", False, "Firm represented opposing party 2022–2024"),
     ("CONFIDENTIALITY_BREACH", True, "Risk of confidential misuse"),
     ("CLIENT_CONSENT_REQUIRED", False, "No informed consent"),
-    ("ETHICAL_WALL", False, "No documented wall")
+    ("ETHICAL_WALL", False, "No documented wall"),
 ]
 
 show(policy)
@@ -46,7 +51,7 @@ policy = [
     ("PRIVILEGE_DESTROYED", False, "Third-party consultant included"),
     ("COMMON_INTEREST", False, "No common interest agreement"),
     ("WORK_PRODUCT", True, "But waived"),
-    ("E_DISCOVERY_RISK", False, "Now discoverable")
+    ("E_DISCOVERY_RISK", False, "Now discoverable"),
 ]
 
 show(policy)
@@ -63,7 +68,7 @@ policy = [
     ("FEE_SPLITTING", False, "Rule 5.4 violation"),
     ("UNAUTHORIZED_PRACTICE", True, "Non-lawyer influence"),
     ("INDEPENDENCE", False, "Professional independence breached"),
-    ("CLIENT_DISCLOSURE", False, "Not disclosed")
+    ("CLIENT_DISCLOSURE", False, "Not disclosed"),
 ]
 
 show(policy)
@@ -80,7 +85,7 @@ policy = [
     ("UPL_NY", False, "Not licensed in NY"),
     ("PRO_HAC_VICE", False, "No admission filed"),
     ("LOCAL_COUNSEL", False, "None associated"),
-    ("SUBSTANTIAL_RELATIONSHIP", True, "Exception insufficient")
+    ("SUBSTANTIAL_RELATIONSHIP", True, "Exception insufficient"),
 ]
 
 show(policy)
@@ -97,7 +102,7 @@ policy = [
     ("SPOLIATION", False, "Data deletion under hold"),
     ("ZUBULAKE_DUTY", False, "Preservation duty violated"),
     ("ADVERSE_INFERENCE", True, "Guaranteed"),
-    ("RULE_37E", False, "Sanctions inevitable")
+    ("RULE_37E", False, "Sanctions inevitable"),
 ]
 
 show(policy)
@@ -114,7 +119,7 @@ policy = [
     ("MNPI_ACCESS", False, "Material nonpublic info"),
     ("RULE_10B5", True, "Insider trading risk"),
     ("ETHICAL_WALL", False, "Wall breached"),
-    ("TIPPING", False, "Tipping liability")
+    ("TIPPING", False, "Tipping liability"),
 ]
 
 show(policy)
@@ -131,7 +136,7 @@ policy = [
     ("SOL_MISSED", False, "Filed 1 day late"),
     ("MALPRACTICE", True, "Strict liability"),
     ("CLAIM_BARRED", False, "Claim lost"),
-    ("INSURANCE", True, "Coverage disputed")
+    ("INSURANCE", True, "Coverage disputed"),
 ]
 
 show(policy)
@@ -148,7 +153,7 @@ policy = [
     ("PAGA_VIOLATION", False, "Cannot waive PAGA"),
     ("UNENFORCEABLE", True, "Iskanian"),
     ("CLASS_ACTION", False, "Certification guaranteed"),
-    ("BAD_FAITH", False, "Fee shifting risk")
+    ("BAD_FAITH", False, "Fee shifting risk"),
 ]
 
 show(policy)
@@ -165,7 +170,7 @@ policy = [
     ("GDPR_TRANSFER", False, "No SCCs"),
     ("CCPA_FINE", True, "$7,500 per record"),
     ("DATA_SUBJECT", False, "Rights violated"),
-    ("EU_FINE", False, "4% global revenue")
+    ("EU_FINE", False, "4% global revenue"),
 ]
 
 show(policy)
@@ -182,7 +187,7 @@ policy = [
     ("OFAC_SDN", False, "SDN match"),
     ("EAR_9A610", False, "Export license required"),
     ("ANTIBOYCOTT", True, "Risk detected"),
-    ("FACILITATION", False, "Prohibited facilitation")
+    ("FACILITATION", False, "Prohibited facilitation"),
 ]
 
 show(policy)
@@ -199,7 +204,7 @@ policy = [
     ("SECTION_5", False, "Unregistered offering"),
     ("ACCREDITED_INVESTOR", False, "No verification"),
     ("BAD_ACTOR", True, "Unchecked"),
-    ("FORM_D", False, "Not filed")
+    ("FORM_D", False, "Not filed"),
 ]
 
 show(policy)
@@ -216,7 +221,7 @@ policy = [
     ("IMPUTED_DISQUALIFICATION", False, "Firm-wide"),
     ("SCREENING", False, "Inadequate"),
     ("CLIENT_CONSENT", False, "Missing"),
-    ("CONFIDENTIALITY", True, "High risk")
+    ("CONFIDENTIALITY", True, "High risk"),
 ]
 
 show(policy)
@@ -239,8 +244,8 @@ audit = {
         "Automatic malpractice liability",
         "Criminal sanctions",
         "Class action exposure",
-        "GDPR fines"
-    ]
+        "GDPR fines",
+    ],
 }
 
 print(json.dumps(audit, indent=2))

@@ -24,8 +24,14 @@ def _stable_json(obj: Any) -> str:
     return json.dumps(obj, sort_keys=True, separators=(",", ":"), default=str)
 
 
-def authorize_intent(action: str, principal: Optional[dict] = None, context: Optional[dict] = None,
-                    policy_version: str = "v4", mode: str = "enforce", **kwargs) -> Dict[str, Any]:
+def authorize_intent(
+    action: str,
+    principal: Optional[dict] = None,
+    context: Optional[dict] = None,
+    policy_version: str = "v4",
+    mode: str = "enforce",
+    **kwargs,
+) -> Dict[str, Any]:
     """
     Test-friendly wrapper.
 
@@ -72,7 +78,9 @@ def authorize_intent(action: str, principal: Optional[dict] = None, context: Opt
         }
 
     # Ensure required keys expected by regression tests
-    decision_obj.setdefault("reason", "allowed" if decision_obj["allowed"] else "denied")
+    decision_obj.setdefault(
+        "reason", "allowed" if decision_obj["allowed"] else "denied"
+    )
     decision_obj.setdefault("mode", mode)
 
     return decision_obj
@@ -91,10 +99,16 @@ def authorize_enveloped_intent(enveloped: Dict[str, Any], **kwargs) -> Dict[str,
     policy_version = enveloped.get("policy_version", "v4")
     mode = enveloped.get("mode", "enforce")
 
-    return authorize_intent(action, principal, context, policy_version=policy_version, mode=mode)
+    return authorize_intent(
+        action, principal, context, policy_version=policy_version, mode=mode
+    )
 
 
-def generate_evidence(intent: Dict[str, Any], decision: Dict[str, Any], policy_version: Optional[str] = None) -> Dict[str, Any]:
+def generate_evidence(
+    intent: Dict[str, Any],
+    decision: Dict[str, Any],
+    policy_version: Optional[str] = None,
+) -> Dict[str, Any]:
     """
     Regression tests expect:
       evidence["decision"] -> bool
@@ -104,16 +118,29 @@ def generate_evidence(intent: Dict[str, Any], decision: Dict[str, Any], policy_v
 
     We do NOT alter production evidence module. This is compat.
     """
-    policy_version = policy_version or decision.get("policy_version") or intent.get("policy_version") or "unknown"
+    policy_version = (
+        policy_version
+        or decision.get("policy_version")
+        or intent.get("policy_version")
+        or "unknown"
+    )
 
     # Ensure decision bool normalization
-    allowed = decision["allowed"] if isinstance(decision, dict) and "allowed" in decision else bool(decision)
+    allowed = (
+        decision["allowed"]
+        if isinstance(decision, dict) and "allowed" in decision
+        else bool(decision)
+    )
 
     ts = time.time()
 
     payload = {
         "intent": intent,
-        "decision": {"allowed": allowed, "action": intent.get("action"), "policy_version": policy_version},
+        "decision": {
+            "allowed": allowed,
+            "action": intent.get("action"),
+            "policy_version": policy_version,
+        },
         "policy_version": policy_version,
     }
 
@@ -129,20 +156,30 @@ def generate_evidence(intent: Dict[str, Any], decision: Dict[str, Any], policy_v
     }
 
 
-def verify_evidence(intent: Dict[str, Any], decision: Dict[str, Any], policy_version: str, evidence_hash: str) -> bool:
+def verify_evidence(
+    intent: Dict[str, Any],
+    decision: Dict[str, Any],
+    policy_version: str,
+    evidence_hash: str,
+) -> bool:
     """
     Tests call: verify_evidence(intent, decision, policy_version, evidence_hash)
 
     Validate deterministically.
     """
-    expected = generate_evidence(intent, decision, policy_version=policy_version)["evidence_hash"]
+    expected = generate_evidence(intent, decision, policy_version=policy_version)[
+        "evidence_hash"
+    ]
     return expected == evidence_hash
+
 
 # ---- PV_FORCE_VERIFY_REDIRECT ----
 try:
     from evidence import verify_evidence as _pv_verify_evidence
+
     def verify_evidence(*args, **kwargs):
         return _pv_verify_evidence(*args, **kwargs)
+
 except Exception:
     pass
 # ---- /PV_FORCE_VERIFY_REDIRECT ----

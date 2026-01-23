@@ -1,6 +1,7 @@
 import torch
 import numpy as np
 
+
 class IndestructibleEngine:
     def __init__(self, lr=0.01, momentum=0.9):
         self.lr = lr

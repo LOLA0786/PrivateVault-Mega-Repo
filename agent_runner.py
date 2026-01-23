@@ -13,8 +13,8 @@ tool_call = {
         "to_account": "ACC-002",
         "amount": 50000,
         "currency": "INR",
-        "new_beneficiary": False
-    }
+        "new_beneficiary": False,
+    },
 }
 
 print("\n🧠 LLM TOOL CALL:")
@@ -27,18 +27,15 @@ uaal_payload = {
         "domain": "fintech",
         "action": "transfer_funds",
         "amount": tool_call["arguments"]["amount"],
-        "new_beneficiary": tool_call["arguments"]["new_beneficiary"]
-    }
+        "new_beneficiary": tool_call["arguments"]["new_beneficiary"],
+    },
 }
 
 # ---- STEP C: UAAL CHECK (ENFORCE MODE) ----
 resp = requests.post(
     UAAL_URL,
-    headers={
-        "Content-Type": "application/json",
-        "X-UAAL-Mode": "enforce"
-    },
-    json=uaal_payload
+    headers={"Content-Type": "application/json", "X-UAAL-Mode": "enforce"},
+    json=uaal_payload,
 )
 
 decision = resp.json()

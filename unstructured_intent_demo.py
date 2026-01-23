@@ -3,6 +3,7 @@ import random
 import hashlib
 import json
 
+
 # -------------------------------------------------
 # INTENT NORMALIZATION (Unstructured → Canonical JSON)
 # -------------------------------------------------
@@ -15,7 +16,7 @@ def normalize_intent(unstructured_text):
         "patient_age": 0,
         "allergies": [],
         "frequency": "daily",
-        "controlled": False
+        "controlled": False,
     }
 
     # Drug extraction
@@ -38,6 +39,7 @@ def normalize_intent(unstructured_text):
 
     return intent
 
+
 # -------------------------------------------------
 # POLICY ENGINE (Deterministic + Graduated)
 # -------------------------------------------------
@@ -48,51 +50,65 @@ def evaluate_policy(intent):
 
     # AGE CHECK
     age_ok = intent["patient_age"] >= 18
-    decisions.append([
-        "AGE_CHECK",
-        age_ok,
-        "Patient age valid" if age_ok else "Under 18 – requires guardian"
-    ])
+    decisions.append(
+        [
+            "AGE_CHECK",
+            age_ok,
+            "Patient age valid" if age_ok else "Under 18 – requires guardian",
+        ]
+    )
     if not age_ok:
         score += weights["medium"]
 
     # ALLERGY CHECK (stub: no allergies)
     allergy_ok = intent["drug"] not in intent["allergies"]
-    decisions.append([
-        "ALLERGY_CHECK",
-        allergy_ok,
-        "No known allergies" if allergy_ok else "CRITICAL: Allergy conflict"
-    ])
+    decisions.append(
+        [
+            "ALLERGY_CHECK",
+            allergy_ok,
+            "No known allergies" if allergy_ok else "CRITICAL: Allergy conflict",
+        ]
+    )
     if not allergy_ok:
         score += weights["critical"]
 
     # CONTROLLED SUBSTANCE LOGIC
     if intent["controlled"]:
         freq_exceeded = intent["frequency"].startswith("4x")
-        decisions.append([
-            "FREQUENCY_LIMIT",
-            not freq_exceeded,
-            "Frequency within limit" if not freq_exceeded else "Max 3x daily exceeded"
-        ])
+        decisions.append(
+            [
+                "FREQUENCY_LIMIT",
+                not freq_exceeded,
+                (
+                    "Frequency within limit"
+                    if not freq_exceeded
+                    else "Max 3x daily exceeded"
+                ),
+            ]
+        )
         if freq_exceeded:
             score += weights["medium"]
 
         # PDMP (simulated 20% chance)
         pdmp_active = random.random() < 0.2
-        decisions.append([
-            "PDMP_CHECK",
-            not pdmp_active,
-            "PDMP clear" if not pdmp_active else "Active prescription exists"
-        ])
+        decisions.append(
+            [
+                "PDMP_CHECK",
+                not pdmp_active,
+                "PDMP clear" if not pdmp_active else "Active prescription exists",
+            ]
+        )
         if pdmp_active:
             score += weights["critical"]
 
         review_needed = freq_exceeded or pdmp_active
-        decisions.append([
-            "MANDATORY_REVIEW",
-            not review_needed,
-            "Review complete" if not review_needed else "30-day review missing"
-        ])
+        decisions.append(
+            [
+                "MANDATORY_REVIEW",
+                not review_needed,
+                "Review complete" if not review_needed else "30-day review missing",
+            ]
+        )
         if review_needed:
             score += weights["medium"]
 
@@ -109,6 +125,7 @@ def evaluate_policy(intent):
     ).hexdigest()
 
     return outcome, decisions, evidence_hash
+
 
 # -------------------------------------------------
 # DEMO RUN

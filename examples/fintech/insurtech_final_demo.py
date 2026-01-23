@@ -2,23 +2,28 @@ import json
 import hashlib
 from datetime import datetime
 
+
 # -------------------------------------------------
 # Utilities
 # -------------------------------------------------
 def h(x):
     return hashlib.sha256(json.dumps(x, sort_keys=True).encode()).hexdigest()
 
+
 def now():
     return datetime.utcnow().isoformat() + "Z"
+
 
 def section(title):
     print("\n" + "=" * 78)
     print(title)
     print("=" * 78)
 
+
 def show(policy):
     for p in policy:
         print(list(p))
+
 
 # -------------------------------------------------
 # DEMO 1: UNFAIR DISCRIMINATION IN UNDERWRITING
@@ -29,7 +34,7 @@ policy = [
     ("PROXY_DISCRIMINATION", False, "ZIP code used as proxy for protected class"),
     ("FAIR_UNDERWRITING", False, "No actuarial support for 2.5x multiplier"),
     ("STATE_LAW_IL", False, "Violates IL Insurance Code § 424"),
-    ("DISPARATE_IMPACT", True, "Statistical bias threshold exceeded")
+    ("DISPARATE_IMPACT", True, "Statistical bias threshold exceeded"),
 ]
 
 show(policy)
@@ -47,7 +52,7 @@ policy = [
     ("RATE_DEVIATION", False, "10% deviation from filed rate SER-2023-45"),
     ("ANTI_REBATING", True, "Unauthorized inducement to purchase"),
     ("STATE_DOI", False, "Strict liability offense"),
-    ("LICENSE_ACTION", False, "Suspension or revocation risk")
+    ("LICENSE_ACTION", False, "Suspension or revocation risk"),
 ]
 
 show(policy)
@@ -65,7 +70,7 @@ policy = [
     ("UCSPA_CA", False, "CA Reg. §2695.7 requires thorough investigation"),
     ("TIMELINESS", False, "Decision exceeded 40-day guideline"),
     ("BAD_FAITH", True, "Unreasonable denial pattern"),
-    ("PUNITIVE_DAMAGES", False, "Punitive exposure likely")
+    ("PUNITIVE_DAMAGES", False, "Punitive exposure likely"),
 ]
 
 show(policy)
@@ -83,7 +88,7 @@ policy = [
     ("ELIGIBILITY", False, "No declinations from admitted carriers"),
     ("CARRIER_APPROVAL", False, "Carrier not on approved surplus list"),
     ("BROKER_AUTHORITY", False, "Violates surplus lines license"),
-    ("POLICY_NULLITY", True, "Coverage may be unenforceable")
+    ("POLICY_NULLITY", True, "Coverage may be unenforceable"),
 ]
 
 show(policy)
@@ -100,7 +105,7 @@ policy = [
     ("FORM_FILING", False, "Policy form not approved by DOI"),
     ("MANDATORY_DISCLOSURE", False, "Required consumer notice missing"),
     ("CONTRACT_ENFORCEABILITY", False, "Policy subject to rescission"),
-    ("MARKET_CONDUCT", True, "Exam trigger likely")
+    ("MARKET_CONDUCT", True, "Exam trigger likely"),
 ]
 
 show(policy)
@@ -117,7 +122,7 @@ policy = [
     ("RBC_THRESHOLD", False, "Risk-Based Capital ratio breached"),
     ("SAP_COMPLIANCE", False, "Under-reserving detected"),
     ("FINANCIAL_MISSTATEMENT", True, "Regulatory reporting risk"),
-    ("REGULATORY_ACTION", False, "DOI supervision likely")
+    ("REGULATORY_ACTION", False, "DOI supervision likely"),
 ]
 
 show(policy)
@@ -142,9 +147,9 @@ audit = {
         "Bad faith verdicts",
         "License revocation",
         "Market conduct exam failures",
-        "Solvency supervision"
+        "Solvency supervision",
     ],
-    "system_role": "Deterministic compliance & solvency enforcement layer"
+    "system_role": "Deterministic compliance & solvency enforcement layer",
 }
 
 print(json.dumps(audit, indent=2))

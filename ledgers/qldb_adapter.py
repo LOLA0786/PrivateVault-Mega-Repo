@@ -6,12 +6,13 @@ from pyqldb.driver import QldbDriver
 from pyqldb.config.retry_policy import RetryPolicy
 from .ledger_base import LedgerBase
 
+
 class QLDBLedger(LedgerBase):
     def __init__(self):
         self.driver = QldbDriver(
             ledger_name=os.getenv("LEDGER_NAME", "IntentAudit"),
             region_name=os.getenv("AWS_REGION", "us-east-1"),
-            retry_policy=RetryPolicy(3)
+            retry_policy=RetryPolicy(3),
         )
 
     async def submit_audit(self, intent, decision, user_id):
@@ -19,13 +20,11 @@ class QLDBLedger(LedgerBase):
             "intent": intent,
             "decision": decision,
             "user_id": user_id,
-            "timestamp": asyncio.get_event_loop().time()
+            "timestamp": asyncio.get_event_loop().time(),
         }
         try:
             result = self.driver.execute_lambda(
-                lambda txn: txn.execute_statement(
-                    "INSERT INTO Audits VALUE ?", payload
-                )
+                lambda txn: txn.execute_statement("INSERT INTO Audits VALUE ?", payload)
             )
             return str(result[0]) if result else None
         except Exception as e:
@@ -37,8 +36,7 @@ class QLDBLedger(LedgerBase):
             result = self.driver.execute_lambda(
                 lambda txn: list(
                     txn.execute_statement(
-                        "SELECT * FROM Audits WHERE metadata.id = ?",
-                        doc_id
+                        "SELECT * FROM Audits WHERE metadata.id = ?", doc_id
                     )
                 )
             )

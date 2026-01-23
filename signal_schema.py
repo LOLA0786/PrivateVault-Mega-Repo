@@ -1,5 +1,6 @@
 import json
 
+
 def canonical_signal_payload(signal: dict) -> bytes:
     """
     Deterministic, ordered signal payload for signing

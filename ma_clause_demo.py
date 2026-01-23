@@ -2,15 +2,16 @@ import json
 import hashlib
 from datetime import datetime
 
+
 def evidence_hash(data):
-    return hashlib.sha256(
-        json.dumps(data, sort_keys=True).encode()
-    ).hexdigest()
+    return hashlib.sha256(json.dumps(data, sort_keys=True).encode()).hexdigest()
+
 
 def section(title):
     print("\n" + "=" * 70)
     print(title)
     print("=" * 70)
+
 
 def main_case():
     section("LEGALTECH DEMO: MERGER CLAUSE VALIDATION")
@@ -22,7 +23,7 @@ def main_case():
         "deal_size": 2500000000,
         "parties": ["public_company", "pe_firm"],
         "contains_fiduciary_duty": True,
-        "contains_termination_fee": False
+        "contains_termination_fee": False,
     }
 
     policy = [
@@ -31,13 +32,13 @@ def main_case():
         ("CALIFORNIA_APPROVAL", True, "CA Secretary of State filing required"),
         ("FIDUCIARY_OUT_CLAUSE", False, "Missing fiduciary duty termination right"),
         ("TERMINATION_FEE_CAP", True, "No fee specified - review required"),
-        ("MATERIAL_ADVERSE_CHANGE", False, "MAC clause definition insufficient")
+        ("MATERIAL_ADVERSE_CHANGE", False, "MAC clause definition insufficient"),
     ]
 
     payload = {
         "intent": intent,
         "policy": policy,
-        "timestamp": datetime.utcnow().isoformat()
+        "timestamp": datetime.utcnow().isoformat(),
     }
 
     print("\n--- INTENT ---")
@@ -69,6 +70,7 @@ def main_case():
     print('Regulatory_Flags: ["HSR Threshold", "SEC Rule 13e-3"]')
     print(f"Evidence_Hash: {h}")
 
+
 def block_regulatory():
     section("BLOCK 1: REGULATORY THRESHOLD VIOLATION")
 
@@ -76,7 +78,7 @@ def block_regulatory():
         ("CFIUS_REVIEW", False, "Foreign ownership > 20% in critical tech"),
         ("EXON_FLORIO", True, "Presidential suspension authority"),
         ("DATA_PRIVACY_REVIEW", False, "GDPR transfer assessment missing"),
-        ("IP_EXPORT_CONTROL", False, "Encryption tech requires BIS license")
+        ("IP_EXPORT_CONTROL", False, "Encryption tech requires BIS license"),
     ]
 
     h = evidence_hash(policy)
@@ -89,6 +91,7 @@ def block_regulatory():
     print("Legal Risk: Transaction unwind + $50M+ penalties")
     print(f"Evidence_Hash: {h}")
 
+
 def block_fiduciary():
     section("BLOCK 2: CONFLICT OF INTEREST / FIDUCIARY BREACH")
 
@@ -96,7 +99,7 @@ def block_fiduciary():
         ("DUTY_OF_LOYALTY", False, "CEO private fund party to deal"),
         ("ENTIRE_FAIRNESS_REVIEW", False, "No independent committee"),
         ("SPECIAL_COMMITTEE", False, "Missing disinterested directors"),
-        ("FAIRNESS_OPINION", True, "Required but not obtained")
+        ("FAIRNESS_OPINION", True, "Required but not obtained"),
     ]
 
     h = evidence_hash(policy)
@@ -109,6 +112,7 @@ def block_fiduciary():
     print("Escalation: Immediate board counsel notification")
     print(f"Evidence_Hash: {h}")
 
+
 def block_antitrust():
     section("BLOCK 3: ANTITRUST / MARKET CONCENTRATION")
 
@@ -116,7 +120,7 @@ def block_antitrust():
         ("HHI_CALCULATION", False, "Post-merger HHI > 2500"),
         ("MARKET_SHARE", False, "Combined 75% exceeds DOJ safe harbor"),
         ("PRICE_EFFECT_ANALYSIS", False, "Econometric model missing"),
-        ("EFFICIENCIES_DEFENSE", True, "Claimed but unsubstantiated")
+        ("EFFICIENCIES_DEFENSE", True, "Claimed but unsubstantiated"),
     ]
 
     h = evidence_hash(policy)
@@ -128,6 +132,7 @@ def block_antitrust():
     print("DOJ / FTC Challenge Probability: 85%+")
     print("Required: Upfront buyer or divestiture plan")
     print(f"Evidence_Hash: {h}")
+
 
 if __name__ == "__main__":
     main_case()

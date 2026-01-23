@@ -26,7 +26,9 @@ def _load_real():
 _real = _load_real()
 
 
-def _to_enveloped(action: str, principal: Dict[str, Any], context: Dict[str, Any]) -> Dict[str, Any]:
+def _to_enveloped(
+    action: str, principal: Dict[str, Any], context: Dict[str, Any]
+) -> Dict[str, Any]:
     """
     Convert old-style args into an enveloped intent dict.
     """
@@ -57,13 +59,20 @@ def authorize_intent__OLD(*args, **kwargs):
             return _real.authorize_intent(args[0], **kwargs)
 
         # old style: authorize_intent(action, principal, context)
-        if len(args) == 3 and isinstance(args[0], str) and isinstance(args[1], dict) and isinstance(args[2], dict):
+        if (
+            len(args) == 3
+            and isinstance(args[0], str)
+            and isinstance(args[1], dict)
+            and isinstance(args[2], dict)
+        ):
             enveloped = _to_enveloped(args[0], args[1], args[2])
             return _real.authorize_intent(enveloped, **kwargs)
 
         # kwargs style
         if "action" in kwargs and "principal" in kwargs and "context" in kwargs:
-            enveloped = _to_enveloped(kwargs["action"], kwargs["principal"], kwargs["context"])
+            enveloped = _to_enveloped(
+                kwargs["action"], kwargs["principal"], kwargs["context"]
+            )
             return _real.authorize_intent(enveloped)
 
         raise TypeError(f"authorize_intent() unsupported args={args} kwargs={kwargs}")
@@ -127,24 +136,28 @@ def generate_synthetic_data(*args, **kwargs):
 # Compatibility wrapper expected by tests/test_synthetic_pipeline.py
 from typing import Any, Dict, List
 
+
 def generate_synthetic_data(n: int = 5) -> List[Dict[str, Any]]:
     # Simple deterministic synthetic generator (works offline)
     out = []
     for i in range(int(n)):
-        out.append({
-            "id": f"syn_{i}",
-            "amount": 1000 + i * 100,
-            "country": "IN",
-            "ts": i
-        })
+        out.append(
+            {"id": f"syn_{i}", "amount": 1000 + i * 100, "country": "IN", "ts": i}
+        )
     return out
 
-def infer_risk(action: str, principal: Dict[str, Any], context: Dict[str, Any]) -> Dict[str, Any]:
+
+def infer_risk(
+    action: str, principal: Dict[str, Any], context: Dict[str, Any]
+) -> Dict[str, Any]:
     # minimal, stable risk response
     amt = float(context.get("amount", 0) or 0)
     score = min(1.0, amt / 500000.0)  # 0..1
     return {"risk_score": score, "reason": "synthetic_static_model"}
+
+
 # ================================================================
+
 
 # === PV_TEST_COMPAT_AUTHORIZE_INTENT_BEGIN ===
 def authorize_intent(action, principal=None, context=None, **kwargs):
@@ -179,5 +192,6 @@ def authorize_intent(action, principal=None, context=None, **kwargs):
     }
 
     return _real.authorize_intent(enveloped, **kwargs)
-# === PV_TEST_COMPAT_AUTHORIZE_INTENT_END ===
 
+
+# === PV_TEST_COMPAT_AUTHORIZE_INTENT_END ===

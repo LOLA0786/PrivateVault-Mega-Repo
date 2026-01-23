@@ -1,12 +1,9 @@
 from auth import authorize_intent
 from evidence import generate_evidence
 
+
 def test_policy_version_migration():
-    intent = {
-        "action": "process_payment",
-        "amount": 8000,
-        "country": "India"
-    }
+    intent = {"action": "process_payment", "amount": 8000, "country": "India"}
 
     # Old policy
     decision_v1 = authorize_intent(intent)
@@ -19,4 +16,3 @@ def test_policy_version_migration():
     assert decision_v1 == decision_v2
     assert evidence_v1["policy_version"] != evidence_v2["policy_version"]
     assert evidence_v1["evidence_hash"] != evidence_v2["evidence_hash"]
-

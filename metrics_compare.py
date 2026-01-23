@@ -1,9 +1,10 @@
 import json
 from collections import Counter
 
+
 def compare(path="logs/routing.log"):
-    rule = {"cost":0, "latency":0, "n":0, "providers": Counter()}
-    ppo  = {"cost":0, "latency":0, "n":0, "providers": Counter()}
+    rule = {"cost": 0, "latency": 0, "n": 0, "providers": Counter()}
+    ppo = {"cost": 0, "latency": 0, "n": 0, "providers": Counter()}
 
     with open(path) as f:
         for line in f:
@@ -28,10 +29,10 @@ def compare(path="logs/routing.log"):
                 target["providers"][provider] += 1
 
     return {
-        "rule_avg_cost": rule["cost"]/rule["n"] if rule["n"] else 0,
-        "ppo_avg_cost": ppo["cost"]/ppo["n"] if ppo["n"] else 0,
-        "rule_avg_latency": rule["latency"]/rule["n"] if rule["n"] else 0,
-        "ppo_avg_latency": ppo["latency"]/ppo["n"] if ppo["n"] else 0,
+        "rule_avg_cost": rule["cost"] / rule["n"] if rule["n"] else 0,
+        "ppo_avg_cost": ppo["cost"] / ppo["n"] if ppo["n"] else 0,
+        "rule_avg_latency": rule["latency"] / rule["n"] if rule["n"] else 0,
+        "ppo_avg_latency": ppo["latency"] / ppo["n"] if ppo["n"] else 0,
         "rule_provider_mix": dict(rule["providers"]),
         "ppo_provider_mix": dict(ppo["providers"]),
     }

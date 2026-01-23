@@ -50,7 +50,9 @@ def dry_run(*args: Any, **kwargs: Any) -> Dict[str, Any]:
         changes = []
         for k in sorted(set(old_policy.keys()) | set(new_policy.keys())):
             if old_policy.get(k) != new_policy.get(k):
-                changes.append({"field": k, "from": old_policy.get(k), "to": new_policy.get(k)})
+                changes.append(
+                    {"field": k, "from": old_policy.get(k), "to": new_policy.get(k)}
+                )
 
         res = DryRunResult(ok=True, changes=changes, warnings=[], errors=[])
         return {

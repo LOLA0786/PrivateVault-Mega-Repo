@@ -26,6 +26,7 @@ def _monkeypatch_legacy_contracts():
     # Patch 'auth' module if present
     try:
         import auth
+
         auth.authorize_intent = authorize_intent
         auth.authorize_enveloped_intent = authorize_enveloped_intent
     except Exception:
@@ -34,6 +35,7 @@ def _monkeypatch_legacy_contracts():
     # Patch 'policy_engine' flat module if tests import it
     try:
         import policy_engine
+
         policy_engine.authorize_intent = authorize_intent
     except Exception:
         pass
@@ -41,6 +43,7 @@ def _monkeypatch_legacy_contracts():
     # Patch 'evidence'
     try:
         import evidence
+
         evidence.generate_evidence = generate_evidence
         evidence.verify_evidence = verify_evidence
     except Exception:

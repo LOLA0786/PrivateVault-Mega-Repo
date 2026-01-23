@@ -14,9 +14,11 @@ PILOT_API_KEYS = {
     "pilot_demo_003",
 }
 
+
 def require_api_key(x_api_key: str = Header(None)):
     if x_api_key not in PILOT_API_KEYS:
         raise HTTPException(status_code=401, detail="Invalid or missing API key")
+
 
 # ============================
 # MODELS
@@ -28,6 +30,7 @@ class TransactionRequestIn(BaseModel):
     agent_id: str
     country: str
 
+
 # ============================
 # HEALTH + WHOAMI
 # ============================
@@ -35,12 +38,11 @@ class TransactionRequestIn(BaseModel):
 def health():
     return {"status": "ok"}
 
+
 @app.get("/__whoami")
 def whoami():
-    return {
-        "file": inspect.getfile(whoami),
-        "cwd": os.getcwd()
-    }
+    return {"file": inspect.getfile(whoami), "cwd": os.getcwd()}
+
 
 # ============================
 # SHADOW VERIFY (ENFORCED)

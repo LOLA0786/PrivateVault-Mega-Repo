@@ -1,6 +1,7 @@
 import torch
 from indestructible_engine import IndestructibleEngine
 
+
 def weaponize_model(model):
     """
     Converts the 'Actual Brain' into a quantized, JIT-compiled weapon.
@@ -15,6 +16,7 @@ def weaponize_model(model):
     scripted_brain = torch.jit.script(quantized_model)
     scripted_brain.save("sovereign_brain.pt")
     print("🚀 BRAIN QUANTIZED & JIT-EXPORTED. READY FOR HARDWARE DEPLOYMENT.")
+
 
 if __name__ == "__main__":
     brain = IndestructibleEngine()

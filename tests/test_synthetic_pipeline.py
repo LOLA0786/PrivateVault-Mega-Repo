@@ -24,7 +24,12 @@ def _parse_n_from_argv(default: int = 5) -> int:
 # Script-style execution (import-time)
 n = _parse_n_from_argv(default=5)
 
-principal = {"id": "agent_synth", "role": "agent", "type": "agent", "trust_level": "high"}
+principal = {
+    "id": "agent_synth",
+    "role": "agent",
+    "type": "agent",
+    "trust_level": "high",
+}
 context = {"amount": 12345}
 
 data = generate_synthetic_data(n=n)
@@ -34,6 +39,7 @@ risk = infer_risk("generate_synthetic_data", principal, context)
 print("Synthetic records:", len(data))
 print("Decision:", decision)
 print("Risk:", risk)
+
 
 # pytest-friendly assertion so it counts as a real test
 def test_synthetic_pipeline_executes():

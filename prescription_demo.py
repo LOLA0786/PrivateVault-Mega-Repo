@@ -3,8 +3,10 @@ import json, hashlib, time
 RESTRICTED_AGE = 18
 AGE_RESTRICTED_DRUGS = ["accutane"]
 
+
 def hash_evidence(obj):
     return hashlib.sha256(json.dumps(obj, sort_keys=True).encode()).hexdigest()
+
 
 def evaluate_policy(intent):
     decisions = []
@@ -19,22 +21,30 @@ def evaluate_policy(intent):
 
     # Allergy check
     if intent["drug"] in intent["allergies"]:
-        decisions.append(["ALLERGY_CHECK", False, "CRITICAL: Patient allergic to medication"])
+        decisions.append(
+            ["ALLERGY_CHECK", False, "CRITICAL: Patient allergic to medication"]
+        )
         allergy_ok = False
     else:
         decisions.append(["ALLERGY_CHECK", True, "No known allergies"])
         allergy_ok = True
 
     # Drug-specific age restriction
-    if intent["drug"] in AGE_RESTRICTED_DRUGS and intent["patient_age"] < RESTRICTED_AGE:
+    if (
+        intent["drug"] in AGE_RESTRICTED_DRUGS
+        and intent["patient_age"] < RESTRICTED_AGE
+    ):
         decisions.append(["AGE_RESTRICTED_DRUG", False, "Age-restricted medication"])
         drug_age_ok = False
     else:
-        decisions.append(["AGE_RESTRICTED_DRUG", True, "Drug age restriction satisfied"])
+        decisions.append(
+            ["AGE_RESTRICTED_DRUG", True, "Drug age restriction satisfied"]
+        )
         drug_age_ok = True
 
     allowed = age_ok and allergy_ok and drug_age_ok
     return allowed, decisions
+
 
 def main():
     drug = input("Enter drug: ").strip().lower()
@@ -43,7 +53,9 @@ def main():
     frequency = input("Enter frequency: ").strip().lower()
     controlled = input("Controlled substance? (true/false): ").strip().lower() == "true"
 
-    allergy_list = [] if allergies == "none" else [a.strip() for a in allergies.split(",")]
+    allergy_list = (
+        [] if allergies == "none" else [a.strip() for a in allergies.split(",")]
+    )
 
     intent = {
         "action": "prescribe_medication",
@@ -51,7 +63,7 @@ def main():
         "patient_age": age,
         "allergies": allergy_list,
         "frequency": frequency,
-        "controlled": controlled
+        "controlled": controlled,
     }
 
     print("\n--- INTENT ---")
@@ -63,11 +75,7 @@ def main():
     for d in decisions:
         print(d)
 
-    evidence = {
-        "intent": intent,
-        "decisions": decisions,
-        "timestamp": time.time()
-    }
+    evidence = {"intent": intent, "decisions": decisions, "timestamp": time.time()}
 
     print("\n--- EVIDENCE HASH ---")
     print(hash_evidence(evidence))
@@ -76,6 +84,7 @@ def main():
         print("\n✅ APPROVED - Prescription allowed")
     else:
         print("\n❌ BLOCKED - Regulatory or safety violation")
+
 
 if __name__ == "__main__":
     main()

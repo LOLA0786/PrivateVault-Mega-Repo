@@ -8,6 +8,7 @@ DEFAULT_LOG_FILES = [
     "logs-medtech.json",
 ]
 
+
 def read_recent_audits(limit=50):
     entries = []
 

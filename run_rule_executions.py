@@ -8,11 +8,7 @@ for _ in range(30):
         "task_type": "analysis",
         "budget": 0.02,
         "latency_sla_ms": 800,
-        "provider_health": {
-            "grok": "healthy",
-            "gpt": "healthy",
-            "local": "unhealthy"
-        }
+        "provider_health": {"grok": "healthy", "gpt": "healthy", "local": "unhealthy"},
     }
 
     plan = router.select_path(state)

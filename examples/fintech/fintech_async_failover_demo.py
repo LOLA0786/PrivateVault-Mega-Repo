@@ -4,14 +4,17 @@ import json
 import hashlib
 from datetime import datetime, timedelta
 
+
 # -----------------------------
 # Utilities
 # -----------------------------
 def h(data):
     return hashlib.sha256(json.dumps(data, sort_keys=True).encode()).hexdigest()
 
+
 def now():
     return datetime.utcnow().isoformat() + "Z"
+
 
 # -----------------------------
 # Mock External Feeds (Async)
@@ -22,24 +25,19 @@ async def ofac_check(name, country):
         "feed": "OFAC",
         "match": True,
         "confidence": 95,
-        "last_updated": (datetime.utcnow() - timedelta(minutes=5)).isoformat() + "Z"
+        "last_updated": (datetime.utcnow() - timedelta(minutes=5)).isoformat() + "Z",
     }
+
 
 async def pep_check(name):
     await asyncio.sleep(0.05)  # 50ms
-    return {
-        "feed": "PEP",
-        "match": True,
-        "risk": "HIGH"
-    }
+    return {"feed": "PEP", "match": True, "risk": "HIGH"}
+
 
 async def geo_risk(country):
     await asyncio.sleep(0.03)  # 30ms
-    return {
-        "feed": "GEO",
-        "risk": "HIGH",
-        "reason": "Comprehensive sanctions"
-    }
+    return {"feed": "GEO", "risk": "HIGH", "reason": "Comprehensive sanctions"}
+
 
 # -----------------------------
 # Policy Engine (Async)
@@ -62,7 +60,7 @@ async def evaluate_transaction(fail_mode="FAIL_CLOSED"):
         policy = [
             ("OFAC_MATCH", False, "95% SDN match"),
             ("PEP_RISK", False, "Politically exposed person"),
-            ("GEO_SANCTIONS", False, "High-risk jurisdiction")
+            ("GEO_SANCTIONS", False, "High-risk jurisdiction"),
         ]
 
         decision = "BLOCKED"
@@ -89,10 +87,7 @@ async def evaluate_transaction(fail_mode="FAIL_CLOSED"):
         "decision": decision,
         "reason": reason,
         "policy": policy,
-        "latency_budget_ms": {
-            **latency,
-            "TOTAL_ms": total_latency
-        }
+        "latency_budget_ms": {**latency, "TOTAL_ms": total_latency},
     }
 
     print("\n--- POLICY DECISION ---")
@@ -105,7 +100,12 @@ async def evaluate_transaction(fail_mode="FAIL_CLOSED"):
     print("\n--- EVIDENCE HASH ---")
     print(h(evidence))
 
-    print(f"\n❌ {decision}: {reason}" if decision == "BLOCKED" else f"\n✅ {decision}: {reason}")
+    print(
+        f"\n❌ {decision}: {reason}"
+        if decision == "BLOCKED"
+        else f"\n✅ {decision}: {reason}"
+    )
+
 
 # -----------------------------
 # Run Demo

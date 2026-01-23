@@ -64,7 +64,9 @@ class AuthManager:
             raise HTTPException(status_code=401, detail="Invalid token")
 
 
-async def get_current_user(credentials: HTTPAuthorizationCredentials = Security(security)) -> dict:
+async def get_current_user(
+    credentials: HTTPAuthorizationCredentials = Security(security),
+) -> dict:
     """
     FastAPI dependency to get current authenticated user
 
@@ -87,7 +89,9 @@ async def require_permission(permission: str):
             ...
     """
 
-    async def permission_checker(credentials: HTTPAuthorizationCredentials = Security(security)):
+    async def permission_checker(
+        credentials: HTTPAuthorizationCredentials = Security(security),
+    ):
         user = AuthManager.verify_token(credentials.credentials)
 
         if permission not in user.get("permissions", []):

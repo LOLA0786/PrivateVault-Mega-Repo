@@ -2,23 +2,28 @@ import json
 import hashlib
 from datetime import datetime
 
+
 # -------------------------------------------------
 # Utilities
 # -------------------------------------------------
 def h(x):
     return hashlib.sha256(json.dumps(x, sort_keys=True).encode()).hexdigest()
 
+
 def now():
     return datetime.utcnow().isoformat() + "Z"
+
 
 def section(title):
     print("\n" + "=" * 78)
     print(title)
     print("=" * 78)
 
+
 def show(policy):
     for p in policy:
         print(list(p))
+
 
 # -------------------------------------------------
 # DEMO 1: DARK PATTERNS / DECEPTIVE UX (FTC)
@@ -29,7 +34,7 @@ policy = [
     ("FTC_DARK_PATTERN", False, "Forced continuity detected"),
     ("FALSE_URGENCY", False, "Fake countdown timer"),
     ("CONSUMER_CONSENT", False, "Consent not freely given"),
-    ("SECTION_5", True, "FTC deceptive practice")
+    ("SECTION_5", True, "FTC deceptive practice"),
 ]
 
 show(policy)
@@ -47,7 +52,7 @@ policy = [
     ("AUTO_RENEWAL_LAW", False, "No clear cancellation path"),
     ("BILLING_DISCLOSURE", False, "Material terms hidden"),
     ("CONSENT_LOGGING", False, "Affirmative consent missing"),
-    ("STATE_AG_RISK", True, "State AG enforcement likely")
+    ("STATE_AG_RISK", True, "State AG enforcement likely"),
 ]
 
 show(policy)
@@ -64,7 +69,7 @@ policy = [
     ("REFERENCE_PRICE", False, "Inflated list price"),
     ("DISCOUNT_AUTHENTICITY", False, "Never-sold-at price"),
     ("FTC_PRICING_RULES", False, "False savings claim"),
-    ("CLASS_ACTION", True, "High likelihood")
+    ("CLASS_ACTION", True, "High likelihood"),
 ]
 
 show(policy)
@@ -81,7 +86,7 @@ policy = [
     ("PCI_DSS", False, "Payment data mishandled"),
     ("REFUND_TIMELINE", False, "Delayed beyond statutory window"),
     ("CHARGEBACK_RISK", True, "Network penalties triggered"),
-    ("CARD_NETWORK_RULES", False, "Visa/Mastercard violation")
+    ("CARD_NETWORK_RULES", False, "Visa/Mastercard violation"),
 ]
 
 show(policy)
@@ -98,7 +103,7 @@ policy = [
     ("FTC_ENDORSEMENT", False, "Sponsored content undisclosed"),
     ("INFLUENCER_GUIDELINES", False, "No #ad disclosure"),
     ("PLATFORM_POLICY", False, "Meta/Google violation"),
-    ("BRAND_LIABILITY", True, "Advertiser responsible")
+    ("BRAND_LIABILITY", True, "Advertiser responsible"),
 ]
 
 show(policy)
@@ -115,7 +120,7 @@ policy = [
     ("GDPR_CONSENT", False, "Implicit consent invalid"),
     ("CCPA_OPT_OUT", False, "Do Not Sell ignored"),
     ("DATA_MINIMIZATION", False, "Excessive tracking"),
-    ("REGULATORY_FINE", True, "Enforcement exposure")
+    ("REGULATORY_FINE", True, "Enforcement exposure"),
 ]
 
 show(policy)
@@ -132,7 +137,7 @@ policy = [
     ("CONSUMER_RIGHTS", False, "Statutory return denied"),
     ("DEFECTIVE_GOODS", False, "Mandatory refund required"),
     ("STATE_LAW", False, "CA/EU violation"),
-    ("REPUTATIONAL_DAMAGE", True, "Brand trust erosion")
+    ("REPUTATIONAL_DAMAGE", True, "Brand trust erosion"),
 ]
 
 show(policy)
@@ -149,7 +154,7 @@ policy = [
     ("CUSTOMS_DECLARATION", False, "Undervalued shipment"),
     ("HS_CODE", False, "Incorrect classification"),
     ("DUTY_EVASION", True, "Intent inferred"),
-    ("SHIPMENT_SEIZURE", False, "High probability")
+    ("SHIPMENT_SEIZURE", False, "High probability"),
 ]
 
 show(policy)
@@ -175,9 +180,9 @@ audit = {
         "Platform de-listing",
         "Privacy fines",
         "Chargeback death spiral",
-        "Brand trust collapse"
+        "Brand trust collapse",
     ],
-    "system_role": "Consumer protection & platform compliance enforcement layer"
+    "system_role": "Consumer protection & platform compliance enforcement layer",
 }
 
 print(json.dumps(audit, indent=2))

@@ -1,5 +1,6 @@
 from .backend import CryptoBackend
 
+
 class PostQuantumStub(CryptoBackend):
     name = "pq-stub"
 

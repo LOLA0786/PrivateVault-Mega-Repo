@@ -5,6 +5,7 @@ SECRET = "uaal-secret"
 TTL = 300
 r = redis.Redis(host="localhost", port=6379, decode_responses=True)
 
+
 def issue_jwt_cap(decision_id, action, principal):
     jti = str(uuid.uuid4())
     payload = {
@@ -12,9 +13,10 @@ def issue_jwt_cap(decision_id, action, principal):
         "decision_id": decision_id,
         "action": action,
         "principal": principal,
-        "exp": time.time() + TTL
+        "exp": time.time() + TTL,
     }
     return jwt.encode(payload, SECRET, algorithm="HS256")
+
 
 def verify_jwt_cap(token, action, principal):
     payload = jwt.decode(token, SECRET, algorithms=["HS256"])

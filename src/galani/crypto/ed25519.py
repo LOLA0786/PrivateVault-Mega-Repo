@@ -1,6 +1,7 @@
 from nacl.signing import SigningKey, VerifyKey
 from .backend import CryptoBackend
 
+
 class Ed25519Backend(CryptoBackend):
     name = "ed25519"
 

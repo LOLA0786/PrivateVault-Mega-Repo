@@ -1,12 +1,13 @@
 """
 Example: How to add metrics to your endpoints
 """
+
 from fastapi import FastAPI
 from prometheus_client import make_asgi_app
 from monitoring.metrics.metrics import (
     track_request_metrics,
     record_risk_decision,
-    active_agents
+    active_agents,
 )
 
 app = FastAPI()
@@ -15,6 +16,7 @@ app = FastAPI()
 metrics_app = make_asgi_app()
 app.mount("/metrics", metrics_app)
 
+
 # ============================================================================
 # Example: Track endpoint metrics
 # ============================================================================
@@ -22,14 +24,15 @@ app.mount("/metrics", metrics_app)
 @track_request_metrics("credit_check")
 async def credit_check(applicant_id: str, amount: float):
     """Endpoint with automatic metrics tracking"""
-    
+
     # Process request
     risk_score = 0.4
-    
+
     # Record business metric
     record_risk_decision("credit_check", risk_score)
-    
+
     return {"status": "approved", "risk_score": risk_score}
+
 
 # ============================================================================
 # Example: Update gauge metrics
@@ -40,6 +43,7 @@ async def startup():
     # Count active agents
     # active_count = db.query("SELECT COUNT(*) FROM agents WHERE status='active'")
     active_agents.set(10)
+
 
 # ============================================================================
 # View metrics

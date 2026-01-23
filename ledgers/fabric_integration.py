@@ -6,6 +6,7 @@ from hfc.fabric import Client
 from hfc.fabric_network.gateway import Gateway
 from .ledger_base import LedgerBase
 
+
 class FabricLedger(LedgerBase):
     def __init__(self):
         self.net_profile = os.getenv("FABRIC_CONNECTION", "./network.json")
@@ -26,12 +27,14 @@ class FabricLedger(LedgerBase):
             network = await self.gateway.get_network(self.channel)
             contract = network.get_contract(self.cc_name)
 
-            payload = json.dumps({
-                "intent": intent,
-                "decision": decision,
-                "user_id": user_id,
-                "timestamp": asyncio.get_event_loop().time()
-            })
+            payload = json.dumps(
+                {
+                    "intent": intent,
+                    "decision": decision,
+                    "user_id": user_id,
+                    "timestamp": asyncio.get_event_loop().time(),
+                }
+            )
 
             resp = await contract.submit_transaction("appendAudit", payload)
             return resp.decode()

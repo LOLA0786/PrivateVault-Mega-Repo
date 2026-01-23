@@ -2,23 +2,28 @@ import json
 import hashlib
 from datetime import datetime
 
+
 # -------------------------------------------------
 # Utilities
 # -------------------------------------------------
 def h(x):
     return hashlib.sha256(json.dumps(x, sort_keys=True).encode()).hexdigest()
 
+
 def now():
     return datetime.utcnow().isoformat() + "Z"
+
 
 def section(title):
     print("\n" + "=" * 78)
     print(title)
     print("=" * 78)
 
+
 def show(policy):
     for p in policy:
         print(list(p))
+
 
 # -------------------------------------------------
 # DEMO 1: GRID RELIABILITY / NERC CIP VIOLATION
@@ -29,7 +34,7 @@ policy = [
     ("NERC_CIP_ACCESS", False, "Unauthorized access to BES cyber asset"),
     ("CHANGE_MANAGEMENT", False, "Unapproved control system change"),
     ("OPERATIONAL_RISK", False, "Risk to grid stability"),
-    ("BLACKOUT_RISK", True, "Cascading outage possible")
+    ("BLACKOUT_RISK", True, "Cascading outage possible"),
 ]
 
 show(policy)
@@ -47,7 +52,7 @@ policy = [
     ("EPA_PERMIT", False, "Emission exceeds permitted threshold"),
     ("CLEAN_AIR_ACT", False, "Unauthorized pollutant discharge"),
     ("REPORTING_ACCURACY", False, "Emission data manipulation detected"),
-    ("STRICT_LIABILITY", True, "No intent defense available")
+    ("STRICT_LIABILITY", True, "No intent defense available"),
 ]
 
 show(policy)
@@ -65,7 +70,7 @@ policy = [
     ("PRICE_MANIPULATION", False, "Artificial congestion strategy detected"),
     ("ANTI_GAMING", False, "Violates FERC market rules"),
     ("CFTC_EXPOSURE", True, "Derivatives manipulation risk"),
-    ("ENRON_PATTERN", False, "Historical abuse signature matched")
+    ("ENRON_PATTERN", False, "Historical abuse signature matched"),
 ]
 
 show(policy)
@@ -82,7 +87,7 @@ policy = [
     ("OSHA_PSM", False, "Process Safety Management controls bypassed"),
     ("LOCKOUT_TAGOUT", False, "Energy isolation missing"),
     ("WORKER_SAFETY", False, "Imminent danger condition"),
-    ("CRIMINAL_LIABILITY", True, "Willful safety violation")
+    ("CRIMINAL_LIABILITY", True, "Willful safety violation"),
 ]
 
 show(policy)
@@ -100,7 +105,7 @@ policy = [
     ("PHMSA_INTEGRITY", False, "Inspection overdue"),
     ("CORROSION_CONTROL", False, "Monitoring lapse detected"),
     ("LEAK_RISK", True, "High probability release"),
-    ("PUBLIC_SAFETY", False, "Community exposure risk")
+    ("PUBLIC_SAFETY", False, "Community exposure risk"),
 ]
 
 show(policy)
@@ -117,7 +122,7 @@ policy = [
     ("SEC_CLIMATE_RULE", False, "Scope 1/2 emissions misstated"),
     ("GREENWASHING", False, "Misleading sustainability claim"),
     ("INVESTOR_DISCLOSURE", False, "Material omission"),
-    ("SEC_ENFORCEMENT", True, "Securities fraud risk")
+    ("SEC_ENFORCEMENT", True, "Securities fraud risk"),
 ]
 
 show(policy)
@@ -142,9 +147,9 @@ audit = {
         "Market manipulation fines",
         "Worker fatalities",
         "Pipeline rupture",
-        "Securities enforcement"
+        "Securities enforcement",
     ],
-    "system_role": "Deterministic safety, market, and compliance control plane"
+    "system_role": "Deterministic safety, market, and compliance control plane",
 }
 
 print(json.dumps(audit, indent=2))
