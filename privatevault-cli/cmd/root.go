@@ -26,10 +26,9 @@ var rootCmd = &cobra.Command{
 	SilenceErrors: true,
 }
 
-func Execute() {
+func Execute() error {
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, "Error:", err.Error())
-		os.Exit(1)
 	}
 }
 
