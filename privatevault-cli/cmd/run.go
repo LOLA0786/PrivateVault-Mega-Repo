@@ -3,37 +3,45 @@ package cmd
 import (
 	"fmt"
 	"os"
-
-	"github.com/spf13/cobra"
+	"os/exec"
+	"path/filepath"
 )
 
-var runCmd = &cobra.Command{
-	Use:   "run",
-	Short: "Run workflows",
-}
-
-var runDemoCmd = &cobra.Command{
-	Use:   "demo",
-	Short: "Run a local PrivateVault demo",
-	RunE: func(cmd *cobra.Command, args []string) error {
-		fmt.Println("🚀 Starting PrivateVault local demo (secure agents + governance relay)...")
-		fmt.Println("✅ Demo: verifying environment...")
-
-		// Minimal self-contained demo output
-		fmt.Println("✅ AI Firewall: enabled (strict)")
-		fmt.Println("✅ Governance: enabled (shadow mode)")
-		fmt.Println("✅ Audit: WORM ledger enabled")
-		fmt.Println("✅ Demo complete.")
-		return nil
-	},
-}
-
-func init() {
-	RootCmd.AddCommand(runCmd)
-	runCmd.AddCommand(runDemoCmd)
-
-	// Safety: never depend on repo paths for demo
-	if os.Getenv("PRIVATEVAULT_DEMO_MODE") == "" {
-		_ = os.Setenv("PRIVATEVAULT_DEMO_MODE", "local")
+// RunCmd: minimal standalone runner (does NOT depend on RootCmd).
+// This avoids goreleaser build failures if RootCmd is missing/renamed.
+func RunCmd(args []string) error {
+	if len(args) == 0 {
+		return fmt.Errorf("missing args: expected `run demo`")
 	}
+
+	switch args[0] {
+	case "demo":
+		return runDemo()
+	default:
+		return fmt.Errorf("unknown run subcommand: %s (supported: demo)", args[0])
+	}
+}
+
+func runDemo() error {
+	// Try common locations:
+	// 1) repo checkout path (dev)
+	// 2) brew install path won’t have demo scripts, so we message clearly
+	repoRoot, _ := os.Getwd()
+
+	candidates := []string{
+		filepath.Join(repoRoot, "demo", "local-demo.sh"),
+		filepath.Join(repoRoot, "..", "demo", "local-demo.sh"),
+	}
+
+	for _, p := range candidates {
+		if st, err := os.Stat(p); err == nil && !st.IsDir() {
+			cmd := exec.Command("bash", p)
+			cmd.Stdout = os.Stdout
+			cmd.Stderr = os.Stderr
+			cmd.Stdin = os.Stdin
+			return cmd.Run()
+		}
+	}
+
+	return fmt.Errorf("missing script: demo/local-demo.sh (this is expected in Homebrew installs; use repo checkout)")
 }
