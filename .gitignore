@@ -113,3 +113,10 @@ audits.worm
 .venv/
 .venv-tests/
 venv/
+
+# never commit bundles/backups/venvs
+*.bundle
+.venv/
+.venv-tests/
+venv/
+dist/
