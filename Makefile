@@ -76,3 +76,21 @@ clean:
 	rm -f *.pyc
 	rm -rf __pycache__
 	@echo "🧹 Clean complete"
+
+.PHONY: install lint test
+
+install:
+	@echo "✅ install: installing python deps"
+	python3 -m pip install --upgrade pip
+	python3 -m pip install -r requirements.txt
+
+lint:
+	@echo "✅ lint"
+	python3 -m pip install -r requirements.txt
+	python3 -m pip install ruff
+	ruff check .
+
+test:
+	@echo "✅ test"
+	python3 -m pip install -r requirements.txt
+	pytest -q

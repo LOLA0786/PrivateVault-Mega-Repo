@@ -34,7 +34,7 @@ jobs:
           safety check --json || true
       
       - name: Upload security reports
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: security-reports
           path: |
@@ -73,7 +73,7 @@ jobs:
           fail_ci_if_error: true
       
       - name: Upload test results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: test-results
@@ -133,7 +133,7 @@ jobs:
       
       - name: Upload logs
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: integration-test-logs
           path: logs/
