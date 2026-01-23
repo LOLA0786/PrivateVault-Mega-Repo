@@ -2,7 +2,7 @@ import json
 import os
 import hashlib
 from typing import Dict, Any, Optional
-from datetime import datetime, UTC
+from datetime import datetime, timezone, UTC
 from .ledger_base import LedgerBase
 
 
