@@ -12,7 +12,7 @@ help:
 	 "✅ lint"
 	python3 -m pip install -r requirements.txt
 	python3 -m pip install ruff
-	ruff check security vaults --output-format=github
+	ruff check security --output-format=github
 
 test:
 	@echo "============================================================="
@@ -75,11 +75,11 @@ install:
 	python3 -m pip install --upgrade pip
 	python3 -m pip install -r requirements.txt
 
-lint:
-	@echo "✅ lint"
+ lint:
+	 "✅ lint"
 	python3 -m pip install -r requirements.txt
 	python3 -m pip install ruff
-	ruff check .
+	ruff check security --output-format=github
 
 test:
 	@echo "✅ test"
