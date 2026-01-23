@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=https://goreleaser.com/static/schema.json
 version: 2
 
 project_name: privatevault
@@ -23,22 +24,15 @@ builds:
 archives:
   - id: default
     format: binary
-    name_template: "{{ .ProjectName }}-{{ .Os }}-{{ .Arch }}"
+    name_template: "privatevault-{{ .Os }}-{{ .Arch }}"
 
 checksum:
   name_template: "checksums.txt"
 
-changelog:
-  sort: asc
-  filters:
-    exclude:
-      - "^docs:"
-      - "^test:"
-
 brews:
   - name: privatevault
     homepage: "https://github.com/LOLA0786/PrivateVault-Mega-Repo"
-    description: "PrivateVault CLI: security control plane for AI agents"
+    description: "PrivateVault CLI: Enterprise-grade secure multi-agent OS manager"
     license: "MIT"
 
     repository:
@@ -49,12 +43,22 @@ brews:
 
     directory: Formula
 
-    commit_author:
-      name: "PrivateVault Bot"
-      email: "bot@privatevault.ai"
-
     install: |
-      bin.install "privatevault"
+      if OS.mac?
+        binary_name = "privatevault-darwin-#{Hardware::CPU.arm? ? "arm64" : "amd64"}"
+      elsif OS.linux?
+        binary_name = "privatevault-linux-#{Hardware::CPU.arm? ? "arm64" : "amd64"}"
+      else
+        odie "Unsupported OS"
+      end
+
+      bin.install binary_name => "privatevault"
+      bin.install_symlink "privatevault" => "pv"
 
     test: |
       system "#{bin}/privatevault", "version"
+
+release:
+  github:
+    owner: LOLA0786
+    name: PrivateVault-Mega-Repo
