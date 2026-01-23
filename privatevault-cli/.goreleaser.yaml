@@ -1,55 +1,80 @@
+# GoReleaser config for PrivateVault CLI
+# Publishes:
+# - GitHub Releases (binaries + checksums)
+# - Homebrew Formula to LOLA0786/homebrew-privatevault
+
 version: 2
+
 project_name: privatevault
+
 before:
   hooks:
-  - go mod tidy
-builds:
-- id: privatevault
-  main: .
-  binary: privatevault
-  env:
-  - CGO_ENABLED=0
-  goos:
-  - linux
-  - darwin
-  - windows
-  goarch:
-  - amd64
-  - arm64
-  ldflags:
-  - -s -w
-  - -X github.com/LOLA0786/PrivateVault-Mega-Repo/privatevault-cli/cmd.Version={{
-    .Version }}
-  - -X github.com/LOLA0786/PrivateVault-Mega-Repo/privatevault-cli/cmd.Commit={{ .Commit
-    }}
-  - -X github.com/LOLA0786/PrivateVault-Mega-Repo/privatevault-cli/cmd.BuildDate={{
-    .Date }}
-archives:
-- id: default
-  format: binary
-  name_template: privatevault-{{ .Os }}-{{ .Arch }}
-checksum:
-  name_template: checksums.txt
-brews:
-- name: privatevault
-  homepage: https://github.com/LOLA0786/PrivateVault-Mega-Repo
-  description: 'PrivateVault CLI: Enterprise-grade secure multi-agent OS manager'
-  license: MIT
-  repository:
-    owner: LOLA0786
-    name: homebrew-privatevault
-    branch: main
-    token: '{{ .Env.GITHUB_TOKEN }}'
-  directory: Formula
-  install: "if OS.mac?\n  binary_name = \"privatevault-darwin-#{Hardware::CPU.arm?\
-    \ ? \"arm64\" : \"amd64\"}\"\nelsif OS.linux?\n  binary_name = \"privatevault-linux-#{Hardware::CPU.arm?\
-    \ ? \"arm64\" : \"amd64\"}\"\nelse\n  odie \"Unsupported OS\"\nend\n\nbin.install\
-    \ binary_name => \"privatevault\"\nbin.install_symlink \"privatevault\" => \"\
-    pv\"\n"
-  test: 'system "#{bin}/privatevault", "version"
+    - go mod tidy
 
-    '
+builds:
+  - id: privatevault
+    main: ./main.go
+    binary: privatevault
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w
+      - -X "main.version={{ .Version }}"
+      - -X "main.commit={{ .Commit }}"
+      - -X "main.date={{ .Date }}"
+
+archives:
+  - id: default
+    builds:
+      - privatevault
+    format: binary
+    name_template: "{{ .ProjectName }}-{{ .Os }}-{{ .Arch }}"
+    replacements:
+      amd64: amd64
+      arm64: arm64
+
+checksum:
+  name_template: "checksums.txt"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^chore:"
+      - "^ci:"
+
 release:
   github:
     owner: LOLA0786
     name: PrivateVault-Mega-Repo
+
+brews:
+  - name: privatevault
+    description: "PrivateVault CLI: secure agent control plane + AI firewall"
+    homepage: "https://github.com/LOLA0786/PrivateVault-Mega-Repo"
+    license: "Apache-2.0"
+
+    # This is the tap repo:
+    repository:
+      owner: LOLA0786
+      name: homebrew-privatevault
+      branch: main
+      token: "{{ .Env.GITHUB_TOKEN }}"
+
+    directory: Formula
+
+    # Use GitHub release artifacts
+    url_template: "https://github.com/LOLA0786/PrivateVault-Mega-Repo/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
+
+    # Homebrew test block
+    test: |
+      system "#{bin}/privatevault", "version"
