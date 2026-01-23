@@ -1,63 +1,54 @@
-# yaml-language-server: $schema=https://goreleaser.com/static/schema.json
 version: 2
-
 project_name: privatevault
-
 before:
   hooks:
-    - go mod tidy
-
+  - go mod tidy
 builds:
-  - id: privatevault
-    main: .
-    binary: privatevault
-    env:
-      - CGO_ENABLED=0
-    goos:
-      - linux
-      - darwin
-      - windows
-    goarch:
-      - amd64
-      - arm64
-
+- id: privatevault
+  main: .
+  binary: privatevault
+  env:
+  - CGO_ENABLED=0
+  goos:
+  - linux
+  - darwin
+  - windows
+  goarch:
+  - amd64
+  - arm64
+  ldflags:
+  - -s -w
+  - -X github.com/LOLA0786/PrivateVault-Mega-Repo/privatevault-cli/cmd.Version={{
+    .Version }}
+  - -X github.com/LOLA0786/PrivateVault-Mega-Repo/privatevault-cli/cmd.Commit={{ .Commit
+    }}
+  - -X github.com/LOLA0786/PrivateVault-Mega-Repo/privatevault-cli/cmd.BuildDate={{
+    .Date }}
 archives:
-  - id: default
-    format: binary
-    name_template: "privatevault-{{ .Os }}-{{ .Arch }}"
-
+- id: default
+  format: binary
+  name_template: privatevault-{{ .Os }}-{{ .Arch }}
 checksum:
-  name_template: "checksums.txt"
-
+  name_template: checksums.txt
 brews:
-  - name: privatevault
-    homepage: "https://github.com/LOLA0786/PrivateVault-Mega-Repo"
-    description: "PrivateVault CLI: Enterprise-grade secure multi-agent OS manager"
-    license: "MIT"
+- name: privatevault
+  homepage: https://github.com/LOLA0786/PrivateVault-Mega-Repo
+  description: 'PrivateVault CLI: Enterprise-grade secure multi-agent OS manager'
+  license: MIT
+  repository:
+    owner: LOLA0786
+    name: homebrew-privatevault
+    branch: main
+    token: '{{ .Env.GITHUB_TOKEN }}'
+  directory: Formula
+  install: "if OS.mac?\n  binary_name = \"privatevault-darwin-#{Hardware::CPU.arm?\
+    \ ? \"arm64\" : \"amd64\"}\"\nelsif OS.linux?\n  binary_name = \"privatevault-linux-#{Hardware::CPU.arm?\
+    \ ? \"arm64\" : \"amd64\"}\"\nelse\n  odie \"Unsupported OS\"\nend\n\nbin.install\
+    \ binary_name => \"privatevault\"\nbin.install_symlink \"privatevault\" => \"\
+    pv\"\n"
+  test: 'system "#{bin}/privatevault", "version"
 
-    repository:
-      owner: LOLA0786
-      name: homebrew-privatevault
-      branch: main
-      token: "{{ .Env.GITHUB_TOKEN }}"
-
-    directory: Formula
-
-    install: |
-      if OS.mac?
-        binary_name = "privatevault-darwin-#{Hardware::CPU.arm? ? "arm64" : "amd64"}"
-      elsif OS.linux?
-        binary_name = "privatevault-linux-#{Hardware::CPU.arm? ? "arm64" : "amd64"}"
-      else
-        odie "Unsupported OS"
-      end
-
-      bin.install binary_name => "privatevault"
-      bin.install_symlink "privatevault" => "pv"
-
-    test: |
-      system "#{bin}/privatevault", "version"
-
+    '
 release:
   github:
     owner: LOLA0786
