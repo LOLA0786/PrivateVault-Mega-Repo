@@ -36,19 +36,9 @@ release:
 
 brews:
   - name: privatevault
-    description: "PrivateVault CLI: secure agent control plane + AI firewall"
-    homepage: "https://github.com/LOLA0786/PrivateVault-Mega-Repo"
-    license: "Apache-2.0"
-
     repository:
       owner: LOLA0786
       name: homebrew-privatevault
       branch: main
-      token: "{{ .Env.GITHUB_TOKEN }}"
-
+      token: "{ .Env.GITHUB_TOKEN }"
     directory: Formula
-
-    url_template: "https://github.com/LOLA0786/PrivateVault-Mega-Repo/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
-
-    test: |
-      system "#{bin}/privatevault", "version"
