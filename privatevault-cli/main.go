@@ -17,7 +17,7 @@ func main() {
 
 	switch os.Args[1] {
 	case "run":
-		if err := cmd.Execute(); err != nil {
+		if cmd.Execute()(); err != nil {
 			fmt.Println("Error:", err)
 			os.Exit(1)
 		}
