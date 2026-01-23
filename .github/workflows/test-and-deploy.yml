@@ -23,7 +23,9 @@ jobs:
       
       - name: Run linters
         run: |
-          black --check .
+          python -m pip install --upgrade pip
+python -m pip install black
+black --check .
           mypy . --ignore-missing-imports
       
       - name: Security scan
