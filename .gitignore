@@ -125,3 +125,6 @@ dist/
 .venv/
 .venv-tests/
 venv/
+
+# goreleaser/accidental tag folders
+privatevault-cli/v*/
