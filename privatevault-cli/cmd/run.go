@@ -5,43 +5,48 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+
+	"github.com/spf13/cobra"
 )
 
-// RunCmd: minimal standalone runner (does NOT depend on RootCmd).
-// This avoids goreleaser build failures if RootCmd is missing/renamed.
-func RunCmd(args []string) error {
-	if len(args) == 0 {
-		return fmt.Errorf("missing args: expected `run demo`")
-	}
-
-	switch args[0] {
-	case "demo":
-		return runDemo()
-	default:
-		return fmt.Errorf("unknown run subcommand: %s (supported: demo)", args[0])
-	}
+// runCmd is referenced by cmd/root.go.
+// We must define it or goreleaser build will fail.
+var runCmd = &cobra.Command{
+	Use:   "run",
+	Short: "Run PrivateVault operations",
 }
 
+var runDemoCmd = &cobra.Command{
+	Use:   "demo",
+	Short: "Run the local PrivateVault demo (repo checkout only)",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		return runDemo()
+	},
+}
+
+func init() {
+	runCmd.AddCommand(runDemoCmd)
+}
+
+// runDemo runs demo/local-demo.sh if present.
+// In Homebrew installs, repo demo scripts aren't present: we fail gracefully.
 func runDemo() error {
-	// Try common locations:
-	// 1) repo checkout path (dev)
-	// 2) brew install path won’t have demo scripts, so we message clearly
-	repoRoot, _ := os.Getwd()
+	wd, _ := os.Getwd()
 
 	candidates := []string{
-		filepath.Join(repoRoot, "demo", "local-demo.sh"),
-		filepath.Join(repoRoot, "..", "demo", "local-demo.sh"),
+		filepath.Join(wd, "demo", "local-demo.sh"),
+		filepath.Join(wd, "..", "demo", "local-demo.sh"),
 	}
 
 	for _, p := range candidates {
 		if st, err := os.Stat(p); err == nil && !st.IsDir() {
-			cmd := exec.Command("bash", p)
-			cmd.Stdout = os.Stdout
-			cmd.Stderr = os.Stderr
-			cmd.Stdin = os.Stdin
-			return cmd.Run()
+			c := exec.Command("bash", p)
+			c.Stdout = os.Stdout
+			c.Stderr = os.Stderr
+			c.Stdin = os.Stdin
+			return c.Run()
 		}
 	}
 
-	return fmt.Errorf("missing script: demo/local-demo.sh (this is expected in Homebrew installs; use repo checkout)")
+	return fmt.Errorf("missing script: demo/local-demo.sh (expected in repo checkout; not bundled in brew install)")
 }
