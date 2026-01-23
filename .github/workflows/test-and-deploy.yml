@@ -20,11 +20,11 @@ jobs:
       
       - name: Install dependencies
         run: |
-          pip install flake8 bandit safety black mypy
+          pip install flake8 security bandit safety black mypy
       
       - name: Run linters
         run: |
-          flake8 . --max-line-length=88 --exclude=venv,__pycache__
+          flake8 security . --max-line-length=88 --exclude=venv,__pycache__
           black --check .
           mypy . --ignore-missing-imports
       
