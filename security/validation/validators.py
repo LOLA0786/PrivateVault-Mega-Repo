@@ -15,15 +15,15 @@ class AgentRequest(BaseModel):
     action: str = Field(..., max_length=100)
     parameters: dict[str, Any]
 
-    @validator("agent_id")
-    def validate_agent_id(cls, v):
+    @validator("agent_id", mode="after")
+    def validate_agent_id(cls, v, **kwargs):
         """Only allow alphanumeric, underscore, hyphen"""
         if not re.match(r"^[a-zA-Z0-9_-]+$", v):
             raise ValueError("Invalid agent_id: only alphanumeric, _, - allowed")
         return v
 
-    @validator("action")
-    def validate_action(cls, v):
+    @validator("action", mode="after")
+    def validate_action(cls, v, **kwargs):
         """Whitelist allowed actions"""
         allowed_actions = ["credit_check", "fraud_detect", "kyc_verify", "risk_assess"]
         if v not in allowed_actions:
@@ -38,8 +38,8 @@ class CreditCheckRequest(BaseModel):
     amount: float = Field(..., gt=0, lt=10_000_000)
     term_months: int = Field(..., ge=1, le=360)
 
-    @validator("amount")
-    def validate_amount(cls, v):
+    @validator("amount", mode="after")
+    def validate_amount(cls, v, **kwargs):
         """Ensure amount is reasonable"""
         if v <= 0:
             raise ValueError("Amount must be positive")
@@ -56,8 +56,8 @@ class FraudDetectRequest(BaseModel):
     merchant: str = Field(max_length=200)
     card_last4: str = Field(pattern=r"^\d{4}$")
 
-    @validator("card_last4")
-    def validate_card(cls, v):
+    @validator("card_last4", mode="after")
+    def validate_card(cls, v, **kwargs):
         """Ensure card is 4 digits"""
         if not v.isdigit() or len(v) != 4:
             raise ValueError("card_last4 must be exactly 4 digits")

@@ -2,7 +2,7 @@ import json
 import os
 import hashlib
 from typing import Dict, Any, Optional
-from datetime import datetime
+from datetime import datetime, UTC
 from .ledger_base import LedgerBase
 
 
@@ -17,7 +17,7 @@ class WORMFallback(LedgerBase):
                     "intent": intent,
                     "decision": decision,
                     "user_id": user_id,
-                    "timestamp": datetime.utcnow().isoformat(),
+                    "timestamp": datetime.now(datetime.UTC).isoformat(),
                 }
             )
             h = hashlib.sha256(payload.encode()).hexdigest()

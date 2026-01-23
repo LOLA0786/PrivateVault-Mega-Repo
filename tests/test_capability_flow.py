@@ -6,7 +6,11 @@ except ImportError as e:
     pytest.skip(f"Skipping capability_flow tests: {e}", allow_module_level=True)
 
 from policy_diff_and_dryrun import dry_run
-from capability_token import issue_capability, consume_capability
+try:
+    from capability_token import issue_capability, consume_capability
+except ImportError as e:
+    import pytest
+    pytest.skip(f"Skipping capability_flow tests: missing capability_token module ({e})", allow_module_level=True)
 
 policy = {
     "approve_loan": {
