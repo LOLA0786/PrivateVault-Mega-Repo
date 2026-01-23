@@ -105,3 +105,6 @@ __pycache__/
 
 # ========= Audit artifacts =========
 audits.worm
+
+# never commit git bundles / backups
+*.bundle
