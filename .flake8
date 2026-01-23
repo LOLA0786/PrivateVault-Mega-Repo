@@ -11,7 +11,4 @@ exclude =
   build,
   ai-firewall-demo,
   examples,
-  demos,
-  usage_tracker.py,
-  unstructured_chaos_demo.py,
-  unstructured_intent_demo.py
+  demos
