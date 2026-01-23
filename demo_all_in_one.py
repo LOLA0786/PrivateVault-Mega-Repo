@@ -14,6 +14,7 @@ import json
 # POLICY ENGINE (AUTHORITATIVE)
 # -----------------------------
 
+
 def authorize_intent(intent: dict):
     action = intent.get("action")
     args = intent.get("args", {})
@@ -34,7 +35,7 @@ def authorize_intent(intent: dict):
                 "fintech-v1.0",
                 intent,
                 evidence_id,
-                timestamp
+                timestamp,
             )
 
     # MedTech invariant
@@ -46,16 +47,11 @@ def authorize_intent(intent: dict):
                 "medtech-v1.0",
                 intent,
                 evidence_id,
-                timestamp
+                timestamp,
             )
 
     return decision_payload(
-        True,
-        "Allowed by policy",
-        "default-v1.0",
-        intent,
-        evidence_id,
-        timestamp
+        True, "Allowed by policy", "default-v1.0", intent, evidence_id, timestamp
     )
 
 
@@ -96,7 +92,7 @@ def replay_evidence(evidence_id: str):
     return {
         "valid": recomputed == stored["evidence_hash"],
         "evidence_id": evidence_id,
-        "policy_version": stored["policy_version"]
+        "policy_version": stored["policy_version"],
     }
 
 
@@ -104,19 +100,21 @@ def replay_evidence(evidence_id: str):
 # AGENT (SIMULATED / LLM-LIKE)
 # -----------------------------
 
+
 def agent_proposes(action, args, context):
     print(f"\n🤖 Agent proposes: {action}")
     return {
         "agent_id": "demo-agent",
         "action": action,
         "args": args,
-        "context": context
+        "context": context,
     }
 
 
 # -----------------------------
 # FULL DEMO RUN
 # -----------------------------
+
 
 def run_demo():
     print("\n==============================")
@@ -125,9 +123,7 @@ def run_demo():
 
     # FinTech BLOCK
     intent1 = agent_proposes(
-        "transfer_money",
-        {"amount": 250000},
-        {"jurisdiction": "IN"}
+        "transfer_money", {"amount": 250000}, {"jurisdiction": "IN"}
     )
     decision1 = authorize_intent(intent1)
     print("Decision:", decision1["decision"])
@@ -138,9 +134,7 @@ def run_demo():
 
     # FinTech ALLOW
     intent2 = agent_proposes(
-        "transfer_money",
-        {"amount": 25000},
-        {"jurisdiction": "IN"}
+        "transfer_money", {"amount": 25000}, {"jurisdiction": "IN"}
     )
     decision2 = authorize_intent(intent2)
     print("Decision:", decision2["decision"])
@@ -150,7 +144,7 @@ def run_demo():
     intent3 = agent_proposes(
         "prescribe_medication",
         {"drug": "morphine"},
-        {"patient_age": 14, "consent": False}
+        {"patient_age": 14, "consent": False},
     )
     decision3 = authorize_intent(intent3)
     print("Decision:", decision3["decision"])

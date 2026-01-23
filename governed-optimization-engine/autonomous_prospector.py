@@ -4,7 +4,8 @@ import google.generativeai as genai
 
 # Setup Gemini - Replace with your API Key
 genai.configure(api_key="YOUR_GEMINI_API_KEY")
-model = genai.GenerativeModel('gemini-1.5-flash')
+model = genai.GenerativeModel("gemini-1.5-flash")
+
 
 class SalesAgent:
     def __init__(self, industry):
@@ -25,19 +26,20 @@ class SalesAgent:
         
         Format: JSON with keys 'pain_point', 'acceleration_benefit', 'pitch'.
         """
-        
+
         response = model.generate_content(prompt)
         # Clean the response to ensure it's valid JSON
-        raw_text = response.text.replace('```json', '').replace('```', '').strip()
+        raw_text = response.text.replace("```json", "").replace("```", "").strip()
         return json.loads(raw_text)
+
 
 # --- Execution ---
 if __name__ == "__main__":
     # Example: Targeting a Series C Logistics company
     agent = SalesAgent(industry="Logistics")
-    
+
     target_companies = ["Flexport", "Deliveroo", "Stord"]
-    
+
     print(f"--- STARTING OUTREACH SCAN ---")
     for co in target_companies:
         insight = agent.research_and_pitch(co)

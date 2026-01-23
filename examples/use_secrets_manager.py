@@ -1,7 +1,9 @@
 """
 Example: Retrieve secrets from Vault (no OpenAI SDK dependency)
 """
+
 from security.secrets.secrets_manager import SecretsManager
+
 
 def main():
     secrets = SecretsManager()
@@ -17,6 +19,7 @@ def main():
         return
 
     print("✅ Retrieved OpenAI key from Vault:", api_key[:6] + "...")
+
 
 if __name__ == "__main__":
     main()

@@ -1,5 +1,6 @@
 import hashlib, hmac, os
 
+
 # Simulation of Homomorphic Addition (Simplified for Demo)
 # In a real system, we would use a library like 'Pyfhel' or 'TenSEAL'
 class SovereignHE:
@@ -15,6 +16,7 @@ class SovereignHE:
         # Verify that the update came from a signed intent without decrypting
         print("🔐 [HE-LAYER] Verifying Encrypted Gradient...")
         return True
+
 
 # Integrating with Galani Protocol
 print("🛰️ [FL-NODE] Initiating Federated Learning Loop...")

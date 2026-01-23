@@ -5,6 +5,7 @@ import time
 
 app = FastAPI(title="UAAL Multi-Domain Demo API")
 
+
 @app.post("/test")
 def test(payload: dict, x_uaal_mode: str = Header(default="shadow")):
     inp = payload.get("input", {})
@@ -61,8 +62,8 @@ def test(payload: dict, x_uaal_mode: str = Header(default="shadow")):
             "policy_version": f"{domain.upper()}_v1.0",
             "evidence": {
                 "hash": evidence_hash,
-                "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ")
-            }
+                "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ"),
+            },
         }
 
     return {
@@ -70,5 +71,5 @@ def test(payload: dict, x_uaal_mode: str = Header(default="shadow")):
         "mode": x_uaal_mode,
         "domain": domain,
         "observed_risks": risks,
-        "policy_version": f"{domain.upper()}_v1.0"
+        "policy_version": f"{domain.upper()}_v1.0",
     }

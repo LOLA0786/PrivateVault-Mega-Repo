@@ -16,9 +16,7 @@ with open("uaal_medtech_30d.log") as f:
         try:
             e = json.loads(line)
         except json.JSONDecodeError as err:
-            raise RuntimeError(
-                f"Invalid JSON at line {lineno}: {err}"
-            )
+            raise RuntimeError(f"Invalid JSON at line {lineno}: {err}")
 
         total += 1
 

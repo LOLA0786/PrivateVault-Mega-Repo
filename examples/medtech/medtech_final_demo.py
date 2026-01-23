@@ -1,5 +1,6 @@
 from execute_and_log import execute_and_log
 
+
 def run_medtech_intent(payload):
     intent = {
         "domain": "medtech",

@@ -49,7 +49,28 @@ jobs:
 
       - name: Prepare .env
         run: |
-          cp -f ai-firewall-demo/.env.example ai-firewall-demo/.env
+          
+mkdir -p ai-firewall-demo
+
+if [ ! -f ai-firewall-demo/.env.example ]; then
+
+  echo "⚠️ ai-firewall-demo/.env.example missing; generating defaults for CI"
+
+  cat <<'EOF' > ai-firewall-demo/.env.example
+
+API_KEY=ci-placeholder
+
+SECRET_KEY=ci-placeholder
+
+JWT_SECRET=ci-placeholder
+
+EOF
+
+fi
+
+cp -f ai-firewall-demo/.env.example ai-firewall-demo/.env
+
+
 
       - name: Verify API
         env:

@@ -1,5 +1,6 @@
 import os
 
+
 class KeyManager:
     """
     Abstracts key access.
@@ -23,7 +24,4 @@ class KeyManager:
         raise NotImplementedError("KMS signing not wired yet")
 
     def rotate(self):
-        return {
-            "backend": self.backend,
-            "rotation": "scheduled"
-        }
+        return {"backend": self.backend, "rotation": "scheduled"}

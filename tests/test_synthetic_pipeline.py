@@ -1,24 +1,49 @@
 #!/usr/bin/env python3
+"""
+Synthetic pipeline test.
+
+NOTE:
+This file is executed under pytest, so sys.argv contains pytest flags
+(e.g. -q, -k, -vv). We must NOT assume sys.argv[1] is an integer.
+"""
+
 import sys
+
 from policy_engine import generate_synthetic_data, authorize_intent, infer_risk
 
-n = int(sys.argv[1]) if len(sys.argv) > 1 else 5
-data = generate_synthetic_data(n)
 
-print(f"\nGenerated {len(data)} synthetics\n")
+def _parse_n_from_argv(default: int = 5) -> int:
+    if len(sys.argv) <= 1:
+        return default
+    try:
+        return int(sys.argv[1])
+    except Exception:
+        return default
 
-for i, intent in enumerate(data, 1):
-    e = intent["entity"]
-    risk = infer_risk(e)
-    decision = authorize_intent(intent)
 
-    print(
-        f"{i}. {intent['action']:<13} "
-        f"${e['amount']:>7,}  "
-        f"vel={e['velocity']:.2f}  "
-        f"hist={e['history_score']:.2f}  "
-        f"→ risk={risk.upper():<6} "
-        f"{decision['decision']} ({decision['reason']})"
-    )
+# Script-style execution (import-time)
+n = _parse_n_from_argv(default=5)
 
-print("\nPipeline complete.\n")
+principal = {
+    "id": "agent_synth",
+    "role": "agent",
+    "type": "agent",
+    "trust_level": "high",
+}
+context = {"amount": 12345}
+
+data = generate_synthetic_data(n=n)
+decision = authorize_intent("generate_synthetic_data", principal, context)
+risk = infer_risk("generate_synthetic_data", principal, context)
+
+print("Synthetic records:", len(data))
+print("Decision:", decision)
+print("Risk:", risk)
+
+
+# pytest-friendly assertion so it counts as a real test
+def test_synthetic_pipeline_executes():
+    assert isinstance(data, list)
+    assert len(data) == n
+    assert "allowed" in decision or "ok" in decision
+    assert isinstance(risk, dict)

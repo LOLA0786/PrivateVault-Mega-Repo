@@ -50,6 +50,7 @@ def consume_approvals(approval_ids: List[str]) -> None:
         if aid in _APPROVALS:
             _APPROVALS[aid]["consumed"] = True
 
+
 # --- Control Plane Stub ---
 def store_approval_request(*args, **kwargs):
     """

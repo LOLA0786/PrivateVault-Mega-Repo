@@ -8,6 +8,7 @@ from cosmospy.aerial.client import LedgerClient
 from cosmospy.aerial.wallet import LocalWallet
 from .ledger_base import LedgerBase
 
+
 class CosmosLedger(LedgerBase):
     """
     Cosmos adapter used as a PUBLIC HASH ANCHOR.
@@ -27,30 +28,32 @@ class CosmosLedger(LedgerBase):
         self.wallet = LocalWallet.from_mnemonic(self.mnemonic)
 
     async def submit_audit(
-        self,
-        intent: Dict[str, Any],
-        decision: Dict[str, Any],
-        user_id: str
+        self, intent: Dict[str, Any], decision: Dict[str, Any], user_id: str
     ) -> Optional[str]:
         try:
-            payload = json.dumps({
-                "intent": intent,
-                "decision": decision,
-                "user_id": user_id,
-                "timestamp": asyncio.get_event_loop().time()
-            }, sort_keys=True)
+            payload = json.dumps(
+                {
+                    "intent": intent,
+                    "decision": decision,
+                    "user_id": user_id,
+                    "timestamp": asyncio.get_event_loop().time(),
+                },
+                sort_keys=True,
+            )
 
             # Canonical hash anchor
             payload_hash = hashlib.sha256(payload.encode()).hexdigest()
 
             tx = (
                 Transaction()
-                .with_messages({
-                    "@type": "/cosmos.bank.v1beta1.MsgSend",
-                    "from_address": self.wallet.address(),
-                    "to_address": self.wallet.address(),
-                    "amount": [{"denom": "uatom", "amount": "1"}]
-                })
+                .with_messages(
+                    {
+                        "@type": "/cosmos.bank.v1beta1.MsgSend",
+                        "from_address": self.wallet.address(),
+                        "to_address": self.wallet.address(),
+                        "amount": [{"denom": "uatom", "amount": "1"}],
+                    }
+                )
                 .with_memo(f"uaal_audit:{payload_hash}")
                 .with_gas(200000)
                 .with_fee(5000)

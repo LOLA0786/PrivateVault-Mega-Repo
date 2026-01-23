@@ -2,23 +2,28 @@ import json
 import hashlib
 from datetime import datetime
 
+
 # -------------------------------------------------
 # Utilities
 # -------------------------------------------------
 def h(x):
     return hashlib.sha256(json.dumps(x, sort_keys=True).encode()).hexdigest()
 
+
 def now():
     return datetime.utcnow().isoformat() + "Z"
+
 
 def section(title):
     print("\n" + "=" * 78)
     print(title)
     print("=" * 78)
 
+
 def show(policy):
     for p in policy:
         print(list(p))
+
 
 # -------------------------------------------------
 # DEMO 1: AML / KYC FAILURE (BSA / FINCEN)
@@ -30,7 +35,7 @@ policy = [
     ("UBO_VERIFICATION", False, "Beneficial ownership incomplete"),
     ("SANCTIONS_SCREENING", False, "OFAC screening missing"),
     ("BSA_COMPLIANCE", False, "Risk-based AML controls absent"),
-    ("SAR_TRIGGER", True, "Suspicious onboarding pattern detected")
+    ("SAR_TRIGGER", True, "Suspicious onboarding pattern detected"),
 ]
 
 show(policy)
@@ -49,7 +54,7 @@ policy = [
     ("EFFECTIVE_APR", False, "Effective APR calculated at 5%"),
     ("DISCLOSURE_CLARITY", False, "Material fees obscured"),
     ("UDAAP_STANDARD", False, "Deceptive marketing detected"),
-    ("CONSUMER_HARM", True, "Likely consumer financial harm")
+    ("CONSUMER_HARM", True, "Likely consumer financial harm"),
 ]
 
 show(policy)
@@ -67,7 +72,7 @@ policy = [
     ("PROTECTED_CLASS", False, "Minority population affected"),
     ("ECOA_RISK", False, "Potential discriminatory outcome"),
     ("CRA_COMPLIANCE", False, "Digital redlining risk"),
-    ("HUMAN_REVIEW", True, "Manual underwriting required")
+    ("HUMAN_REVIEW", True, "Manual underwriting required"),
 ]
 
 show(policy)
@@ -86,7 +91,7 @@ policy = [
     ("TOTAL_PAYMENTS", False, "Total of payments absent"),
     ("APR_CALCULATION", False, "Numerical inconsistency"),
     ("TILA_DISCLOSURE", False, "Required fields incomplete"),
-    ("REGULATORY_APPROVAL", False, "Approval cannot finalize")
+    ("REGULATORY_APPROVAL", False, "Approval cannot finalize"),
 ]
 
 show(policy)
@@ -108,9 +113,9 @@ audit = {
         "AML enforcement action",
         "CFPB UDAAP penalties",
         "CRA downgrade",
-        "TILA rescission & fines"
+        "TILA rescission & fines",
     ],
-    "system_role": "Deterministic authorization layer for autonomous banking agents"
+    "system_role": "Deterministic authorization layer for autonomous banking agents",
 }
 
 print(json.dumps(audit, indent=2))

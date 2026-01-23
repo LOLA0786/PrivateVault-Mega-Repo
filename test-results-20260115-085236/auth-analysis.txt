@@ -1,0 +1,20 @@
+./gateway/app.py:        f"{INTENT_ENGINE}/authorize-intent",
+./sovereign-sdk/src/uaal/engine.py:    def authorize(self, actor, mode, gradient):
+./sovereign-sdk/src/uaal/secure_kernel.py:    def verify_and_authorize(self, intent_payload):
+./sovereign-sdk/src/uaal/secure_kernel.py:            return {"allowed": False, "token": None, "reason": "HARDWARE_BLOCK"}
+./sovereign-sdk/src/uaal/secure_kernel.py:        token = self.sign_intent(intent_id, "ALLOW")
+./sovereign-sdk/src/uaal/secure_kernel.py:        return {"allowed": True, "token": token, "reason": "KERNEL_VERIFIED"}
+./main_vault_integrated.py:from security.auth.jwt_auth import get_current_user, AuthManager
+./main_vault_integrated.py:@app.post("/api/v1/auth/login")
+./main_vault_integrated.py:    Login endpoint - returns JWT token
+./main_vault_integrated.py:    # For demo, just return token
+./main_vault_integrated.py:    token = AuthManager.create_token(
+./main_vault_integrated.py:        "access_token": token,
+./main_vault_integrated.py:        "token_type": "bearer",
+./integration_test.py:                print(f"✅ AUTHORIZED: {result['authorized_by']}")
+./galani_medtech_demo.py:    {"id": "09", "cat": "SUR", "desc": "Insulin Pump: Unauthorized Firmware Update", "risk": 99.9, "mode": "ENFORCE", "val": 20000000},
+./galani_medtech_demo.py:    {"id": "16", "cat": "PRI", "desc": "Unauthorized Access: Admin Credential Spoof", "risk": 99.9, "mode": "ENFORCE", "val": 250000},
+./drift_detection_fixed.py:        # Extract words (alphanumeric tokens)
+./privatevault_comprehensive_test_suite.py:    def test_authentication_strength(self):
+./privatevault_comprehensive_test_suite.py:        """Verify strong authentication mechanisms"""
+./privatevault_comprehensive_test_suite.py:        print("✅ Strong authentication verified")

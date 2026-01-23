@@ -5,10 +5,7 @@ from typing import Dict, Any, Optional
 class LedgerBase(ABC):
     @abstractmethod
     async def submit_audit(
-        self,
-        intent: Dict[str, Any],
-        decision: Dict[str, Any],
-        user_id: str
+        self, intent: Dict[str, Any], decision: Dict[str, Any], user_id: str
     ) -> Optional[str]:
         pass
 
@@ -30,24 +27,30 @@ def get_ledger(ledger_type: str) -> "LedgerBase":
 
     if ledger_type == "fabric":
         from .fabric_integration import FabricLedger
+
         return FabricLedger()
 
     if ledger_type in ("quorum", "besu", "ethereum"):
         from .ethereum_adapter import EthereumLedger
+
         return EthereumLedger()
 
     if ledger_type == "qldb":
         from .qldb_adapter import QLDBLedger
+
         return QLDBLedger()
 
     if ledger_type == "cosmos":
         from .cosmos_adapter import CosmosLedger
+
         return CosmosLedger()
 
     if ledger_type == "worm":
         from .worm_fallback import WORMFallback
+
         return WORMFallback()
 
     # Safe default: no external deps
     from .worm_fallback import WORMFallback
+
     return WORMFallback()

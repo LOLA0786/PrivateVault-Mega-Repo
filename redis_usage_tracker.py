@@ -3,8 +3,9 @@ import redis
 
 r = redis.Redis(host="localhost", port=6379, decode_responses=True)
 
-RATE_WINDOW = 60          # seconds
-DAILY_WINDOW = 86400     # seconds
+RATE_WINDOW = 60  # seconds
+DAILY_WINDOW = 86400  # seconds
+
 
 def check_rate(principal_id, limit):
     key = f"rate:{principal_id}"
@@ -17,6 +18,7 @@ def check_rate(principal_id, limit):
     r.expire(key, RATE_WINDOW)
 
     return count <= limit
+
 
 def check_spend(principal_id, amount, cap):
     key = f"spend:{principal_id}"

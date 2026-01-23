@@ -1,5 +1,6 @@
 import json
 
+
 def summarize(path="logs/routing.log"):
     total = 0
     cost = 0
@@ -22,8 +23,9 @@ def summarize(path="logs/routing.log"):
         "requests": total,
         "avg_cost": cost / total if total else 0,
         "avg_latency_ms": latency / total if total else 0,
-        "failure_rate": failures / total if total else 0
+        "failure_rate": failures / total if total else 0,
     }
+
 
 # --------------------------------------------------
 # Public adapter for audit / kill-tests

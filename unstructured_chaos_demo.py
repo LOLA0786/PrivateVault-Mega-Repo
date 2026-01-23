@@ -3,6 +3,7 @@ import random
 import hashlib
 import json
 
+
 # -------------------------------------------------
 # NORMALIZATION (Unstructured → Canonical Intent)
 # -------------------------------------------------
@@ -17,7 +18,7 @@ def normalize_intent(text):
         "frequency": "daily",
         "controlled": False,
         "symptoms": [],
-        "pregnant": False
+        "pregnant": False,
     }
 
     # Drug extraction
@@ -55,6 +56,7 @@ def normalize_intent(text):
 
     return intent
 
+
 # -------------------------------------------------
 # POLICY ENGINE (Graduated + Deterministic)
 # -------------------------------------------------
@@ -65,51 +67,55 @@ def evaluate_policy(intent):
 
     # AGE
     age_ok = intent["patient_age"] >= 18
-    decisions.append([
-        "AGE_CHECK",
-        age_ok,
-        "Patient age valid" if age_ok else "Under 18 – requires guardian"
-    ])
+    decisions.append(
+        [
+            "AGE_CHECK",
+            age_ok,
+            "Patient age valid" if age_ok else "Under 18 – requires guardian",
+        ]
+    )
     if not age_ok:
         score += weights["medium"]
 
     # ALLERGY
     allergy_ok = intent["drug"] not in intent["allergies"]
-    decisions.append([
-        "ALLERGY_CHECK",
-        allergy_ok,
-        "No known allergies" if allergy_ok else "CRITICAL: Allergy conflict"
-    ])
+    decisions.append(
+        [
+            "ALLERGY_CHECK",
+            allergy_ok,
+            "No known allergies" if allergy_ok else "CRITICAL: Allergy conflict",
+        ]
+    )
     if not allergy_ok:
         score += weights["critical"]
 
     # SYMPTOM PROXY (rash + penicillin)
     if "rash" in intent["symptoms"] and intent["drug"] == "penicillin":
-        decisions.append([
-            "SYMPTOM_RISK",
-            False,
-            "Rash may indicate allergic reaction"
-        ])
+        decisions.append(["SYMPTOM_RISK", False, "Rash may indicate allergic reaction"])
         score += weights["low"]
 
     # AGE-RESTRICTED DRUG
     if intent["drug"] == "accutane":
         age_restricted_ok = intent["patient_age"] >= 18
-        decisions.append([
-            "AGE_RESTRICTED_DRUG",
-            age_restricted_ok,
-            "Age restriction satisfied" if age_restricted_ok else "Accutane prohibited for minors"
-        ])
+        decisions.append(
+            [
+                "AGE_RESTRICTED_DRUG",
+                age_restricted_ok,
+                (
+                    "Age restriction satisfied"
+                    if age_restricted_ok
+                    else "Accutane prohibited for minors"
+                ),
+            ]
+        )
         if not age_restricted_ok:
             score += weights["medium"]
 
     # PREGNANCY ABSOLUTE BLOCK (Accutane)
     if intent["pregnant"] and intent["drug"] == "accutane":
-        decisions.append([
-            "PREGNANCY_CONTRAINDICATION",
-            False,
-            "Accutane causes severe fetal harm"
-        ])
+        decisions.append(
+            ["PREGNANCY_CONTRAINDICATION", False, "Accutane causes severe fetal harm"]
+        )
         score += weights["critical"]
 
     # OUTCOME
@@ -125,6 +131,7 @@ def evaluate_policy(intent):
     ).hexdigest()
 
     return outcome, decisions, evidence_hash
+
 
 # -------------------------------------------------
 # DEMO RUN

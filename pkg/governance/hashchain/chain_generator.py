@@ -1,9 +1,10 @@
 import hashlib
 
+
 class SovereignLedger:
     def __init__(self, tenant_id, secret_salt):
         self.tenant_id = tenant_id
-        self.secret_salt = secret_salt # This makes every chain unique per customer
+        self.secret_salt = secret_salt  # This makes every chain unique per customer
         self.prev_hash = "0000000000"
 
     def sign_decision(self, data):

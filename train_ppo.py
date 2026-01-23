@@ -5,6 +5,7 @@ import numpy as np
 
 from train_data import load_training_data
 
+
 class LogReplayEnv(gym.Env):
     def __init__(self, states, rewards):
         super().__init__()
@@ -31,12 +32,11 @@ class LogReplayEnv(gym.Env):
         obs = np.array(self.states[self.i - 1])
         return obs, reward, terminated, truncated, {}
 
+
 # Load logged data
 states, _, rewards = load_training_data()
 
-env = DummyVecEnv([
-    lambda: LogReplayEnv(states, rewards)
-])
+env = DummyVecEnv([lambda: LogReplayEnv(states, rewards)])
 if not states or not rewards:
     raise RuntimeError(
         "No PPO training data found. "

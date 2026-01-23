@@ -4,11 +4,7 @@ state = {
     "task_type": "analysis",
     "budget": 0.005,
     "latency_sla_ms": 500,
-    "provider_health": {
-        "grok": "healthy",
-        "gpt": "rate_limited",
-        "local": "unhealthy"
-    }
+    "provider_health": {"grok": "healthy", "gpt": "rate_limited", "local": "unhealthy"},
 }
 
 router = RuleBasedRouter()

@@ -1,35 +1,33 @@
 """
 Example: How to use structured logging
 """
+
 from monitoring.logging.logger import get_logger
 
 logger = get_logger(__name__)
 
+
 def process_credit_check(applicant_id: str, amount: float):
     """Example function with logging"""
-    
+
     # Log start
-    logger.info(
-        "credit_check_started",
-        applicant_id=applicant_id,
-        amount=amount
-    )
-    
+    logger.info("credit_check_started", applicant_id=applicant_id, amount=amount)
+
     try:
         # Do processing
         risk_score = calculate_risk(applicant_id, amount)
-        
+
         # Log success
         logger.info(
             "credit_check_completed",
             applicant_id=applicant_id,
             amount=amount,
             risk_score=risk_score,
-            decision="approved"
+            decision="approved",
         )
-        
+
         return {"status": "approved", "risk_score": risk_score}
-        
+
     except Exception as e:
         # Log error with context
         logger.error(
@@ -37,13 +35,15 @@ def process_credit_check(applicant_id: str, amount: float):
             applicant_id=applicant_id,
             amount=amount,
             error=str(e),
-            error_type=type(e).__name__
+            error_type=type(e).__name__,
         )
         raise
+
 
 def calculate_risk(applicant_id: str, amount: float) -> float:
     """Dummy risk calculation"""
     return 0.3
+
 
 # Output will be JSON (easy to search in logs):
 """

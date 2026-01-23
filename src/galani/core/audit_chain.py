@@ -2,6 +2,7 @@ from typing import List
 from .decision_record import DecisionRecord
 import hashlib
 
+
 class AuditChain:
     def __init__(self):
         self.chain: List[str] = []

@@ -2,23 +2,28 @@ import json
 import hashlib
 from datetime import datetime
 
+
 # -------------------------------------------------
 # Utilities
 # -------------------------------------------------
 def h(x):
     return hashlib.sha256(json.dumps(x, sort_keys=True).encode()).hexdigest()
 
+
 def now():
     return datetime.utcnow().isoformat() + "Z"
+
 
 def section(title):
     print("\n" + "=" * 78)
     print(title)
     print("=" * 78)
 
+
 def show(policy):
     for p in policy:
         print(list(p))
+
 
 # -------------------------------------------------
 # DEMO 1: CLASSIFIED INFORMATION LEAK
@@ -30,7 +35,7 @@ policy = [
     ("NEED_TO_KNOW", False, "No documented need-to-know"),
     ("NETWORK_VIOLATION", False, "TS//SCI leaving SCIF"),
     ("DATA_MARKING", False, "Incomplete portion markings"),
-    ("EXFILTRATION_TTP", True, "Matches known exfil patterns")
+    ("EXFILTRATION_TTP", True, "Matches known exfil patterns"),
 ]
 
 show(policy)
@@ -48,7 +53,7 @@ policy = [
     ("BATCH_MODIFICATION", False, "Suspicious bulk changes"),
     ("TIME_ANOMALY", False, "Outside business hours"),
     ("CREDENTIAL_COMPROMISE", True, "Stolen credentials"),
-    ("HAVA_VIOLATION", False, "Election infrastructure breach")
+    ("HAVA_VIOLATION", False, "Election infrastructure breach"),
 ]
 
 show(policy)
@@ -66,7 +71,7 @@ policy = [
     ("ANTI_DEFICIENCY", False, "31 U.S.C. § 1341 violation"),
     ("KICKBACK_RISK", True, "Related subcontractor"),
     ("FALSE_CLAIMS", False, "FCA exposure"),
-    ("PROCUREMENT_INTEGRITY", False, "41 U.S.C. § 2102 breach")
+    ("PROCUREMENT_INTEGRITY", False, "41 U.S.C. § 2102 breach"),
 ]
 
 show(policy)
@@ -84,7 +89,7 @@ policy = [
     ("PRESIDENTIAL_FINDING", False, "Missing authorization"),
     ("COLLATERAL_DAMAGE", False, "Civilian risk"),
     ("ESCALATION_RISK", False, "High"),
-    ("WAR_POWERS", True, "Potential violation")
+    ("WAR_POWERS", True, "Potential violation"),
 ]
 
 show(policy)
@@ -102,7 +107,7 @@ policy = [
     ("FISA_APPROVAL", False, "Court rejected"),
     ("US_PERSON_PROTECTION", False, "Minimization failure"),
     ("BULK_COLLECTION", True, "USA FREEDOM Act"),
-    ("OVERSIGHT", False, "Congress bypassed")
+    ("OVERSIGHT", False, "Congress bypassed"),
 ]
 
 show(policy)
@@ -120,7 +125,7 @@ policy = [
     ("DUAL_USE_RESEARCH", False, "Weaponization risk"),
     ("NSABB_REVIEW", False, "Bypassed"),
     ("EXPORT_CONTROL", False, "Misclassified"),
-    ("BIOLOGICAL_WEAPONS", True, "18 U.S.C. § 175")
+    ("BIOLOGICAL_WEAPONS", True, "18 U.S.C. § 175"),
 ]
 
 show(policy)
@@ -138,7 +143,7 @@ policy = [
     ("COLLISION_PROBABILITY", False, ">1e-4 ignored"),
     ("SPACE_TRAFFIC", False, "STM violation"),
     ("OUTER_SPACE_TREATY", True, "Article IX"),
-    ("KESSLER_RISK", False, "Cascade risk")
+    ("KESSLER_RISK", False, "Cascade risk"),
 ]
 
 show(policy)
@@ -156,7 +161,7 @@ policy = [
     ("SOLICITATION", False, "Fundraising prohibited"),
     ("OFFICIAL_RESOURCES", False, "Gov email used"),
     ("IMPLIED_ENDORSEMENT", True, "Official appearance"),
-    ("OSC_JURISDICTION", False, "OSC violation")
+    ("OSC_JURISDICTION", False, "OSC violation"),
 ]
 
 show(policy)
@@ -174,7 +179,7 @@ policy = [
     ("DIFFERENTIAL_PRIVACY", False, "Noise insufficient"),
     ("REIDENTIFICATION", False, "High risk"),
     ("STATISTICAL_DISCLOSURE", True, "Detected"),
-    ("PRIVACY_ACT", False, "1974 Act violated")
+    ("PRIVACY_ACT", False, "1974 Act violated"),
 ]
 
 show(policy)
@@ -192,7 +197,7 @@ policy = [
     ("EX_PARTE", False, "Prohibited communication"),
     ("DISCLOSURE", False, "Not disclosed"),
     ("RECUSAL", True, "28 U.S.C. § 455"),
-    ("JUDICIAL_CONDUCT", False, "Code violated")
+    ("JUDICIAL_CONDUCT", False, "Code violated"),
 ]
 
 show(policy)
@@ -210,7 +215,7 @@ policy = [
     ("NIH_POLICY", False, "42 CFR Part 93"),
     ("FALSE_STATEMENTS", True, "18 U.S.C. § 1001"),
     ("GRANT_FRAUD", False, "FCA exposure"),
-    ("DEBARMENT", False, "Funding ban risk")
+    ("DEBARMENT", False, "Funding ban risk"),
 ]
 
 show(policy)
@@ -230,7 +235,7 @@ audit = {
     "classifications": ["UNCLASS", "CONFIDENTIAL", "SECRET", "TS//SCI"],
     "checks_performed": 212,
     "critical_findings": 6,
-    "national_security_impact": "EXTREME"
+    "national_security_impact": "EXTREME",
 }
 
 print(json.dumps(audit, indent=2))

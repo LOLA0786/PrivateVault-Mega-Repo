@@ -1,0 +1,6 @@
+./.venv-tests/lib/python3.12/site-packages/setuptools/_distutils/util.py:449:        execute(os.remove, (script_name,), f"removing {script_name}", dry_run=dry_run)
+./.venv-tests/lib/python3.12/site-packages/setuptools/_distutils/compilers/C/cygwin.py:183:            self.execute(write_file, (def_file, contents), f"writing {def_file}")
+./.venv-tests/lib/python3.12/site-packages/setuptools/command/install_egg_info.py:39:        self.execute(self.copytree, (), f"Copying {self.source} to {self.target}")
+./.venv-tests/lib64/python3.12/site-packages/setuptools/_distutils/util.py:449:        execute(os.remove, (script_name,), f"removing {script_name}", dry_run=dry_run)
+./.venv-tests/lib64/python3.12/site-packages/setuptools/_distutils/compilers/C/cygwin.py:183:            self.execute(write_file, (def_file, contents), f"writing {def_file}")
+./.venv-tests/lib64/python3.12/site-packages/setuptools/command/install_egg_info.py:39:        self.execute(self.copytree, (), f"Copying {self.source} to {self.target}")

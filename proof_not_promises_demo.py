@@ -6,28 +6,23 @@ import random
 # Core primitives
 # -------------------------------------------------
 
+
 def hash_proof(obj):
     return hashlib.sha256(str(obj).encode()).hexdigest()
+
 
 def execute_policy(intent, node):
     """
     Deterministic policy evaluation.
     Node location MUST NOT affect outcome.
     """
-    policy = {
-        "max_amount": 1000000,
-        "blocked_countries": ["Russia", "Belarus", "Iran"]
-    }
+    policy = {"max_amount": 1000000, "blocked_countries": ["Russia", "Belarus", "Iran"]}
 
     decision = "ALLOW"
     if intent.get("amount", 0) > policy["max_amount"]:
         decision = "BLOCK"
 
-    proof = hash_proof({
-        "intent": intent,
-        "policy": policy,
-        "decision": decision
-    })
+    proof = hash_proof({"intent": intent, "policy": policy, "decision": decision})
 
     return decision, proof
 
@@ -36,19 +31,18 @@ def execute_policy(intent, node):
 # Sanctions policy (hot-swappable)
 # -------------------------------------------------
 
-ACTIVE_POLICY = {
-    "version": "v1.0",
-    "blocked_countries": ["Russia", "Belarus"]
-}
+ACTIVE_POLICY = {"version": "v1.0", "blocked_countries": ["Russia", "Belarus"]}
+
 
 def hot_swap_policy(version):
     global ACTIVE_POLICY
     if version == "v1.1":
         ACTIVE_POLICY = {
             "version": "v1.1",
-            "blocked_countries": ["Russia", "Belarus", "Iran"]
+            "blocked_countries": ["Russia", "Belarus", "Iran"],
         }
     time.sleep(0.015)  # simulate 15ms rollout
+
 
 def check_sanction(country):
     return "BLOCKED" if country in ACTIVE_POLICY["blocked_countries"] else "ALLOWED"
@@ -58,6 +52,7 @@ def check_sanction(country):
 # External dependency failure simulation
 # -------------------------------------------------
 
+
 def ofac_api():
     latency = random.randint(50, 120)
     time.sleep(latency / 1000)
@@ -65,26 +60,20 @@ def ofac_api():
         raise TimeoutError("OFAC API timeout")
     return {"status": "OK"}
 
+
 def check_with_timeout(fn, timeout_ms):
     start = time.time()
     try:
         fn()
-        return {
-            "decision": "ALLOW",
-            "confidence": 95,
-            "mode": "NORMAL"
-        }
+        return {"decision": "ALLOW", "confidence": 95, "mode": "NORMAL"}
     except Exception:
-        return {
-            "decision": "BLOCK",
-            "confidence": 100,
-            "mode": "FAIL_CLOSED"
-        }
+        return {"decision": "BLOCK", "confidence": 100, "mode": "FAIL_CLOSED"}
 
 
 # -------------------------------------------------
 # DEMO SEQUENCE
 # -------------------------------------------------
+
 
 def main():
     print("=== REAL-WORLD STRESS TEST ===")

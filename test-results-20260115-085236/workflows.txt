@@ -1,0 +1,20 @@
+./privatevault_comprehensive_test_suite.py:- Multi-agent orchestration
+./privatevault_comprehensive_test_suite.py:    Tests for multi-agent orchestration - the core value proposition.
+./privatevault_comprehensive_test_suite.py:    async def test_banking_loan_approval_workflow(self):
+./privatevault_comprehensive_test_suite.py:        """Test complete banking loan approval workflow"""
+./privatevault_comprehensive_test_suite.py:        # Execute multi-agent workflow
+./privatevault_comprehensive_test_suite.py:        result = await self._execute_workflow('banking_loan_approval', loan_application)
+./privatevault_comprehensive_test_suite.py:        print(f"✅ Loan workflow completed: {result['final_decision']}")
+./privatevault_comprehensive_test_suite.py:        """Test HIPAA-compliant patient data access workflow"""
+./privatevault_comprehensive_test_suite.py:        result = await self._execute_workflow('healthcare_data_access', access_request)
+./privatevault_comprehensive_test_suite.py:        print(f"✅ Healthcare workflow completed: Access {'granted' if result['access_granted'] else 'denied'}")
+./privatevault_comprehensive_test_suite.py:    async def _execute_workflow(self, workflow_name: str, data: Dict) -> Dict:
+./privatevault_comprehensive_test_suite.py:        # Mock: Execute multi-agent workflow
+./privatevault_comprehensive_test_suite.py:        if workflow_name == 'banking_loan_approval':
+./privatevault_comprehensive_test_suite.py:        elif workflow_name == 'healthcare_data_access':
+./pkg/governance/temporal_workflow.py:from temporalio import workflow
+./pkg/governance/temporal_workflow.py:@workflow.definition
+./pkg/governance/temporal_workflow.py:    @workflow.run
+./pkg/governance/temporal_workflow.py:        # This 'wait_condition' pauses the workflow until a human clicks 'Approve'
+./pkg/governance/temporal_workflow.py:        await workflow.wait_condition(lambda: self.approved)
+./pkg/governance/temporal_workflow.py:    @workflow.signal

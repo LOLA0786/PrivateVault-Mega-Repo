@@ -1,6 +1,7 @@
 """
 Example: How to add health checks to your app
 """
+
 from fastapi import FastAPI
 from monitoring.health.health_check import add_health_endpoints
 

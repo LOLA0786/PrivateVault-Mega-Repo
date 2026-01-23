@@ -7,7 +7,7 @@ intent = {
     "loan_amount": 100_000,
     "credit_score": 720,
     "derived_from_model": True,
-    "source_verified": False
+    "source_verified": False,
 }
 
 allowed, audit = authorize(intent)

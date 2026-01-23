@@ -3,24 +3,19 @@ from policy_diff_and_dryrun import dry_run
 from capability_token import issue_capability, consume_capability
 
 policy = {
-  "approve_loan": {
-    "allowed_roles": ["agent"],
-    "max_amount": 500000,
-    "min_trust_level": "high",
-    "rate_limit_per_min": 2,
-    "daily_spend_cap": 700000
-  }
+    "approve_loan": {
+        "allowed_roles": ["agent"],
+        "max_amount": 500000,
+        "min_trust_level": "high",
+        "rate_limit_per_min": 2,
+        "daily_spend_cap": 700000,
+    }
 }
 
 register_policy("v4", policy, active=True)
 activate_policy("v4")
 
-principal = {
-    "id": "agent_b",
-    "role": "agent",
-    "type": "agent",
-    "trust_level": "high"
-}
+principal = {"id": "agent_b", "role": "agent", "type": "agent", "trust_level": "high"}
 
 context = {"amount": 300000}
 

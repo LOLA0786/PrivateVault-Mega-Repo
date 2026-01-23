@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 import hashlib
 import random
 
+
 # -------------------------------
 # Mock OFAC API Client
 # -------------------------------
@@ -19,17 +20,16 @@ class OFACAPI:
             "match": True,
             "confidence": 95,
             "sanctions_list": "OFAC_SDN",
-            "last_updated": (
-                datetime.utcnow() - timedelta(minutes=5)
-            ).isoformat() + "Z",
-            "source": "treasury.gov/ofac"
+            "last_updated": (datetime.utcnow() - timedelta(minutes=5)).isoformat()
+            + "Z",
+            "source": "treasury.gov/ofac",
         }
         return response
 
+
 def evidence_hash(data):
-    return hashlib.sha256(
-        json.dumps(data, sort_keys=True).encode()
-    ).hexdigest()
+    return hashlib.sha256(json.dumps(data, sort_keys=True).encode()).hexdigest()
+
 
 # -------------------------------
 # LIVE DEMO
@@ -52,7 +52,7 @@ if __name__ == "__main__":
     policy_decision = [
         ("OFAC_MATCH", False, "95% confidence SDN match"),
         ("GEO_BLOCK", False, "Russia comprehensive sanctions"),
-        ("ESCALATION", True, "Immediate freeze + OFAC report")
+        ("ESCALATION", True, "Immediate freeze + OFAC report"),
     ]
 
     print("\n--- POLICY DECISION ---")
@@ -62,7 +62,7 @@ if __name__ == "__main__":
     evidence = {
         "external_api": response,
         "policy": policy_decision,
-        "timestamp": datetime.utcnow().isoformat() + "Z"
+        "timestamp": datetime.utcnow().isoformat() + "Z",
     }
 
     print("\n--- EVIDENCE HASH ---")

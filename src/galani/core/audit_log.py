@@ -1,5 +1,6 @@
 import json, hashlib, time
 
+
 def write_audit(decision_id, stage, data, allowed, reason):
     record = {
         "ts": time.time(),
@@ -7,7 +8,7 @@ def write_audit(decision_id, stage, data, allowed, reason):
         "stage": stage,
         "allowed": allowed,
         "reason": reason,
-        "data": data
+        "data": data,
     }
     record["hash"] = hashlib.sha256(
         json.dumps(record, sort_keys=True).encode()

@@ -1,0 +1,20 @@
+./galani_medtech_demo.py:    {"id": "17", "cat": "PRI", "desc": "Cloud Upload: Unencrypted DICOM Header", "risk": 80.0, "mode": "ENFORCE", "val": 750000},
+./privatevault_comprehensive_test_suite.py:    min_encryption_bits: int = 256
+./privatevault_comprehensive_test_suite.py:    hipaa_encryption_required: bool = True
+./privatevault_comprehensive_test_suite.py:    def test_encryption_at_rest(self):
+./privatevault_comprehensive_test_suite.py:        """Verify all sensitive data is encrypted at rest with AES-256+"""
+./privatevault_comprehensive_test_suite.py:        # Test database encryption
+./privatevault_comprehensive_test_suite.py:        encrypted_fields = self._check_database_encryption()
+./privatevault_comprehensive_test_suite.py:        assert len(encrypted_fields) > 0, "No encrypted fields found in database"
+./privatevault_comprehensive_test_suite.py:        for field in encrypted_fields:
+./privatevault_comprehensive_test_suite.py:            assert field['algorithm'] in ['AES-256-GCM', 'AES-256-CBC'], \
+./privatevault_comprehensive_test_suite.py:                f"Weak encryption for {field['name']}: {field['algorithm']}"
+./privatevault_comprehensive_test_suite.py:        print(f"✅ Verified {len(encrypted_fields)} encrypted fields")
+./privatevault_comprehensive_test_suite.py:    def test_encryption_in_transit(self):
+./privatevault_comprehensive_test_suite.py:    def _check_database_encryption(self) -> List[Dict]:
+./privatevault_comprehensive_test_suite.py:            {'name': 'user.password', 'algorithm': 'AES-256-GCM'},
+./privatevault_comprehensive_test_suite.py:            {'name': 'agent.api_key', 'algorithm': 'AES-256-GCM'},
+./privatevault_comprehensive_test_suite.py:            {'name': 'transaction.pii', 'algorithm': 'AES-256-CBC'}
+./privatevault_comprehensive_test_suite.py:    def test_hipaa_phi_encryption(self):
+./privatevault_comprehensive_test_suite.py:        """Verify PHI is encrypted (HIPAA Security Rule)"""
+./privatevault_comprehensive_test_suite.py:        if not CONFIG.hipaa_encryption_required:

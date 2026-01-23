@@ -83,3 +83,45 @@ ai-firewall-demo/*.jsonl
 ai-firewall-demo/*.patch
 ai-firewall-demo/stop
 ai-firewall-demo/test
+
+# ========= AI Firewall demo artifacts =========
+*.jsonl
+audit_report.json
+dashboard_report.json
+dashboard.html
+dashboard_report.json
+dashboard.html
+ai_firewall_ledger.jsonl
+ai-firewall-demo/ai_firewall_ledger.jsonl
+ai-firewall-demo/*.json
+ai-firewall-demo/*.html
+
+# ========= System / packages =========
+*.deb
+
+# ========= Python =========
+__pycache__/
+*.pyc
+
+# ========= Audit artifacts =========
+audits.worm
+
+# never commit git bundles / backups
+*.bundle
+
+# never commit virtualenvs
+.venv/
+.venv-tests/
+venv/
+
+# never commit bundles/backups/venvs
+*.bundle
+.venv/
+.venv-tests/
+venv/
+dist/
+
+# never commit venvs
+.venv/
+.venv-tests/
+venv/

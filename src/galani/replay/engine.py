@@ -3,6 +3,7 @@ import json
 import time
 from typing import Dict
 
+
 class DecisionReplayEngine:
     def __init__(self):
         self._store = {}
@@ -16,6 +17,4 @@ class DecisionReplayEngine:
         return self._store[decision_id]
 
     def _hash(self, payload: Dict) -> str:
-        return hashlib.sha256(
-            json.dumps(payload, sort_keys=True).encode()
-        ).hexdigest()
+        return hashlib.sha256(json.dumps(payload, sort_keys=True).encode()).hexdigest()

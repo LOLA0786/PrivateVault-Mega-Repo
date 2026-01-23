@@ -1,6 +1,7 @@
 from signal_crypto import verify_signal
 from signal_schema import canonical_signal_payload
 
+
 def verify_policy_signals(policy, public_keys):
     """
     policy: list of tuples OR dicts
@@ -23,6 +24,4 @@ def verify_policy_signals(policy, public_keys):
                 raise Exception(f"UNKNOWN_SIGNAL_PROVIDER: {provider}")
 
             if not verify_signal(public_keys[provider], payload, item["signature"]):
-                raise Exception(
-                    f"SIGNAL_SIGNATURE_INVALID: {item['signal']}"
-                )
+                raise Exception(f"SIGNAL_SIGNATURE_INVALID: {item['signal']}")

@@ -1,5 +1,6 @@
 import json
 
+
 class AlphaTracker:
     def __init__(self, initial_balance=10000.0):
         self.balance = initial_balance
@@ -7,7 +8,7 @@ class AlphaTracker:
         self.entry_price = 0.0
         self.total_fees = 0.0
         self.trade_count = 0
-        self.fee_rate = 0.0001 # 0.01% Binance-level fee
+        self.fee_rate = 0.0001  # 0.01% Binance-level fee
 
     def update(self, signal, current_price):
         """
@@ -17,7 +18,7 @@ class AlphaTracker:
         """
         # BUY LOGIC
         if signal > 0.3 and self.position == 0:
-            slippage = current_price * 0.00005 # 0.005% slippage
+            slippage = current_price * 0.00005  # 0.005% slippage
             exec_price = current_price + slippage
             self.position = self.balance / exec_price
             self.entry_price = exec_price

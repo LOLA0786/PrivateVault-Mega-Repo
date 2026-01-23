@@ -18,6 +18,7 @@ import numpy as np
 # FEATURE 1: ZERO-KNOWLEDGE PROOFS
 # ============================================================================
 
+
 class ZeroKnowledgeProver:
     def __init__(self, secret_salt: bytes):
         self.salt = secret_salt
@@ -28,18 +29,22 @@ class ZeroKnowledgeProver:
         commitment = hashlib.sha256(payload.encode()).hexdigest()
         return commitment, opening_key
 
-    def prove_range(self, value: float, min_val: float, max_val: float) -> Dict[str, Any]:
+    def prove_range(
+        self, value: float, min_val: float, max_val: float
+    ) -> Dict[str, Any]:
         commitment, opening_key = self.create_commitment(value)
         return {
             "proof": {
                 "commitment": commitment,
                 "in_range": min_val <= value <= max_val,
-                "timestamp": time.time()
+                "timestamp": time.time(),
             },
-            "opening_key": opening_key
+            "opening_key": opening_key,
         }
 
-    def prove_compliance_without_data(self, transaction_amount, risk_score, regulatory_limits):
+    def prove_compliance_without_data(
+        self, transaction_amount, risk_score, regulatory_limits
+    ):
         amount_ok = transaction_amount <= regulatory_limits["max_transaction"]
         risk_ok = risk_score <= regulatory_limits["max_risk_score"]
 
@@ -48,28 +53,34 @@ class ZeroKnowledgeProver:
             "timestamp": datetime.now(timezone.utc).isoformat(),
             "compliance_status": amount_ok and risk_ok,
             "data_minimization": True,
-            "verifiable": True
+            "verifiable": True,
         }
+
 
 # ============================================================================
 # FEATURE 2: REGULATORY INTELLIGENCE
 # ============================================================================
 
+
 class RegulatoryIntelligenceEngine:
-    async def synthesize_multi_jurisdiction_policy(self, jurisdictions: List[str]) -> Dict[str, Any]:
+    async def synthesize_multi_jurisdiction_policy(
+        self, jurisdictions: List[str]
+    ) -> Dict[str, Any]:
         await asyncio.sleep(0.1)
         return {
             "policy_id": str(uuid.uuid4()),
             "jurisdictions": jurisdictions,
             "unified_rules": {
                 "max_transaction_amount": 100000,
-                "explainability_required": True
-            }
+                "explainability_required": True,
+            },
         }
+
 
 # ============================================================================
 # FEATURE 3: AUDIT EVIDENCE
 # ============================================================================
+
 
 class AuditEvidenceGenerator:
     def __init__(self, zkp_engine: ZeroKnowledgeProver):
@@ -81,15 +92,17 @@ class AuditEvidenceGenerator:
             "sections": {
                 "internal_controls": {
                     "tests_performed": len(logs),
-                    "effectiveness": "EFFECTIVE"
+                    "effectiveness": "EFFECTIVE",
                 }
             },
-            "executive_summary": {"conclusion": "COMPLIANT"}
+            "executive_summary": {"conclusion": "COMPLIANT"},
         }
+
 
 # ============================================================================
 # FEATURE 4: EXPLAINABLE AI
 # ============================================================================
+
 
 class ExplainableAIEngine:
     def explain_decision(self, decision, risk_score, features, policies_evaluated):
@@ -98,18 +111,22 @@ class ExplainableAIEngine:
             "decision": "APPROVED" if decision else "REJECTED",
             "primary_reason": "Risk threshold exceeded",
             "feature_contributions": [{"feature": "amount"}],
-            "human_readable": "Decision explained in plain English."
+            "human_readable": "Decision explained in plain English.",
         }
+
 
 # ============================================================================
 # FEATURE 5: COST–BENEFIT ANALYSIS
 # ============================================================================
 
+
 class CostBenefitAnalyzer:
     def __init__(self):
         self.savings = []
 
-    def calculate_decision_value(self, decision, risk_score, transaction_amount, policies_violated):
+    def calculate_decision_value(
+        self, decision, risk_score, transaction_amount, policies_violated
+    ):
         value = transaction_amount * 0.7 if not decision else 150
         self.savings.append(value)
 
@@ -118,12 +135,14 @@ class CostBenefitAnalyzer:
         return {
             "kpis": {"total_value_created": f"${total:,.0f}"},
             "roi_analysis": {"roi_percentage": 4800},
-            "executive_summary": "System created massive enterprise value."
+            "executive_summary": "System created massive enterprise value.",
         }
+
 
 # ============================================================================
 # DEMO RUNNER
 # ============================================================================
+
 
 async def enterprise_killer_demo():
     print("=" * 80)
@@ -153,9 +172,7 @@ async def enterprise_killer_demo():
     print("\n[3/5] AUTOMATED AUDIT EVIDENCE")
     print(f"✓ Conclusion: {sox['executive_summary']['conclusion']}")
 
-    explanation = xai.explain_decision(
-        False, 0.82, {"amount": 950000}, ["RiskLimit"]
-    )
+    explanation = xai.explain_decision(False, 0.82, {"amount": 950000}, ["RiskLimit"])
     print("\n[4/5] EXPLAINABLE AI")
     print(f"✓ Decision: {explanation['decision']}")
 
@@ -169,6 +186,7 @@ async def enterprise_killer_demo():
 
     print("\nENTERPRISE VALUE: $12–18M ANNUAL IMPACT")
     print("=" * 80)
+
 
 if __name__ == "__main__":
     asyncio.run(enterprise_killer_demo())

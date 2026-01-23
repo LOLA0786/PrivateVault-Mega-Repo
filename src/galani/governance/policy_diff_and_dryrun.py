@@ -4,6 +4,7 @@ from copy import deepcopy
 from policy_registry import load_policies
 from policy_engine import authorize
 
+
 def policy_diff(version_a: str, version_b: str):
     policies = load_policies()
     pa = policies[version_a]["policy"]
@@ -28,17 +29,12 @@ def dry_run(version, action, principal, context):
     policies = load_policies()
     policy = deepcopy(policies[version]["policy"])
 
-    allowed, reason = authorize(
-        action,
-        principal,
-        context,
-        policy
-    )
+    allowed, reason = authorize(action, principal, context, policy)
 
     return {
         "policy_version": version,
         "action": action,
         "decision": "ALLOW" if allowed else "DENY",
         "reason": reason,
-        "dry_run": True
+        "dry_run": True,
     }

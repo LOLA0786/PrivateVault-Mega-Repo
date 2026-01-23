@@ -19,7 +19,6 @@ def compute_reward(outcome: dict) -> float:
     # Cost penalty (target = -zsh.01)
     reward -= min(outcome["cost"] / 0.01, 3.0) * 0.6
 
-
     # Latency penalty (target = 1000ms)
     reward -= min(outcome["latency_ms"] / 1000, 2.0) * 0.2
 

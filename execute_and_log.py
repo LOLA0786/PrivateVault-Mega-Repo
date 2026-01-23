@@ -3,6 +3,7 @@ import json
 import hashlib
 from shadow_mode import shadow_evaluate
 
+
 def execute_and_log(intent: dict):
     intent_hash = hashlib.sha256(
         json.dumps(intent, sort_keys=True).encode()

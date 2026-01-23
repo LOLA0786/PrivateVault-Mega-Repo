@@ -7,9 +7,11 @@ POLICY_VERSION = "v1.0.0"
 
 AUDIT_LOG_FILE = "audit_log.jsonl"
 
+
 def hash_decision(payload: dict) -> str:
     raw = json.dumps(payload, sort_keys=True).encode()
     return hashlib.sha256(raw).hexdigest()
+
 
 def write_audit_log(
     decision_id: str,
@@ -17,7 +19,7 @@ def write_audit_log(
     action: str,
     resource: dict,
     decision: str,
-    reason: str
+    reason: str,
 ):
     entry = {
         "timestamp": datetime.utcnow().isoformat(),
@@ -27,7 +29,7 @@ def write_audit_log(
         "action": action,
         "resource": resource,
         "decision": decision,
-        "reason": reason
+        "reason": reason,
     }
 
     entry["decision_hash"] = hash_decision(entry)

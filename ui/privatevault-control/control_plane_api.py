@@ -15,30 +15,31 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 @app.get("/status")
 def status():
     return {
         "node": "ONLINE",
         "mode": ["SHADOW", "ENFORCE"],
-        "policy_version": policy_registry.get_active_policy_version()
+        "policy_version": policy_registry.get_active_policy_version(),
     }
+
 
 @app.get("/intents/recent")
 def recent_intents(limit: int = 50):
     raw = read_recent_audits(limit)
     return [normalize_audit(r) for r in raw]
 
+
 @app.get("/shadow/summary")
 def shadow_summary():
     if hasattr(shadow_mode, "shadow_stats"):
         return shadow_mode.shadow_stats()
-    return {
-        "would_block": 0,
-        "exposure_prevented": 0,
-        "violations": []
-    }
+    return {"would_block": 0, "exposure_prevented": 0, "violations": []}
+
 
 @app.get("/replay/{intent_hash}")
 def replay(intent_hash: str):
     from replay_protection import replay_intent
+
     return replay_intent(intent_hash)

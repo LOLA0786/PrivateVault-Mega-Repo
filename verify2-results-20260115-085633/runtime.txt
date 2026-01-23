@@ -1,0 +1,3 @@
+api_health=fail
+postgres=warn
+redis=warn

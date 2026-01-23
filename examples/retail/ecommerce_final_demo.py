@@ -2,23 +2,28 @@ import json
 import hashlib
 from datetime import datetime
 
+
 # -------------------------------------------------
 # Utilities
 # -------------------------------------------------
 def h(x):
     return hashlib.sha256(json.dumps(x, sort_keys=True).encode()).hexdigest()
 
+
 def now():
     return datetime.utcnow().isoformat() + "Z"
+
 
 def section(title):
     print("\n" + "=" * 78)
     print(title)
     print("=" * 78)
 
+
 def show(policy):
     for p in policy:
         print(list(p))
+
 
 # -------------------------------------------------
 # DEMO 1: PCI DSS
@@ -29,7 +34,7 @@ policy = [
     ("PCI_DSS_3.2.1", False, "CVV storage prohibited"),
     ("ENCRYPTION_AT_REST", False, "Card data unencrypted"),
     ("ACCESS_LOGGING", False, "No audit logs"),
-    ("PCI_SCAN", False, "Quarterly scan missing")
+    ("PCI_SCAN", False, "Quarterly scan missing"),
 ]
 
 show(policy)
@@ -46,7 +51,7 @@ policy = [
     ("GDPR_CONSENT", False, "Pre-checked box invalid"),
     ("DATA_TRANSFER", False, "No SCCs"),
     ("PRIVACY_NOTICE", False, "EU rights missing"),
-    ("DPO_REQUIRED", False, "No DPO appointed")
+    ("DPO_REQUIRED", False, "No DPO appointed"),
 ]
 
 show(policy)
@@ -63,7 +68,7 @@ policy = [
     ("AGE_VERIFICATION", False, "User under 13"),
     ("PARENTAL_CONSENT", False, "No consent"),
     ("CHILD_DATA_LIMIT", False, "Photos collected"),
-    ("CHILD_PRIVACY_POLICY", False, "Missing")
+    ("CHILD_PRIVACY_POLICY", False, "Missing"),
 ]
 
 show(policy)
@@ -80,7 +85,7 @@ policy = [
     ("IATA_DGR", False, "Lithium battery restriction"),
     ("IMPORT_LICENSE_DE", False, "German license missing"),
     ("HAZMAT_TRAINING", False, "Staff uncertified"),
-    ("AIR_CARRIER_RULES", False, "Policy breach")
+    ("AIR_CARRIER_RULES", False, "Policy breach"),
 ]
 
 show(policy)
@@ -97,7 +102,7 @@ policy = [
     ("ECONOMIC_NEXUS", False, "Ohio threshold exceeded"),
     ("TAX_REGISTRATION", False, "Not registered"),
     ("TAX_COLLECTION", False, "No tax collected"),
-    ("PENALTY_RISK", True, "Back taxes inevitable")
+    ("PENALTY_RISK", True, "Back taxes inevitable"),
 ]
 
 show(policy)
@@ -114,7 +119,7 @@ policy = [
     ("CUSTOMS_FRAUD", False, "Declared value too low"),
     ("DUTY_EVASION", True, "Intent inferred"),
     ("SEIZURE_RISK", False, "High"),
-    ("IMPORT_PRIVILEGE", False, "Revocable")
+    ("IMPORT_PRIVILEGE", False, "Revocable"),
 ]
 
 show(policy)
@@ -131,7 +136,7 @@ policy = [
     ("MAGNUSON_MOSS", False, "Tie-in sales illegal"),
     ("RIGHT_TO_REPAIR", False, "Violated"),
     ("FTC_GUIDANCE", False, "Non-compliant"),
-    ("CLASS_ACTION", False, "Likely")
+    ("CLASS_ACTION", False, "Likely"),
 ]
 
 show(policy)
@@ -148,7 +153,7 @@ policy = [
     ("FDA_APPROVAL", False, "Not approved"),
     ("MISBRANDING", True, "Marketed as supplement"),
     ("PLATFORM_POLICY", False, "Marketplace ban"),
-    ("CRIMINAL_RISK", False, "Possible")
+    ("CRIMINAL_RISK", False, "Possible"),
 ]
 
 show(policy)
@@ -165,7 +170,7 @@ policy = [
     ("APPLE_3_1_1", False, "Alternative payments"),
     ("PAYMENT_SKIRTING", True, "Detected"),
     ("CONTENT_POLICY", False, "Adult content"),
-    ("ACCOUNT_BAN", False, "High risk")
+    ("ACCOUNT_BAN", False, "High risk"),
 ]
 
 show(policy)
@@ -182,7 +187,7 @@ policy = [
     ("FTC_DECEPTION", False, "Fake urgency"),
     ("FALSE_ADVERTISING", True, "Section 5"),
     ("CONSUMER_TRUST", False, "Eroded"),
-    ("REFUND_LIABILITY", False, "Triggered")
+    ("REFUND_LIABILITY", False, "Triggered"),
 ]
 
 show(policy)
@@ -199,7 +204,7 @@ policy = [
     ("SONG_BEVERLY", False, "CA law violated"),
     ("IMPLIED_WARRANTY", False, "Merchantability"),
     ("STATUTORY_DAMAGES", True, "Applicable"),
-    ("CLASS_ACTION", False, "Pattern risk")
+    ("CLASS_ACTION", False, "Pattern risk"),
 ]
 
 show(policy)
@@ -216,7 +221,7 @@ policy = [
     ("CA_1798_82", False, "Late notification"),
     ("NY_SHIELD", False, "Deadline missed"),
     ("FTC_DELAY", True, "Unreasonable"),
-    ("CREDIT_MONITORING", False, "Not offered")
+    ("CREDIT_MONITORING", False, "Not offered"),
 ]
 
 show(policy)
@@ -241,8 +246,8 @@ audit = {
         "COPPA class action",
         "Customs seizure",
         "Sales tax audits",
-        "FTC enforcement"
-    ]
+        "FTC enforcement",
+    ],
 }
 
 print(json.dumps(audit, indent=2))

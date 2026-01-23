@@ -22,6 +22,7 @@ try:
     from replay_protection import ReplayProtection
     from intent_schema import normalize_intent
     from metrics import calculate_exposure
+
     print("✅ Real imports loaded — PROD MODE")
 except Exception as e:
     print("⚠️ Fallback mocks enabled:", e)
@@ -37,6 +38,7 @@ except Exception as e:
     class ReplayProtection:
         def __init__(self):
             self.seen = set()
+
         def check(self, nonce):
             if nonce in self.seen:
                 return False
@@ -56,7 +58,9 @@ except Exception as e:
 
     def get_ledger(_):
         from ledgers.worm_fallback import WORMFallback
+
         return WORMFallback()
+
 
 # ===============================
 # CONFIG
@@ -66,14 +70,15 @@ LEDGER_TYPE = os.getenv("LEDGER_TYPE", "worm")
 NUM_PARALLEL = 10
 DEMO_OVERRIDE = True  # ⚠️ DEMO ONLY
 
+
 def _hash(payload: Dict[str, Any]) -> str:
-    return hashlib.sha256(
-        json.dumps(payload, sort_keys=True).encode()
-    ).hexdigest()
+    return hashlib.sha256(json.dumps(payload, sort_keys=True).encode()).hexdigest()
+
 
 # ===============================
 # SINGLE AUDIT
 # ===============================
+
 
 async def single_wire_audit(intent, context, nonce):
     ledger = get_ledger(LEDGER_TYPE)
@@ -96,12 +101,10 @@ async def single_wire_audit(intent, context, nonce):
         "intent": normalized,
         "decision": shadow,
         "user_id": context["user_id"],
-        "timestamp": datetime.utcnow().isoformat()
+        "timestamp": datetime.utcnow().isoformat(),
     }
 
-    tx_id = await ledger.submit_audit(
-        normalized, shadow, context["user_id"]
-    )
+    tx_id = await ledger.submit_audit(normalized, shadow, context["user_id"])
 
     stored = await ledger.query_chain(tx_id)
     if _hash(stored) != _hash(audit):
@@ -119,12 +122,14 @@ async def single_wire_audit(intent, context, nonce):
         "tx_id": tx_id,
         "latency": time.time() - start,
         "amount": normalized["amount"],
-        "risk_score": shadow["risk_score"]
+        "risk_score": shadow["risk_score"],
     }
+
 
 # ===============================
 # MAIN
 # ===============================
+
 
 async def main():
     print(f"\n💰 $1M Wire Test | ledger={LEDGER_TYPE} | parallel={NUM_PARALLEL}")
@@ -134,15 +139,16 @@ async def main():
     intent = {"amount": 1_000_000}
 
     nonces = [os.urandom(16).hex() for _ in range(NUM_PARALLEL)]
-    results = await asyncio.gather(*[
-        single_wire_audit(intent, context, n) for n in nonces
-    ])
+    results = await asyncio.gather(
+        *[single_wire_audit(intent, context, n) for n in nonces]
+    )
 
     approved = [r for r in results if r["status"] == "APPROVED"]
 
     avg_latency = (
         sum(r["latency"] for r in approved) / len(approved)
-        if approved else float("inf")
+        if approved
+        else float("inf")
     )
 
     exposure = calculate_exposure(approved)
@@ -158,6 +164,7 @@ async def main():
 
     print("\n❌ BLOCKED")
     return 1
+
 
 if __name__ == "__main__":
     raise SystemExit(asyncio.run(main()))

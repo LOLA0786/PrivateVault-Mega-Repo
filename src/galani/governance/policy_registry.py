@@ -5,6 +5,7 @@ from datetime import datetime
 
 POLICY_STORE = "policies.json"
 
+
 def load_policies():
     try:
         with open(POLICY_STORE, "r") as f:
@@ -12,18 +13,21 @@ def load_policies():
     except FileNotFoundError:
         return {}
 
+
 def save_policies(policies):
     with open(POLICY_STORE, "w") as f:
         json.dump(policies, f, indent=2)
+
 
 def register_policy(version: str, policy: dict, active=False):
     policies = load_policies()
     policies[version] = {
         "policy": policy,
         "created_at": datetime.utcnow().isoformat(),
-        "active": active
+        "active": active,
     }
     save_policies(policies)
+
 
 def activate_policy(version: str):
     policies = load_policies()
@@ -36,6 +40,7 @@ def activate_policy(version: str):
     policies[version]["active"] = True
     save_policies(policies)
 
+
 def get_active_policy():
     policies = load_policies()
     for v, data in policies.items():
@@ -43,9 +48,11 @@ def get_active_policy():
             return v, data["policy"]
     raise RuntimeError("No active policy")
 
+
 def rollback(to_version: str):
     activate_policy(to_version)
     return f"Rolled back to policy {to_version}"
+
 
 # --- Control Plane Adapter ---
 def get_active_policy_version():

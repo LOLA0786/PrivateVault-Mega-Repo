@@ -6,11 +6,7 @@ from typing import Optional, Dict, Any, Literal
 # SECURITY-CRITICAL CORE
 # -----------------------------
 class IntentCore(BaseModel):
-    action: Literal[
-        "process_payment",
-        "engage_legal_counsel",
-        "read_prescription"
-    ]
+    action: Literal["process_payment", "engage_legal_counsel", "read_prescription"]
     amount: Optional[float] = Field(default=None, ge=0)
     country: Optional[str] = None
     risk: Optional[Literal["low", "medium", "high"]] = None
@@ -29,6 +25,7 @@ class IntentEnvelope(BaseModel):
 
     class Config:
         extra = Extra.allow  # payload can evolve freely
+
 
 # --------------------------------------------------
 # Compatibility adapter for tests / external callers

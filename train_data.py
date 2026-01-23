@@ -1,5 +1,6 @@
 import json
 
+
 def load_training_data(path="logs/routing.log"):
     states = []
     actions = []
