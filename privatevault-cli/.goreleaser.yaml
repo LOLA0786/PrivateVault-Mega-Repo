@@ -1,8 +1,3 @@
-# GoReleaser config for PrivateVault CLI
-# Publishes:
-# - GitHub Releases (binaries + checksums)
-# - Homebrew Formula to LOLA0786/homebrew-privatevault
-
 version: 2
 
 project_name: privatevault
@@ -17,13 +12,8 @@ builds:
     binary: privatevault
     env:
       - CGO_ENABLED=0
-    goos:
-      - linux
-      - darwin
-      - windows
-    goarch:
-      - amd64
-      - arm64
+    goos: [linux, darwin, windows]
+    goarch: [amd64, arm64]
     ldflags:
       - -s -w
       - -X "main.version={{ .Version }}"
@@ -32,25 +22,12 @@ builds:
 
 archives:
   - id: default
-    builds:
-      - privatevault
+    builds: [privatevault]
     format: binary
     name_template: "{{ .ProjectName }}-{{ .Os }}-{{ .Arch }}"
-    replacements:
-      amd64: amd64
-      arm64: arm64
 
 checksum:
   name_template: "checksums.txt"
-
-changelog:
-  sort: asc
-  filters:
-    exclude:
-      - "^docs:"
-      - "^test:"
-      - "^chore:"
-      - "^ci:"
 
 release:
   github:
@@ -63,7 +40,6 @@ brews:
     homepage: "https://github.com/LOLA0786/PrivateVault-Mega-Repo"
     license: "Apache-2.0"
 
-    # This is the tap repo:
     repository:
       owner: LOLA0786
       name: homebrew-privatevault
@@ -72,9 +48,7 @@ brews:
 
     directory: Formula
 
-    # Use GitHub release artifacts
     url_template: "https://github.com/LOLA0786/PrivateVault-Mega-Repo/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
 
-    # Homebrew test block
     test: |
       system "#{bin}/privatevault", "version"
