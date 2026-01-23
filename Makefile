@@ -8,20 +8,11 @@ help:
 	@echo "  make verify3  - verify2 + dashboard"
 	@echo "  make clean    - delete generated artifacts"
 
-lint:
-	@echo "============================================================="
-	@echo "🔎 Lint (syntax check)"
-	@echo "============================================================="
-	python3 -m py_compile \
-		ai_firewall_core.py \
-		tool_authorization.py \
-		drift_detection_fixed.py \
-		decision_ledger.py \
-		multi_agent_workflow.py \
-		sandbox_simulation.py \
-		compliance_mapper.py \
-		ciso_dashboard_report.py
-	@echo "✅ Python compile OK"
+ lint:
+	 "✅ lint"
+	python3 -m pip install -r requirements.txt
+	python3 -m pip install ruff
+	ruff check security vaults --output-format=github
 
 test:
 	@echo "============================================================="
