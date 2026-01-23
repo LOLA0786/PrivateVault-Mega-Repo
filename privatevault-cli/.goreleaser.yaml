@@ -2,92 +2,47 @@ version: 2
 
 project_name: privatevault
 
+before:
+  hooks:
+    - go mod tidy
+
 builds:
   - id: privatevault
-    env:
-      - CGO_ENABLED=0
     main: .
     binary: privatevault
+    env:
+      - CGO_ENABLED=0
     goos:
-      - darwin
       - linux
+      - darwin
       - windows
     goarch:
       - amd64
       - arm64
-    ignore:
-      - goos: windows
-        goarch: arm64
-    ldflags:
-      - -s -w
-      - -X github.com/LOLA0786/PrivateVault-Mega-Repo/privatevault-cli/cmd.Version={{ .Tag }}
-      - -X github.com/LOLA0786/PrivateVault-Mega-Repo/privatevault-cli/cmd.Commit={{ .FullCommit }}
-      - -X github.com/LOLA0786/PrivateVault-Mega-Repo/privatevault-cli/cmd.BuildDate={{ .Date }}
 
 archives:
-  - id: binaries
+  - id: default
     format: binary
-    name_template: "{{ .Binary }}-{{ .Os }}-{{ .Arch }}"
-    files: []
+    name_template: "{{ .ProjectName }}-{{ .Os }}-{{ .Arch }}"
 
 checksum:
   name_template: "checksums.txt"
-  algorithm: sha256
 
-release:
-  github:
-    owner: LOLA0786
-    name: PrivateVault-Mega-Repo
-  name_template: "{{ .Tag }}"
-  prerelease: auto
-  draft: false
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
 
-# Docker images (only for real releases; snapshots should skip docker)
-dockers:
-  - id: pv_amd64
-    use: buildx
-    goos: linux
-    goarch: amd64
-    dockerfile: Dockerfile
-    image_templates:
-      - "ghcr.io/LOLA0786/privatevault-cli:{{ .Tag }}-amd64"
-    build_flag_templates:
-      - "--platform=linux/amd64"
-      - "--label=org.opencontainers.image.source={{ .GitURL }}"
-      - "--label=org.opencontainers.image.version={{ .Version }}"
-      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
-  - id: pv_arm64
-    use: buildx
-    goos: linux
-    goarch: arm64
-    dockerfile: Dockerfile
-    image_templates:
-      - "ghcr.io/LOLA0786/privatevault-cli:{{ .Tag }}-arm64"
-    build_flag_templates:
-      - "--platform=linux/arm64"
-      - "--label=org.opencontainers.image.source={{ .GitURL }}"
-      - "--label=org.opencontainers.image.version={{ .Version }}"
-      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
-
-docker_manifests:
-  - name_template: "ghcr.io/LOLA0786/privatevault-cli:{{ .Tag }}"
-    image_templates:
-      - "ghcr.io/LOLA0786/privatevault-cli:{{ .Tag }}-amd64"
-      - "ghcr.io/LOLA0786/privatevault-cli:{{ .Tag }}-arm64"
-  - name_template: "ghcr.io/LOLA0786/privatevault-cli:latest"
-    image_templates:
-      - "ghcr.io/LOLA0786/privatevault-cli:{{ .Tag }}-amd64"
-      - "ghcr.io/LOLA0786/privatevault-cli:{{ .Tag }}-arm64"
-
-# Homebrew (GoReleaser v2 syntax: repository + directory)
 brews:
   - name: privatevault
     homepage: "https://github.com/LOLA0786/PrivateVault-Mega-Repo"
-    description: "PrivateVault CLI: Enterprise-grade secure multi-agent OS manager"
+    description: "PrivateVault CLI: security control plane for AI agents"
     license: "MIT"
 
     repository:
-      owner: privatevault-ai
+      owner: LOLA0786
       name: homebrew-privatevault
       branch: main
       token: "{{ .Env.GITHUB_TOKEN }}"
@@ -99,28 +54,7 @@ brews:
       email: "bot@privatevault.ai"
 
     install: |
-      if OS.mac?
-        binary_name = "privatevault-darwin-#{Hardware::CPU.arm? ? 'arm64' : 'amd64'}"
-      else
-        binary_name = "privatevault-linux-amd64"
-      end
-      bin.install binary_name => "privatevault"
-      bin.install_symlink "privatevault" => "pv"
-
-    caveats: |
-      🚀 Get started:
-        privatevault run demo
-      Upgrade anytime:
-        brew upgrade privatevault
+      bin.install "privatevault"
 
     test: |
-      assert_match "PrivateVault CLI v#{version}", shell_output("#{bin}/privatevault version")
-
-changelog:
-  sort: asc
-  filters:
-    exclude:
-      - '^docs:'
-      - '^test:'
-      - Merge pull request
-      - Merge branch
+      system "#{bin}/privatevault", "version"
