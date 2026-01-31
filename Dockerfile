@@ -2,8 +2,11 @@ FROM python:3.9-slim
 
 WORKDIR /app
 
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
 COPY . .
 
-RUN chmod +x /app/main.py
+EXPOSE 8080
 
-CMD ["python", "/app/main.py"]
+CMD ["python", "main_vault_integrated.py"]
