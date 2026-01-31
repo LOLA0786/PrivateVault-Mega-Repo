@@ -1,22 +1,15 @@
 fastapi
 uvicorn[standard]
 
-python-jwt
-PyJWT
-
 hvac
-
+PyJWT
 structlog
 
 prometheus-client
-
 requests
 pydantic
 python-multipart
-
 cryptography
 bcrypt
-
 python-dotenv
-
 aiofiles
