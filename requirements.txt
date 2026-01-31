@@ -13,3 +13,4 @@ cryptography
 bcrypt
 python-dotenv
 aiofiles
+python-json-logger
