@@ -9,4 +9,4 @@ COPY . .
 
 EXPOSE 8080
 
-CMD ["python", "main_vault_integrated.py"]
+CMD ["python", "/app/main_vault_integrated.py"]

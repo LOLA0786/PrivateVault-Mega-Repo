@@ -1,4 +1,10 @@
-fastapi==0.109.0
-uvicorn==0.27.0
-pydantic==2.6.0
-requests==2.31.0
+fastapi
+uvicorn[standard]
+python-jose
+PyJWT
+hvac
+prometheus-client
+requests
+pydantic
+python-multipart
+cryptography
