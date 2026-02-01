@@ -1,8 +1,13 @@
-FROM python:3.9-slim
+FROM python:3.11-slim
+
 WORKDIR /app
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+
+COPY runtime/requirements-integrated.txt ./
+
+RUN pip install --no-cache-dir -r requirements-integrated.txt
+
 COPY . .
-# FORCE CACHE BUST with a timestamp
-ENV REFRESHED_AT=1767546580
-CMD ["uvicorn", "governance:app", "--host", "0.0.0.0", "--port", "8000"]
+
+ENV PYTHONUNBUFFERED=1
+
+CMD ["python", "runtime/main_vault_integrated.py"]

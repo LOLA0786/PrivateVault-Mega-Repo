@@ -1,3 +1,4 @@
+from typing import Optional
 """
 Production-grade secrets management with HashiCorp Vault
 """
@@ -24,7 +25,7 @@ class SecretsManager:
 
         logger.info("Successfully connected to Vault")
 
-    def get_secret(self, path: str) -> dict | None:
+    def get_secret(self, path: str) -> Optional[dict]:
         """
         Retrieve secret from Vault
 
