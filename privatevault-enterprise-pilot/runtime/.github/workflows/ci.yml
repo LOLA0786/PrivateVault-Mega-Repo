@@ -1,0 +1,79 @@
+name: CI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+
+jobs:
+  verify:
+    name: Verify (lint + tests)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          make install
+
+      - name: Verify
+        run: |
+          make verify
+
+  verify_api:
+    name: Verify API (start -> test -> stop)
+    runs-on: ubuntu-latest
+    needs: verify
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          make install
+
+      - name: Prepare .env
+        run: |
+          
+mkdir -p ai-firewall-demo
+
+if [ ! -f ai-firewall-demo/.env.example ]; then
+
+  echo "⚠️ ai-firewall-demo/.env.example missing; generating defaults for CI"
+
+  cat <<'EOF' > ai-firewall-demo/.env.example
+
+API_KEY=ci-placeholder
+
+SECRET_KEY=ci-placeholder
+
+JWT_SECRET=ci-placeholder
+
+EOF
+
+fi
+
+cp -f ai-firewall-demo/.env.example ai-firewall-demo/.env
+
+
+
+      - name: Verify API
+        env:
+          PORT: 5001
+        run: |
+          make verify-api PORT=5001

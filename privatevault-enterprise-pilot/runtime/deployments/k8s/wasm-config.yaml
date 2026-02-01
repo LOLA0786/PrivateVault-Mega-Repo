@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: opa-wasm-config
+  namespace: governance
+data:
+  conf.yaml: |
+    # Hardened Configuration: Running Binary Logic
+    bundles:
+      authz:
+        resource: policy-hardened.wasm.tar.gz
+    
+    services:
+      privatevault_relay:
+        url: http://governance-relay:5000
+    
+    # Decisions are still sent to the Relay for the Hash-Chain
+    decision_logs:
+      reporting:
+        service: privatevault_relay

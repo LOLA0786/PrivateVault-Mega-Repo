@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  ai-firewall-api:
+    build: .
+    ports:
+      - "5000:5000"
+      - "9090:9090"
+    environment:
+      - FLASK_ENV=production
+      - SECRET_KEY=${SECRET_KEY}
+      - API_KEY=${API_KEY}
+      - DRIFT_PRODUCTION_THRESHOLD=0.40
+      - DRIFT_SHADOW_THRESHOLD=0.65
+      - ENABLE_METRICS=true
+    volumes:
+      - ./logs:/app/logs
+    restart: unless-stopped
+  
+  # Optional: Redis for rate limiting
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    restart: unless-stopped

@@ -1,0 +1,15 @@
+from fastapi import FastAPI
+import time
+
+app = FastAPI()
+
+START_TIME = time.time()
+
+@app.get("/health", include_in_schema=False)
+def health():
+    return {
+        "status": "ok",
+        "uptime_seconds": int(time.time() - START_TIME)
+    }
+
+

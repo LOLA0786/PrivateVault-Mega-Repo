@@ -1,0 +1,89 @@
+openapi: 3.0.3
+info:
+  title: Galani Shadow Verify API
+  description: |
+    Shadow verification endpoint for evaluating intents without enforcement.
+    Designed for pilot testing and production shadow runs.
+  version: "0.1.0"
+
+servers:
+  - url: http://galani-alb-2013282884.ap-south-1.elb.amazonaws.com
+    description: Early pilot endpoint (AWS ALB)
+
+paths:
+  /api/v1/shadow_verify:
+    post:
+      summary: Shadow-verify an intent
+      description: |
+        Accepts an intent and payload, evaluates it in shadow mode,
+        and returns a shadow decision with diff information.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - intent
+                - payload
+              properties:
+                intent:
+                  type: string
+                  example: payment_authorization
+                payload:
+                  type: object
+                  example:
+                    amount: 3000
+                    currency: USD
+      responses:
+        "200":
+          description: Shadow evaluation completed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  shadow_decision:
+                    type: string
+                    example: BLOCK
+                  primary_decision:
+                    type: string
+                    example: ALLOW
+                  diff:
+                    type: object
+                    example:
+                      rule: high_amount_velocity
+                      threshold: 2000
+                      observed: 3000
+                  prevented_value_usd:
+                    type: number
+                    example: 3000
+                  latency_ms:
+                    type: number
+                    example: 18
+        "400":
+          description: Invalid request
+        "500":
+          description: Internal server error
+
+  /health:
+    get:
+      summary: Health check
+      description: Returns service health status
+      responses:
+        "200":
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  service:
+                    type: string
+                    example: galani-api
+                  mode:
+                    type: string
+                    example: pilot

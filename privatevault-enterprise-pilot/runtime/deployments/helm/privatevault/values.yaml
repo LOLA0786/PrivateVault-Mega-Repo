@@ -1,0 +1,22 @@
+replicaCount: 3
+image:
+  repository: privatevault/governance-relay
+  tag: "2026.1.0"
+
+envoy:
+  enabled: true
+  port: 8080
+
+opa:
+  config: |
+    services:
+      relay:
+        url: http://governance-relay:5000
+    decision_logs:
+      reporting:
+        service: relay
+
+persistence:
+  enabled: true
+  storageClass: "standard"
+  size: 10Gi

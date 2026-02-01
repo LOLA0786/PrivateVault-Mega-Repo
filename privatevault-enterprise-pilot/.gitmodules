@@ -1,0 +1,6 @@
+[submodule "runtime"]
+	path = runtime
+	url = https://github.com/LOLA0786/PrivateVault-Mega-Repo.git
+[submodule "interop/agent-frameworks"]
+	path = interop/agent-frameworks
+	url = https://github.com/LOLA0786/PrivateVaultAgentInterop.git

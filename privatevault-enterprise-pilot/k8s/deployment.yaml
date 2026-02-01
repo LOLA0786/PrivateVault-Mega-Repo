@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: privatevault
+  namespace: pv-pilot
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: privatevault
+  template:
+    metadata:
+      labels:
+        app: privatevault
+    spec:
+      containers:
+      - name: privatevault
+        image: privatevault:pilot-v2
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: PRIVATEVAULT_SIGNING_KEY
+          valueFrom:
+            secretKeyRef:
+              name: privatevault-secrets
+              key: PRIVATEVAULT_SIGNING_KEY
+        command: ["/app/privatevault"]
+        args: ["run", "demo"]
+        resources:
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+          requests:
+            cpu: "200m"
+            memory: "256Mi"

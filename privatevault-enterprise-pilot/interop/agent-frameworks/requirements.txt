@@ -1,0 +1,18 @@
+pytest
+
+# Agent frameworks
+langchain
+langchain-community
+langgraph
+pyautogen
+crewai
+
+# RAG frameworks
+llama-index
+haystack-ai
+
+# Enterprise / orchestration
+semantic-kernel
+
+# Google Agent Development Kit
+google-adk

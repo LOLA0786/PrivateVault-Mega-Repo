@@ -1,0 +1,2 @@
+#!/bin/bash
+uvicorn control_plane_api:app --host 0.0.0.0 --port 7000
