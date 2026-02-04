@@ -59,6 +59,14 @@ class QuorumValidateResponse(BaseModel):
     rule_id: str
 
 
+class QuorumRulesResponse(BaseModel):
+    rules: dict
+
+
+class QuorumRulesUpdateRequest(BaseModel):
+    rules: dict
+
+
 class AuditEventResponse(BaseModel):
     timestamp: str
     event_type: str
@@ -74,3 +82,32 @@ class AuditEventResponse(BaseModel):
     quorum: Optional[dict] = None
     error: Optional[str] = None
     client_ip: Optional[str] = None
+
+
+class ApprovalRecord(BaseModel):
+    approval_id: Optional[str] = None
+    approver_id: Optional[str] = None
+    role: Optional[str] = None
+    region: Optional[str] = None
+    intent_hash: Optional[str] = None
+    issued_at: Optional[int] = None
+    expires_at: Optional[int] = None
+    rule_id: Optional[str] = None
+    tenant_id: Optional[str] = None
+    action: Optional[str] = None
+    timestamp: Optional[str] = None
+
+
+class EvidenceExportRequest(BaseModel):
+    tenant_id: Optional[str] = None
+    start: str
+    end: str
+    bundle_name: Optional[str] = None
+
+
+class EvidenceExportResponse(BaseModel):
+    bundle_id: str
+    bundle_path: str
+    manifest_hash: str
+    verified: bool
+    warnings: list

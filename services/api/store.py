@@ -1,9 +1,10 @@
-from typing import Dict
+from typing import Dict, Optional, Any
 
 from services.api.models import TenantResponse
 
 
 _TENANTS: Dict[str, TenantResponse] = {}
+_QUORUM_RULES: Optional[dict] = None
 
 
 def list_tenants():
@@ -32,3 +33,13 @@ def update_tenant(tenant_id: str, updates: dict):
 
 def delete_tenant(tenant_id: str):
     return _TENANTS.pop(tenant_id, None)
+
+
+def get_quorum_rules() -> Optional[dict]:
+    return _QUORUM_RULES
+
+
+def set_quorum_rules(rules: dict) -> dict:
+    global _QUORUM_RULES
+    _QUORUM_RULES = rules
+    return _QUORUM_RULES

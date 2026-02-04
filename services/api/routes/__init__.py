@@ -1,3 +1,3 @@
-from services.api.routes import audit, auth, quorum, status, tenants  # noqa
+from services.api.routes import audit, auth, quorum, status, tenants, approvals, evidence  # noqa
 
-__all__ = ["audit", "auth", "quorum", "status", "tenants"]
+__all__ = ["audit", "auth", "quorum", "status", "tenants", "approvals", "evidence"]

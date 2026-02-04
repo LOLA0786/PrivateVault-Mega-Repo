@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException
 
 from services.api.errors import http_exception_handler, unhandled_exception_handler
 from services.api.middleware.request_context import auth_tenant_middleware
-from services.api.routes import audit, auth, quorum, status, tenants
+from services.api.routes import audit, auth, quorum, status, tenants, approvals, evidence
 
 
 def create_app() -> FastAPI:
@@ -22,6 +22,8 @@ def create_app() -> FastAPI:
     api.include_router(tenants.router)
     api.include_router(quorum.router)
     api.include_router(audit.router)
+    api.include_router(approvals.router)
+    api.include_router(evidence.router)
 
     @api.get("/openapi.json")
     def openapi_spec():
