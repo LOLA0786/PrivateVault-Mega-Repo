@@ -1,0 +1,34 @@
+{
+  "id": "pv.ai.openai",
+  "name": "OpenAI Connector",
+  "version": "1.0.0",
+  "domain": "ai",
+  "publisher": "PrivateVault",
+  "entrypoint": "connectors/ai/openai/connector.py",
+  "capabilities": [
+    {
+      "action": "model_invoke",
+      "schema": "schemas/model_invoke.json",
+      "quorum_policy": "AI_SENSITIVE",
+      "idempotency": true
+    },
+    {
+      "action": "tool_call",
+      "schema": "schemas/tool_call.json",
+      "quorum_policy": "AI_TOOL",
+      "idempotency": true
+    }
+  ],
+  "auth": {
+    "type": "vault",
+    "scopes": ["ai:invoke"]
+  },
+  "audit": {
+    "required": true,
+    "events": ["request", "decision", "execution", "error"]
+  },
+  "signing": {
+    "required": true,
+    "publisher_key_id": "pv-key-001"
+  }
+}
