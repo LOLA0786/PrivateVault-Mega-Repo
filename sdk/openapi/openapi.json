@@ -1,0 +1,260 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "PrivateVault API v1",
+    "version": "v1"
+  },
+  "servers": [
+    {"url": "http://localhost:8000/api/v1"}
+  ],
+  "paths": {
+    "/status": {
+      "get": {
+        "summary": "Status",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/StatusResponse"}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "summary": "Health",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/HealthResponse"}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/me": {
+      "get": {
+        "summary": "Auth Me",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/AuthToken"}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tenants": {
+      "get": {
+        "summary": "List tenants",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {"type": "array", "items": {"$ref": "#/components/schemas/Tenant"}}
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create tenant",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {"schema": {"$ref": "#/components/schemas/TenantCreate"}}
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {"schema": {"$ref": "#/components/schemas/Tenant"}}
+            }
+          }
+        }
+      }
+    },
+    "/tenants/{tenant_id}": {
+      "get": {
+        "summary": "Get tenant",
+        "parameters": [
+          {"name": "tenant_id", "in": "path", "required": true, "schema": {"type": "string"}}
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {"schema": {"$ref": "#/components/schemas/Tenant"}}
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update tenant",
+        "parameters": [
+          {"name": "tenant_id", "in": "path", "required": true, "schema": {"type": "string"}}
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {"schema": {"$ref": "#/components/schemas/TenantUpdate"}}
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {"schema": {"$ref": "#/components/schemas/Tenant"}}
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete tenant",
+        "parameters": [
+          {"name": "tenant_id", "in": "path", "required": true, "schema": {"type": "string"}}
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {"schema": {"type": "object"}}
+            }
+          }
+        }
+      }
+    },
+    "/quorum/rules": {
+      "get": {
+        "summary": "Get quorum rules",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {"schema": {"$ref": "#/components/schemas/QuorumRules"}}
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Set quorum rules",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {"schema": {"$ref": "#/components/schemas/QuorumRules"}}
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {"schema": {"$ref": "#/components/schemas/QuorumRules"}}
+            }
+          }
+        }
+      }
+    },
+    "/quorum/validate": {
+      "post": {
+        "summary": "Validate quorum",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {"schema": {"$ref": "#/components/schemas/QuorumValidate"}}
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {"schema": {"$ref": "#/components/schemas/QuorumValidateResponse"}}
+            }
+          }
+        }
+      }
+    },
+    "/approvals": {
+      "get": {
+        "summary": "List approvals",
+        "parameters": [
+          {"name": "tenant_id", "in": "query", "schema": {"type": "string"}},
+          {"name": "start", "in": "query", "schema": {"type": "string"}},
+          {"name": "end", "in": "query", "schema": {"type": "string"}}
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {"schema": {"type": "array", "items": {"$ref": "#/components/schemas/Approval"}}}
+            }
+          }
+        }
+      }
+    },
+    "/audit": {
+      "get": {
+        "summary": "List audit events",
+        "parameters": [
+          {"name": "tenant_id", "in": "query", "schema": {"type": "string"}},
+          {"name": "start", "in": "query", "schema": {"type": "string"}},
+          {"name": "end", "in": "query", "schema": {"type": "string"}}
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {"schema": {"type": "array", "items": {"$ref": "#/components/schemas/AuditEvent"}}}
+            }
+          }
+        }
+      }
+    },
+    "/evidence/export": {
+      "post": {
+        "summary": "Export evidence",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {"schema": {"$ref": "#/components/schemas/EvidenceExport"}}
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {"schema": {"$ref": "#/components/schemas/EvidenceExportResponse"}}
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "StatusResponse": {"type": "object", "properties": {"status": {"type": "string"}, "version": {"type": "string"}}},
+      "HealthResponse": {"type": "object", "properties": {"status": {"type": "string"}}},
+      "AuthToken": {"type": "object", "properties": {"token": {"type": "string"}, "scopes": {"type": "array", "items": {"type": "string"}}, "tenant_id": {"type": "string"}}},
+      "TenantCreate": {"type": "object", "properties": {"tenant_id": {"type": "string"}, "name": {"type": "string"}, "region": {"type": "string"}}, "required": ["tenant_id", "name"]},
+      "TenantUpdate": {"type": "object", "properties": {"name": {"type": "string"}, "region": {"type": "string"}}, "additionalProperties": false},
+      "Tenant": {"type": "object", "properties": {"tenant_id": {"type": "string"}, "name": {"type": "string"}, "region": {"type": "string"}}},
+      "QuorumRules": {"type": "object", "properties": {"rules": {"type": "object"}}},
+      "QuorumValidate": {"type": "object", "properties": {"action": {"type": "string"}, "payload": {"type": "object"}, "approvals": {"type": "array", "items": {"type": "object"}}, "tenant_id": {"type": "string"}}, "required": ["action", "payload", "approvals"]},
+      "QuorumValidateResponse": {"type": "object", "properties": {"required": {"type": "integer"}, "approved": {"type": "integer"}, "approvers": {"type": "array", "items": {"type": "string"}}, "roles": {"type": "array", "items": {"type": "string"}}, "intent_hash": {"type": "string"}, "tenant_id": {"type": "string"}, "action": {"type": "string"}, "rule_id": {"type": "string"}}},
+      "Approval": {"type": "object", "properties": {"approval_id": {"type": "string"}, "approver_id": {"type": "string"}, "role": {"type": "string"}, "region": {"type": "string"}, "intent_hash": {"type": "string"}, "issued_at": {"type": "integer"}, "expires_at": {"type": "integer"}, "rule_id": {"type": "string"}, "tenant_id": {"type": "string"}, "action": {"type": "string"}, "timestamp": {"type": "string"}}},
+      "AuditEvent": {"type": "object", "properties": {"timestamp": {"type": "string"}, "event_type": {"type": "string"}, "method": {"type": "string"}, "path": {"type": "string"}, "status_code": {"type": "integer"}, "decision": {"type": "string"}, "latency_ms": {"type": "integer"}, "actor_id": {"type": "string"}, "tenant_id": {"type": "string"}, "role": {"type": "string"}, "request_hash": {"type": "string"}, "quorum": {"type": "object"}, "error": {"type": "string"}, "client_ip": {"type": "string"}}},
+      "EvidenceExport": {"type": "object", "properties": {"tenant_id": {"type": "string"}, "start": {"type": "string"}, "end": {"type": "string"}, "bundle_name": {"type": "string"}}, "required": ["start", "end"]},
+      "EvidenceExportResponse": {"type": "object", "properties": {"bundle_id": {"type": "string"}, "bundle_path": {"type": "string"}, "manifest_hash": {"type": "string"}, "verified": {"type": "boolean"}, "warnings": {"type": "array", "items": {"type": "string"}}}}
+    }
+  }
+}
