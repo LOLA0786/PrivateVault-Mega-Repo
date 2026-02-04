@@ -323,3 +323,101 @@ async def require_quorum_for_emit(request: Request) -> Dict[str, Any]:
     }
     request.state.pv_quorum = quorum_info
     return quorum_info
+
+
+def validate_quorum(
+    *, action: str, payload: dict, approvals: list, tenant_id: Optional[str] = None
+) -> Dict[str, Any]:
+    if not isinstance(payload, dict):
+        raise HTTPException(status_code=400, detail="PAYLOAD_INVALID")
+    if not isinstance(approvals, list):
+        raise HTTPException(status_code=400, detail="APPROVALS_INVALID")
+
+    rule = _resolve_v2_rule(tenant_id, action)
+    min_required = _get_rule_min_approvals(rule, action)
+    intent_hash = canonical_hash(payload)
+
+    context_keys = _load_context_keys()
+    allowlist = _get_approver_allowlist()
+    revoked_ids = set(_get_revoked_approval_ids())
+    rule_allowlist = _normalize_list(rule.get("allow_approver_ids")) if rule else None
+    roles_required = _normalize_list(rule.get("roles_required")) if rule else None
+    roles_optional = _normalize_list(rule.get("roles_optional")) if rule else None
+    approver_regions = _normalize_list(rule.get("approver_regions")) if rule else None
+    require_distinct_roles = bool(rule.get("require_distinct_roles")) if rule else False
+    require_approval_id = bool(rule.get("require_approval_id")) if rule else False
+    max_age = rule.get("max_approvals_age_seconds") if rule else None
+
+    approvers_seen = set()
+    roles_seen = set()
+    valid_approvals = []
+
+    for approval in approvals:
+        if not isinstance(approval, dict):
+            continue
+        approver_id = approval.get("approver_id")
+        key_id = approval.get("key_id")
+        signature = approval.get("signature")
+        approval_intent_hash = approval.get("intent_hash")
+        approval_id = approval.get("approval_id")
+        role = approval.get("role")
+        region = approval.get("region")
+        if not approver_id or not key_id or not signature:
+            continue
+        if approval_intent_hash != intent_hash:
+            continue
+        if require_approval_id and not approval_id:
+            continue
+        if approval.get("revoked"):
+            continue
+        if approval_id and approval_id in revoked_ids:
+            continue
+        if _approval_is_expired(approval):
+            continue
+        if _approval_is_too_old(approval, max_age):
+            continue
+        if approver_regions and region not in approver_regions:
+            continue
+        if roles_required or roles_optional:
+            allowed_roles = set(roles_required or []) | set(roles_optional or [])
+            if not role or role not in allowed_roles:
+                continue
+        if allowlist and approver_id not in allowlist:
+            continue
+        if rule_allowlist and approver_id not in rule_allowlist:
+            continue
+        secret = context_keys.get(str(key_id))
+        if not secret:
+            continue
+        _verify_approval_signature(secret, intent_hash, signature)
+        if approver_id in approvers_seen:
+            continue
+        approvers_seen.add(approver_id)
+        valid_approvals.append(approval)
+        if role:
+            roles_seen.add(str(role))
+
+    if roles_required:
+        for role in roles_required:
+            if role not in roles_seen:
+                raise HTTPException(status_code=403, detail="QUORUM_ROLE_MISSING")
+        min_required = max(min_required, len(roles_required))
+
+    if require_distinct_roles:
+        approved_count = len(roles_seen)
+    else:
+        approved_count = len(valid_approvals)
+
+    if approved_count < min_required:
+        raise HTTPException(status_code=403, detail="QUORUM_NOT_MET")
+
+    return {
+        "required": min_required,
+        "approved": approved_count,
+        "approvers": sorted(approvers_seen),
+        "roles": sorted(roles_seen),
+        "intent_hash": intent_hash,
+        "tenant_id": tenant_id,
+        "action": action,
+        "rule_id": rule.get("rule_id") if rule else DEFAULT_RULE_ID,
+    }
