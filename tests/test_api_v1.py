@@ -18,11 +18,19 @@ def _env_setup(tmp_path, monkeypatch):
     tokens = [
         {
             "token": "token-admin",
-            "scopes": ["tenant:read", "tenant:write", "quorum:read", "audit:read"],
+            "scopes": [
+                "tenant:read",
+                "tenant:write",
+                "quorum:read",
+                "quorum:write",
+                "audit:read",
+                "approvals:read",
+                "evidence:export",
+            ],
         },
         {
             "token": "token-tenant",
-            "scopes": ["tenant:read", "quorum:read", "audit:read"],
+            "scopes": ["tenant:read", "quorum:read", "audit:read", "approvals:read"],
             "tenant_id": "tenant-1",
         },
     ]
@@ -46,6 +54,7 @@ def _env_setup(tmp_path, monkeypatch):
         + "\n"
     )
     monkeypatch.setenv("PV_AUDIT_LOG_PATH", str(audit_path))
+    monkeypatch.setenv("PV_EXPORT_ROOT", str(tmp_path / "exports"))
     yield
 
 
@@ -128,9 +137,41 @@ def test_quorum_validate():
     assert resp.json()["approved"] >= 2
 
 
+def test_quorum_set_get():
+    client = _client()
+    headers = {"Authorization": "Bearer token-admin"}
+    rules = {"defaults": {"min_approvals": 2}}
+    resp = client.put("/api/v1/quorum/rules", headers=headers, json={"rules": rules})
+    assert resp.status_code == 200
+    resp = client.get("/api/v1/quorum/rules", headers=headers)
+    assert resp.status_code == 200
+    assert resp.json()["rules"] == rules
+
+
 def test_audit_read():
     client = _client()
     headers = {"Authorization": "Bearer token-admin"}
     resp = client.get("/api/v1/audit", headers=headers)
     assert resp.status_code == 200
     assert len(resp.json()) == 1
+
+
+def test_approvals_list():
+    client = _client()
+    headers = {"Authorization": "Bearer token-admin"}
+    resp = client.get("/api/v1/approvals", headers=headers)
+    assert resp.status_code == 200
+
+
+def test_evidence_export():
+    client = _client()
+    headers = {"Authorization": "Bearer token-admin"}
+    payload = {
+        "tenant_id": "tenant-1",
+        "start": "2026-02-01T00:00:00Z",
+        "end": "2026-02-02T00:00:00Z",
+        "bundle_name": "bundle-test",
+    }
+    resp = client.post("/api/v1/evidence/export", headers=headers, json=payload)
+    assert resp.status_code == 200
+    assert resp.json()["bundle_id"] == "bundle-test"
