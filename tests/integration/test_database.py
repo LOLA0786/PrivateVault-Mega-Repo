@@ -2,11 +2,15 @@
 Integration tests for database operations
 """
 
+import os
 import pytest
+import pytest_asyncio
 import socket
 
 
 def _postgres_running(host="127.0.0.1", port=5432, timeout=0.2):
+    if os.getenv("PV_TEST_DB_MODE") == "fake":
+        return True
     try:
         with socket.create_connection((host, port), timeout=timeout):
             return True
@@ -111,7 +115,7 @@ class TestDatabaseOperations:
             assert row is None
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def db_pool():
     """Create database connection pool for tests"""
     pool = await asyncpg.create_pool(
