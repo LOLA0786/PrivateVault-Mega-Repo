@@ -1,18 +1,13 @@
 import json
 import os
 
-DEFAULT_LOG_FILES = [
-    "audit.log",
-    "logs.json",
-    "logs-test.json",
-    "logs-medtech.json",
-]
+from audit_logger import get_audit_log_paths
 
 
 def read_recent_audits(limit=50):
     entries = []
 
-    for path in DEFAULT_LOG_FILES:
+    for path in get_audit_log_paths():
         if not os.path.exists(path):
             continue
 
