@@ -11,6 +11,7 @@ from control_plane_replay import replay_from_audit
 from audit_logger import build_request_audit_event, log_audit_event
 from security_context import require_signed_context
 from quorum import require_quorum_for_emit
+from evidence_export import export_bundle
 
 app = FastAPI(title="PrivateVault Sovereign Control Plane")
 
@@ -126,3 +127,33 @@ def emit_medtech(
     from medtech_final_demo import run_medtech_intent
 
     return safe_call(run_medtech_intent, payload, "medtech")
+
+
+@app.post("/api/evidence/export")
+def export_evidence(payload: dict, context=Depends(require_signed_context)):
+    tenant_id = payload.get("tenant_id") or context.get("tenant_id")
+    if not tenant_id:
+        raise HTTPException(status_code=400, detail="TENANT_ID_REQUIRED")
+    if context.get("tenant_id") and tenant_id != context.get("tenant_id"):
+        raise HTTPException(status_code=403, detail="TENANT_SCOPE_VIOLATION")
+    start = payload.get("start")
+    end = payload.get("end")
+    if not start or not end:
+        raise HTTPException(status_code=400, detail="TIME_RANGE_REQUIRED")
+    bundle_name = payload.get("bundle_name")
+    try:
+        result = export_bundle(
+            tenant_id=str(tenant_id),
+            start_iso=str(start),
+            end_iso=str(end),
+            bundle_name=bundle_name,
+        )
+    except RuntimeError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+    return {
+        "bundle_id": result.bundle_id,
+        "bundle_path": result.bundle_path,
+        "manifest_hash": result.manifest_hash,
+        "verified": result.verified,
+        "warnings": result.warnings,
+    }
