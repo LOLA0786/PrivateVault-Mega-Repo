@@ -3,7 +3,7 @@
     "containerDefinitions": [
         {
             "name": "Main",
-            "image": "209483893123.dkr.ecr.ap-south-1.amazonaws.com/galani-enterprise@sha256:1f0b1782dd8402dd6c610bcedbcf44fe8a945609743da6bc9d08614f9d8fd018",
+            "image": "209483893123.dkr.ecr.ap-south-1.amazonaws.com/galani-enterprise:apikey-fix",
             "cpu": 0,
             "portMappings": [
                 {

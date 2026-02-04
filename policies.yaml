@@ -1,0 +1,7 @@
+- action: send_discount
+  allowed_if:
+    deal_stage: negotiation
+    customer_value:
+      op: ">"
+      value: 50000
+    manager_approved: true

@@ -1,62 +1,15 @@
-options:
-  logging: CLOUD_LOGGING_ONLY
-
 steps:
-  # --- UAAL POLICY CHECK (SHADOW MODE) ---
-  - name: 'python:3.10-slim'
-    id: 'uaal-policy-check'
-    entrypoint: 'bash'
-    args:
-      - -c
-      - |
-        python uaal_ci_check.py
-    env:
-      - 'UAAL_SHADOW_MODE=true'
-
-  # --- BUILD DOCKER IMAGE ---
   - name: 'gcr.io/cloud-builders/docker'
-    id: 'docker-build'
     args:
       - build
       - -t
-      - privatevault-api:$COMMIT_SHA
+      - us-central1-docker.pkg.dev/intent-engine-482103/test-repo/privatevault-api:latest
       - .
 
-  # --- LOGIN TO AWS ECR ---
-  - name: 'amazon/aws-cli'
-    id: 'ecr-login'
-    entrypoint: 'bash'
-    secretEnv:
-      - AWS_ACCESS_KEY_ID
-      - AWS_SECRET_ACCESS_KEY
-      - AWS_REGION
-    args:
-      - -c
-      - |
-        aws ecr get-login-password --region "$AWS_REGION" \
-        | docker login --username AWS --password-stdin \
-          209483893123.dkr.ecr.ap-south-1.amazonaws.com
-
-  # --- TAG IMAGE FOR ECR ---
   - name: 'gcr.io/cloud-builders/docker'
-    id: 'docker-tag'
-    args:
-      - tag
-      - privatevault-api:$COMMIT_SHA
-      - 209483893123.dkr.ecr.ap-south-1.amazonaws.com/privatevault-api:$COMMIT_SHA
-
-  # --- PUSH TO ECR ---
-  - name: 'gcr.io/cloud-builders/docker'
-    id: 'docker-push'
     args:
       - push
-      - 209483893123.dkr.ecr.ap-south-1.amazonaws.com/privatevault-api:$COMMIT_SHA
+      - us-central1-docker.pkg.dev/intent-engine-482103/test-repo/privatevault-api:latest
 
-availableSecrets:
-  secretManager:
-    - versionName: projects/intent-engine-482103/secrets/aws-access-key-id/versions/latest
-      env: AWS_ACCESS_KEY_ID
-    - versionName: projects/intent-engine-482103/secrets/aws-secret-access-key/versions/latest
-      env: AWS_SECRET_ACCESS_KEY
-    - versionName: projects/intent-engine-482103/secrets/aws-region/versions/latest
-      env: AWS_REGION
+images:
+  - us-central1-docker.pkg.dev/intent-engine-482103/test-repo/privatevault-api:latest

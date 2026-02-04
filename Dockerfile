@@ -1,11 +1,8 @@
 FROM python:3.9-slim
-
 WORKDIR /app
-
-COPY requirements.txt /app/
-
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
-
-COPY . /app
-
-CMD ["python", "/app/main_vault_integrated.py"]
+COPY . .
+# FORCE CACHE BUST with a timestamp
+ENV REFRESHED_AT=1767704313
+CMD ["uvicorn", "governance:app", "--host", "0.0.0.0", "--port", "8000"]
