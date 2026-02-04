@@ -17,11 +17,13 @@ def _sign(secret: str, payload: str) -> str:
     return hmac.new(secret.encode("utf-8"), payload.encode("utf-8"), hashlib.sha256).hexdigest()
 
 
-def _build_context_headers(method: str, path: str, body: bytes, key_id: str, secret: str):
+def _build_context_headers(
+    method: str, path: str, body: bytes, key_id: str, secret: str, tenant_id: str = "tenant-1"
+):
     request_hash = compute_request_hash(method, path, body)
     context = {
         "actor_id": "user-1",
-        "tenant_id": "tenant-1",
+        "tenant_id": tenant_id,
         "role": "admin",
         "timestamp": int(time.time()),
         "nonce": "nonce-1",
@@ -42,6 +44,30 @@ def _build_approval(approver_id: str, key_id: str, secret: str, intent_hash: str
         "key_id": key_id,
         "signature": _sign(secret, intent_hash),
         "intent_hash": intent_hash,
+    }
+
+
+def _build_approval_v2(
+    approver_id: str,
+    key_id: str,
+    secret: str,
+    intent_hash: str,
+    approval_id: str,
+    role: str,
+    region: str,
+    issued_at: int,
+    expires_at: int,
+):
+    return {
+        "approver_id": approver_id,
+        "key_id": key_id,
+        "signature": _sign(secret, intent_hash),
+        "intent_hash": intent_hash,
+        "approval_id": approval_id,
+        "role": role,
+        "region": region,
+        "issued_at": issued_at,
+        "expires_at": expires_at,
     }
 
 
@@ -122,3 +148,182 @@ def test_emit_accepts_quorum_and_logs(monkeypatch, tmp_path):
     event = json.loads(lines[-1])
     assert event.get("event_type") == "control_plane_request"
     assert event.get("decision") == "ALLOW"
+
+
+def test_quorum_v2_tenant_action_roles_regions(monkeypatch, tmp_path):
+    from control_plane_api import app
+
+    rules = {
+        "defaults": {"min_approvals": 2},
+        "tenants": {
+            "tenant-1": {
+                "defaults": {"min_approvals": 3},
+                "actions": {
+                    "POST /api/emit/fintech": {
+                        "min_approvals": 3,
+                        "roles_required": ["CRO", "Legal"],
+                        "roles_optional": ["Finance"],
+                        "approver_regions": ["US", "EU"],
+                        "require_approval_id": True,
+                        "rule_id": "tenant-1-fintech",
+                    }
+                },
+            }
+        },
+    }
+    monkeypatch.setenv("PV_QUORUM_RULES_V2", json.dumps(rules))
+
+    fake = types.ModuleType("fintech_final_demo")
+    fake.run_fintech_intent = lambda payload: {"ok": True}
+    sys.modules["fintech_final_demo"] = fake
+
+    client = TestClient(app)
+    payload = {"amount": 100, "recipient": "acct-1"}
+    body = json.dumps(payload, separators=(",", ":"), sort_keys=True).encode("utf-8")
+    intent_hash = canonical_hash(payload)
+    now = int(time.time())
+    approvals = [
+        _build_approval_v2(
+            "approver-1",
+            "k1",
+            "secret-1",
+            intent_hash,
+            "APP-1",
+            "CRO",
+            "US",
+            now,
+            now + 600,
+        ),
+        _build_approval_v2(
+            "approver-2",
+            "k2",
+            "secret-2",
+            intent_hash,
+            "APP-2",
+            "Legal",
+            "EU",
+            now,
+            now + 600,
+        ),
+        _build_approval_v2(
+            "approver-3",
+            "k1",
+            "secret-1",
+            intent_hash,
+            "APP-3",
+            "Finance",
+            "US",
+            now,
+            now + 600,
+        ),
+    ]
+    headers = _build_context_headers(
+        "POST", "/api/emit/fintech", body, "k1", "secret-1", tenant_id="tenant-1"
+    )
+    headers["X-PV-Approvals"] = json.dumps(approvals, separators=(",", ":"), sort_keys=True)
+
+    response = client.post(
+        "/api/emit/fintech",
+        data=body,
+        headers={**headers, "Content-Type": "application/json"},
+    )
+    assert response.status_code == 200
+
+    audit_path = tmp_path / "audit.log"
+    event = json.loads(audit_path.read_text().strip().splitlines()[-1])
+    assert event.get("decision") == "ALLOW"
+    assert event.get("quorum", {}).get("rule_id") == "tenant-1-fintech"
+    assert len(event.get("quorum", {}).get("approvals_used", [])) == 3
+
+
+def test_quorum_v2_rejects_expired(monkeypatch):
+    from control_plane_api import app
+
+    rules = {
+        "actions": {
+            "POST /api/emit/fintech": {
+                "min_approvals": 1,
+                "max_approvals_age_seconds": 10,
+            }
+        }
+    }
+    monkeypatch.setenv("PV_QUORUM_RULES_V2", json.dumps(rules))
+
+    fake = types.ModuleType("fintech_final_demo")
+    fake.run_fintech_intent = lambda payload: {"ok": True}
+    sys.modules["fintech_final_demo"] = fake
+
+    client = TestClient(app)
+    payload = {"amount": 100, "recipient": "acct-1"}
+    body = json.dumps(payload, separators=(",", ":"), sort_keys=True).encode("utf-8")
+    intent_hash = canonical_hash(payload)
+    past = int(time.time()) - 100
+    approvals = [
+        _build_approval_v2(
+            "approver-1",
+            "k1",
+            "secret-1",
+            intent_hash,
+            "APP-OLD",
+            "CRO",
+            "US",
+            past,
+            past + 5,
+        )
+    ]
+    headers = _build_context_headers("POST", "/api/emit/fintech", body, "k1", "secret-1")
+    headers["X-PV-Approvals"] = json.dumps(approvals, separators=(",", ":"), sort_keys=True)
+
+    response = client.post(
+        "/api/emit/fintech",
+        data=body,
+        headers={**headers, "Content-Type": "application/json"},
+    )
+    assert response.status_code == 403
+
+
+def test_quorum_v2_rejects_revoked(monkeypatch):
+    from control_plane_api import app
+
+    rules = {
+        "actions": {
+            "POST /api/emit/fintech": {
+                "min_approvals": 1,
+                "require_approval_id": True,
+            }
+        }
+    }
+    monkeypatch.setenv("PV_QUORUM_RULES_V2", json.dumps(rules))
+    monkeypatch.setenv("PV_QUORUM_REVOKED_IDS", json.dumps(["APP-REVOKED"]))
+
+    fake = types.ModuleType("fintech_final_demo")
+    fake.run_fintech_intent = lambda payload: {"ok": True}
+    sys.modules["fintech_final_demo"] = fake
+
+    client = TestClient(app)
+    payload = {"amount": 100, "recipient": "acct-1"}
+    body = json.dumps(payload, separators=(",", ":"), sort_keys=True).encode("utf-8")
+    intent_hash = canonical_hash(payload)
+    now = int(time.time())
+    approvals = [
+        _build_approval_v2(
+            "approver-1",
+            "k1",
+            "secret-1",
+            intent_hash,
+            "APP-REVOKED",
+            "CRO",
+            "US",
+            now,
+            now + 600,
+        )
+    ]
+    headers = _build_context_headers("POST", "/api/emit/fintech", body, "k1", "secret-1")
+    headers["X-PV-Approvals"] = json.dumps(approvals, separators=(",", ":"), sort_keys=True)
+
+    response = client.post(
+        "/api/emit/fintech",
+        data=body,
+        headers={**headers, "Content-Type": "application/json"},
+    )
+    assert response.status_code == 403
