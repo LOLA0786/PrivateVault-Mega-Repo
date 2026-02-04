@@ -1,0 +1,31 @@
+{
+  "defaults": {
+    "min_approvals": 2
+  },
+  "actions": {
+    "POST /api/emit/medtech": {
+      "min_approvals": 2,
+      "roles_required": ["DPO"],
+      "approver_regions": ["EU"]
+    }
+  },
+  "tenants": {
+    "tenant-demo": {
+      "defaults": {
+        "min_approvals": 3,
+        "roles_required": ["CRO", "Legal"]
+      },
+      "actions": {
+        "POST /api/emit/fintech": {
+          "min_approvals": 3,
+          "roles_required": ["CRO", "Legal"],
+          "roles_optional": ["Finance"],
+          "approver_regions": ["US", "EU"],
+          "require_approval_id": true,
+          "max_approvals_age_seconds": 1800,
+          "rule_id": "tenant-demo-fintech"
+        }
+      }
+    }
+  }
+}

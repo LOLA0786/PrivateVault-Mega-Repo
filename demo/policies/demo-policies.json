@@ -1,0 +1,20 @@
+{
+  "demo-v1": {
+    "policy": {
+      "name": "Demo Policy v1",
+      "controls": ["SOC2-CC6", "ISO27001-A12"],
+      "scope": "demo"
+    },
+    "created_at": "2026-02-01T08:00:00Z",
+    "active": false
+  },
+  "demo-v2": {
+    "policy": {
+      "name": "Demo Policy v2",
+      "controls": ["SOC2-CC7", "ISO27001-A9"],
+      "scope": "demo"
+    },
+    "created_at": "2026-02-15T12:00:00Z",
+    "active": true
+  }
+}
