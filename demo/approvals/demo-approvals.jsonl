@@ -1,0 +1,8 @@
+{"approval_id":"APP-1001","approver_id":"demo-cro","role":"CRO","region":"US","intent_hash":"intent-001","issued_at":1760000000,"expires_at":1760003600}
+{"approval_id":"APP-1002","approver_id":"demo-legal","role":"Legal","region":"EU","intent_hash":"intent-001","issued_at":1760000000,"expires_at":1760003600}
+{"approval_id":"APP-1003","approver_id":"demo-finance","role":"Finance","region":"US","intent_hash":"intent-001","issued_at":1760000000,"expires_at":1760003600}
+{"approval_id":"APP-2001","approver_id":"demo-dpo","role":"DPO","region":"EU","intent_hash":"intent-002","issued_at":1760500000,"expires_at":1760503600}
+{"approval_id":"APP-3001","approver_id":"demo-cro","role":"CRO","region":"US","intent_hash":"intent-004","issued_at":1761000000,"expires_at":1761003600}
+{"approval_id":"APP-3002","approver_id":"demo-legal","role":"Legal","region":"EU","intent_hash":"intent-004","issued_at":1761000000,"expires_at":1761003600}
+{"approval_id":"APP-3003","approver_id":"demo-finance","role":"Finance","region":"US","intent_hash":"intent-004","issued_at":1761000000,"expires_at":1761003600}
+{"approval_id":"APP-4001","approver_id":"demo-cro","role":"CRO","region":"US","intent_hash":"intent-006","issued_at":1761500000,"expires_at":1761503600}
