@@ -1,19 +1,10 @@
-def pytest_ignore_collect(path, config):
-    p = str(path)
+import os
 
-    if "tests/integration" in p:
-        return True
+import pytest
 
-    if "test_temporal.py" in p:
-        return True
 
-    if "test_worm.py" in p:
-        return True
-
-    if "tests/benchmarks" in p:
-        return True
-
-    if "test_synthetic_pipeline.py" in p:
-        return True
-
-    return False
+@pytest.fixture(autouse=True)
+def _audit_log_env():
+    if not os.getenv("PV_AUDIT_LOG_PATH"):
+        os.environ["PV_AUDIT_LOG_PATH"] = "/tmp/pv_test_audit.log"
+    yield

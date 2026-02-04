@@ -5,9 +5,6 @@ from datetime import datetime, timezone
 from typing import Any, Dict, Iterable, List, Optional
 
 
-DEFAULT_AUDIT_LOG_PATH = "/var/lib/privatevault/audit.log"
-
-
 def _utc_now_iso() -> str:
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat()
 
@@ -27,7 +24,14 @@ def _assert_path_not_in_repo(path: str) -> None:
 
 
 def get_audit_log_path() -> str:
-    return os.getenv("PV_AUDIT_LOG_PATH", DEFAULT_AUDIT_LOG_PATH)
+    path = os.getenv("PV_AUDIT_LOG_PATH")
+    if not path or not path.strip():
+        raise RuntimeError("PV_AUDIT_LOG_PATH_REQUIRED")
+    _assert_path_not_in_repo(path)
+    _ensure_parent_dir(path)
+    if not os.path.exists(path):
+        open(path, "a").close()
+    return path
 
 
 def get_audit_log_paths() -> List[str]:
@@ -37,7 +41,12 @@ def get_audit_log_paths() -> List[str]:
     else:
         paths = [get_audit_log_path()]
     for path in paths:
+        if not path:
+            raise RuntimeError("PV_AUDIT_LOG_PATH_REQUIRED")
         _assert_path_not_in_repo(path)
+        _ensure_parent_dir(path)
+        if not os.path.exists(path):
+            open(path, "a").close()
     return paths
 
 
@@ -49,8 +58,6 @@ def _ensure_parent_dir(path: str) -> None:
 
 def log_audit_event(event: Dict[str, Any]) -> None:
     path = get_audit_log_path()
-    _assert_path_not_in_repo(path)
-    _ensure_parent_dir(path)
     payload = dict(event)
     payload.setdefault("timestamp", _utc_now_iso())
     with open(path, "a", encoding="utf-8") as f:
