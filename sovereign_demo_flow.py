@@ -2,7 +2,7 @@ import httpx
 import asyncio
 
 
-async def test_scenario(name, gradient, mode):
+async def demo_scenario(name, gradient, mode):
     print(f"\n--- Scenario: {name} (Mode: {mode}) ---")
     payload = {
         "current_val": 100.0,

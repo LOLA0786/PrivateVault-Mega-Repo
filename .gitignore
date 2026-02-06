@@ -128,3 +128,26 @@ venv/
 
 # goreleaser/accidental tag folders
 privatevault-cli/v*/
+
+# Test artifacts
+test_diagnostics_*
+old_test_runs/
+test_reports/
+
+# Proof artifacts
+pv-proof*
+pv-test/
+
+# Python
+__pycache__/
+*.pyc
+
+# Logs
+logs*
+*.log
+
+# Venv
+venv/
+
+# Node
+node_modules/
