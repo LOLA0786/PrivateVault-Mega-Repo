@@ -1,1 +1,0 @@
-Syntax error: ./generate_ppo_data.py

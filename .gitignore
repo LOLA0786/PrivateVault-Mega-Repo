@@ -27,3 +27,6 @@ api_keys.json
 
 # Systemd
 *.service
+
+# Archived legacy code
+_archive/

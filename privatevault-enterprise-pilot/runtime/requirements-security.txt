@@ -1,7 +1,0 @@
-# Security dependencies
-hvac==1.2.1              # HashiCorp Vault client
-PyJWT==2.8.0             # JWT tokens
-python-multipart==0.0.6  # For form data
-pydantic==2.5.0          # Input validation
-cryptography==41.0.7     # Encryption
-bcrypt==4.1.2            # Password hashing
