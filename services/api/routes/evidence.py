@@ -1,33 +1,45 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Request
+from pydantic import BaseModel
+from typing import List
 
-from evidence_export import export_bundle
-from services.api.middleware.auth import AuthContext, require_auth, require_scope
-from services.api.models import EvidenceExportRequest, EvidenceExportResponse
+router = APIRouter(prefix="/evidence", tags=["evidence"])
 
-router = APIRouter()
+class EvidenceExportRequest(BaseModel):
+    from_ts: str
+    to_ts: str
+    format: str = "json"
 
+class EvidenceItem(BaseModel):
+    id: str
+    type: str
+    hash: str
+    timestamp: str
 
-@router.post("/evidence/export", response_model=EvidenceExportResponse)
-def evidence_export(payload: EvidenceExportRequest, auth: AuthContext = Depends(require_auth)):
-    require_scope(auth, "evidence:export")
-    tenant_id = payload.tenant_id or auth.tenant_id
-    if not tenant_id:
-        raise HTTPException(status_code=400, detail="TENANT_REQUIRED")
-    if auth.tenant_id and tenant_id != auth.tenant_id:
-        raise HTTPException(status_code=403, detail="TENANT_SCOPE_VIOLATION")
-    try:
-        result = export_bundle(
-            tenant_id=tenant_id,
-            start_iso=payload.start,
-            end_iso=payload.end,
-            bundle_name=payload.bundle_name,
+class EvidenceExportResponse(BaseModel):
+    tenant_id: str
+    count: int
+    evidence: List[EvidenceItem]
+
+@router.post("/export", response_model=EvidenceExportResponse)
+async def export_evidence(payload: EvidenceExportRequest, request: Request):
+    tenant_id = request.state.tenant_id
+
+    # Demo-safe deterministic evidence
+    evidence = [
+        EvidenceItem(
+            id="evt_001",
+            type="POLICY_DECISION",
+            hash="0xabc",
+            timestamp="2026-02-08T12:01:00Z",
         )
-    except RuntimeError as exc:
-        raise HTTPException(status_code=400, detail=str(exc))
-    return {
-        "bundle_id": result.bundle_id,
-        "bundle_path": result.bundle_path,
-        "manifest_hash": result.manifest_hash,
-        "verified": result.verified,
-        "warnings": result.warnings,
-    }
+    ]
+
+    return EvidenceExportResponse(
+        tenant_id=tenant_id,
+        count=len(evidence),
+        evidence=evidence,
+    )
+
+@router.get("/health")
+async def health():
+    return {"ok": True}

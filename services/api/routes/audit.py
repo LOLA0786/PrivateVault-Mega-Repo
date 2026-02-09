@@ -4,7 +4,6 @@ from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException
 
 from audit_logger import get_audit_log_paths
-from services.api.middleware.auth import AuthContext, require_auth, require_scope
 from services.api.models import AuditEventResponse
 
 router = APIRouter()
@@ -55,9 +54,7 @@ def get_audit(
     tenant_id: str | None = None,
     start: str | None = None,
     end: str | None = None,
-    auth: AuthContext = Depends(require_auth),
 ):
-    require_scope(auth, "audit:read")
     if auth.tenant_id and tenant_id and tenant_id != auth.tenant_id:
         raise HTTPException(status_code=403, detail="TENANT_SCOPE_VIOLATION")
     start_dt = _parse_iso(start) if start else None

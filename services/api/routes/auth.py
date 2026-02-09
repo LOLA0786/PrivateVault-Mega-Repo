@@ -1,11 +1,10 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Request
 
-from services.api.middleware.auth import AuthContext, require_auth
-from services.api.models import AuthToken
+router = APIRouter(prefix="/auth", tags=["auth"])
 
-router = APIRouter()
-
-
-@router.get("/auth/me", response_model=AuthToken)
-def auth_me(auth: AuthContext = Depends(require_auth)):
-    return {"token": auth.token, "scopes": auth.scopes, "tenant_id": auth.tenant_id}
+@router.get("/whoami")
+async def whoami(request: Request):
+    return {
+        "tenant_id": getattr(request.state, "tenant_id", None),
+        "api_key_id": getattr(request.state, "api_key_id", None),
+    }
