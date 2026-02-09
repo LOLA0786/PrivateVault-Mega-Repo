@@ -1,63 +1,59 @@
-from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
-
-import json
-from pathlib import Path
+from fastapi import APIRouter, Request
+from services.api.governance.normalizer import normalize
+from services.api.governance.policy_engine import evaluate_policy
 
 router = APIRouter(prefix="/chat", tags=["chat"])
 
 
-# ---------
-# Models
-# ---------
+@router.post("/respond")
+async def chat_respond(payload: dict):
+    """
+    Internal chat governance endpoint
+    """
+    normalized = normalize(payload)
+    decision = evaluate_policy(normalized)
 
-class ChatRequest(BaseModel):
-    request_id: str
+    if decision["blocked"]:
+        return {
+            "message": (
+                "❌ Decision: BLOCKED\n"
+                f"📜 Policy: {decision['policy']}\n"
+                "🧠 Reason: Policy enforcement\n"
+                f"🔐 Evidence Hash: {decision['evidence_hash']}\n"
+                f"⏱ Timestamp: {decision['timestamp']}"
+            )
+        }
 
-
-class ChatResponse(BaseModel):
-    message: str
-
-
-# ---------
-# Load synthetic evidence + templates
-# (later this can be DB-backed, no API change)
-# ---------
-
-BASE = Path(__file__).resolve().parents[3]
-
-with open(BASE / "synthetic_data/evidence_store.json") as f:
-    EVIDENCE = json.load(f)
-
-with open(BASE / "synthetic_data/chat_responses.json") as f:
-    TEMPLATES = json.load(f)
+    return {"message": "✅ Allowed"}
 
 
-# ---------
-# Endpoint
-# ---------
+@router.post("/webhook/cometchat")
+async def cometchat_webhook(request: Request):
+    """
+    CometChat → PrivateVault governance webhook
+    """
+    payload = await request.json()
 
-@router.post("/respond", response_model=ChatResponse)
-def chat_respond(payload: ChatRequest):
-    evt = next(
-        (e for e in EVIDENCE if e["request_id"] == payload.request_id),
-        None,
-    )
+    message = payload.get("data", {}).get("text", "")
+    sender = payload.get("data", {}).get("sender", "unknown")
 
-    if not evt:
-        raise HTTPException(status_code=404, detail="REQUEST_NOT_FOUND")
+    normalized = normalize({
+        "source": "cometchat",
+        "sender": sender,
+        "text": message,
+    })
 
-    template = (
-        TEMPLATES["why_blocked"]["template"]
-        if evt["decision"] == "BLOCK"
-        else TEMPLATES["why_allowed"]["template"]
-    )
+    decision = evaluate_policy(normalized)
 
-    message = template.format(
-        policy=evt["policy"],
-        reason="Policy enforcement",
-        hash=evt["hash"],
-        timestamp=evt["timestamp"],
-    )
+    if decision["blocked"]:
+        return {
+            "action": "BLOCK",
+            "policy": decision["policy"],
+            "evidence_hash": decision["evidence_hash"],
+            "message": "Message blocked by governance policy"
+        }
 
-    return ChatResponse(message=message)
+    return {
+        "action": "ALLOW",
+        "message": message
+    }
