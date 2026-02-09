@@ -1,0 +1,12 @@
+{
+  "req_1001": {
+    "final_decision": "BLOCK",
+    "policy": "GDPR_PII_RESTRICTION",
+    "explanation": "PII detected in EU region"
+  },
+  "req_1002": {
+    "final_decision": "ALLOW",
+    "policy": "CONTENT_POLICY_V1",
+    "explanation": "No restricted data detected"
+  }
+}

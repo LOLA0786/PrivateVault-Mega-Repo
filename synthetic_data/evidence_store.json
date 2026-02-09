@@ -1,0 +1,18 @@
+[
+  {
+    "request_id": "req_1001",
+    "tenant_id": "test-tenant",
+    "decision": "BLOCK",
+    "policy": "GDPR_PII_RESTRICTION",
+    "hash": "0xabc123",
+    "timestamp": "2026-02-09T07:30:00Z"
+  },
+  {
+    "request_id": "req_1002",
+    "tenant_id": "test-tenant",
+    "decision": "ALLOW",
+    "policy": "CONTENT_POLICY_V1",
+    "hash": "0xdef456",
+    "timestamp": "2026-02-09T07:32:00Z"
+  }
+]

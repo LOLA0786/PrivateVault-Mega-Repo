@@ -1,0 +1,33 @@
+[
+  {
+    "request_id": "req_1001",
+    "tenant_id": "test-tenant",
+    "model": "gpt-4",
+    "action": "approve_loan",
+    "input": {
+      "name": "John Doe",
+      "country": "DE",
+      "contains_pii": true
+    },
+    "ai_output": {
+      "decision": "APPROVE",
+      "confidence": 0.91,
+      "reason": "Meets financial criteria"
+    }
+  },
+  {
+    "request_id": "req_1002",
+    "tenant_id": "test-tenant",
+    "model": "gpt-4",
+    "action": "generate_marketing_email",
+    "input": {
+      "region": "EU",
+      "contains_pii": false
+    },
+    "ai_output": {
+      "decision": "APPROVE",
+      "confidence": 0.88,
+      "reason": "No sensitive data detected"
+    }
+  }
+]

@@ -1,0 +1,8 @@
+{
+  "why_blocked": {
+    "template": "❌ Decision: BLOCKED\n📜 Policy: {policy}\n🧠 Reason: {reason}\n🔐 Evidence Hash: {hash}\n⏱ Timestamp: {timestamp}"
+  },
+  "why_allowed": {
+    "template": "✅ Decision: ALLOWED\n📜 Policy: {policy}\n🧠 Reason: {reason}\n🔐 Evidence Hash: {hash}\n⏱ Timestamp: {timestamp}"
+  }
+}
