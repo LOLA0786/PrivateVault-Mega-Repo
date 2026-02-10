@@ -1,3 +1,15 @@
+from services.api.security.replay_guard import guard_replay
+
+from fastapi import Request
+
+from services.api.security.cometchat_verify import verify_cometchat_signature
+
+
+from services.api.governance.policy_engine import evaluate_policy
+
+from services.api.governance.policy_loader import load_policy_for_tenant
+
+
 from fastapi import APIRouter, Request
 from pydantic import BaseModel
 from datetime import datetime
@@ -74,6 +86,7 @@ import hashlib
 from fastapi import Header, HTTPException
 
 def verify_cometchat_signature(
+
     payload: bytes,
     signature: str,
     secret: str,
@@ -101,12 +114,14 @@ async def cometchat_webhook(
     COMETCHAT_SECRET = "demo-secret"
 
     verify_cometchat_signature(
+
         payload=raw_body,
         signature=x_cometchat_signature,
         secret=COMETCHAT_SECRET,
     )
 
     event = await request.json()
+
 
     # normalize + evaluate just like chat/respond
     normalized = normalize_input(event.get("message", ""))
@@ -174,4 +189,91 @@ async def cometchat_webhook(
     return {
         "status": "processed",
         "decision": decision,
+    }
+
+@router.post("/chat/respond")
+async def chat_respond(request: Request, payload: dict):
+    tenant_id = getattr(request.state, "tenant_id", "default")
+
+    policy = load_policy_for_tenant(tenant_id)
+    decision = evaluate_policy(
+        message=payload.get("message", ""),
+        policy=policy,
+        context={"request_id": payload.get("request_id")}
+    )
+
+    # SHADOW / MONITOR MODE
+    if decision["action"] == "BLOCK" and policy["mode"] in ("monitor", "shadow"):
+        return {
+            "message": "⚠️ Policy violation (not enforced)",
+            "decision": decision,
+            "shadow": True
+        }
+
+    # STRICT MODE
+    if decision["action"] == "BLOCK":
+        return {
+            "message": "❌ Message blocked by governance policy",
+            "decision": decision,
+            "shadow": False
+        }
+
+    return {
+        "message": "✅ Allowed",
+        "decision": decision
+    }
+
+@router.post("/chat/webhook/cometchat")
+async def cometchat_webhook(request: Request):
+    body = await request.body()
+
+    # 🔐 Verify CometChat signature
+    verify_cometchat_signature(request, body)
+
+
+    event = await request.json()
+
+    message = event.get("data", {}).get("text", "")
+
+    tenant_id = event.get("data", {}).get("receiver", "default")
+    policy = load_policy_for_tenant(tenant_id)
+
+    decision = evaluate_policy(
+        message=message,
+        policy=policy,
+        context={"source": "cometchat"}
+    )
+
+    return {
+        "status": "processed",
+        "decision": decision
+    }
+
+@router.post("/chat/webhook/cometchat")
+async def cometchat_webhook(request: Request):
+    body = await request.body()
+
+    # 🔐 Verify CometChat signature
+    verify_cometchat_signature(request, body)
+
+    event = await request.json()
+
+    # 🔁 Replay protection
+    event_id = event.get("id") or event.get("data", {}).get("id")
+    if event_id:
+        guard_replay(event_id)
+
+    message = event.get("data", {}).get("text", "")
+    tenant_id = event.get("data", {}).get("receiver", "default")
+
+    policy = load_policy_for_tenant(tenant_id)
+    decision = evaluate_policy(
+        message=message,
+        policy=policy,
+        context={"source": "cometchat"}
+    )
+
+    return {
+        "status": "processed",
+        "decision": decision
     }

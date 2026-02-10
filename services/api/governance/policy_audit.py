@@ -53,3 +53,24 @@ def record_policy_change(old_policy: str, new_policy: str):
         f.write("\n---\n")
 
     return record
+
+# -------------------------------
+# Public read API
+# -------------------------------
+
+def read_policy_audit_log(limit: int = 100):
+    """
+    Read recent policy change audit events.
+    """
+    if not AUDIT_LOG.exists():
+        return []
+
+    events = []
+    with open(AUDIT_LOG, "r") as f:
+        for line in f.readlines()[-limit:]:
+            try:
+                events.append(json.loads(line))
+            except Exception:
+                continue
+
+    return events

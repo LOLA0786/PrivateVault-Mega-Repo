@@ -1,51 +1,38 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 
 from services.api.middleware.api_key import APIKeyMiddleware
 
 from services.api.routes import (
-    audit,
-    auth,
-    quorum,
     status,
     tenants,
-    approvals,
-    evidence,
     api_keys,
     usage,
-    chat, 
+    chat,
+    audit_policy,
 )
 
 
 def create_app() -> FastAPI:
-    # Root app (no auth here)
-    app = FastAPI(title="PrivateVault Platform API", version="v1")
+    # Root app (public)
+    app = FastAPI(title="PrivateVault Platform API")
 
-
-    # Versioned API (API key enforced here)
+    # Versioned API (API key enforced)
     api = FastAPI(title="PrivateVault API v1", version="v1")
-
     api.add_middleware(APIKeyMiddleware)
 
-    # Public / core routes
+    # Core routes
     api.include_router(status.router)
-    api.include_router(auth.router)
-
-    # Tenant + governance
-    api.include_router(tenants.router)
-    api.include_router(quorum.router)
-    api.include_router(audit.router)
-    api.include_router(approvals.router)
-    api.include_router(evidence.router)
-    from services.api.routes import usage
-    api.include_router(usage.router)
-    from services.api.routes import usage
-    api.include_router(usage.router)
     api.include_router(chat.router)
-    # API key management + usage
-    api.include_router(api_keys.router)
-    api.include_router(usage.router)
+
+    # Tenant & governance
+    api.include_router(tenants.router)
     api.include_router(audit_policy.router)
 
+    # Keys + usage
+    api.include_router(api_keys.router)
+    api.include_router(usage.router)
+
+    # OpenAPI passthrough
     @api.get("/openapi.json")
     def openapi_spec():
         return api.openapi()

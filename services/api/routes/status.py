@@ -1,4 +1,6 @@
 from fastapi import APIRouter
+from services.api.governance.policy_loader import invalidate_policy_cache
+
 
 from services.api.models import HealthResponse, StatusResponse
 
@@ -21,3 +23,8 @@ from services.api.governance.policy_loader import invalidate_policy_cache
 def reload_policies():
     invalidate_policy_cache()
     return {"status": "policy_cache_cleared"}
+
+@router.post("/status/reload-policies")
+def reload_policies():
+    invalidate_policy_cache()
+    return {"status": "ok", "message": "policy cache reloaded"}
