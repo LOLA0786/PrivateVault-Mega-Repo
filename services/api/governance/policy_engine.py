@@ -1,52 +1,43 @@
-"""
-Policy Engine
--------------
-Deterministic governance rules.
-NO randomness. NO external models.
-"""
+from pathlib import Path
+from services.api.governance.policy_loader import get_policy
 
-from datetime import datetime
+BASE_DIR = Path(__file__).resolve().parents[4]
+POLICY_DIR = BASE_DIR / "policy_store" / "tenants"
 
 
-def evaluate_policy(normalized: dict) -> dict:
+def evaluate_policy(message: str, tenant_id: str = "default"):
     """
-    Evaluate input against governance policies.
-    Returns a deterministic decision + evidence.
+    Evaluates a message against tenant-specific policy.
+    Hot-reloads policy on YAML change.
     """
 
-    text = normalized.get("text", "").lower()
+    policy_path = POLICY_DIR / f"{tenant_id}.yaml"
 
-    # GDPR / PII
-    if any(keyword in text for keyword in ["aadhaar", "ssn", "passport", "credit card"]):
-        return {
-            "blocked": True,
-            "policy": "GDPR_PII_RESTRICTION",
-            "evidence_hash": "0xabc123",
-            "timestamp": datetime.utcnow().isoformat() + "Z",
-        }
+    if not policy_path.exists():
+        policy_path = POLICY_DIR / "default.yaml"
 
-    # Healthcare (HIPAA)
-    if any(keyword in text for keyword in ["patient", "diagnosis", "medical record", "insulin"]):
-        return {
-            "blocked": True,
-            "policy": "HIPAA_PHI_RESTRICTION",
-            "evidence_hash": "0xdef456",
-            "timestamp": datetime.utcnow().isoformat() + "Z",
-        }
+    policy = get_policy(policy_path)
 
-    # Fintech
-    if any(keyword in text for keyword in ["transfer", "bank account", "routing number"]):
-        return {
-            "blocked": True,
-            "policy": "FINANCIAL_TRANSACTION_RESTRICTION",
-            "evidence_hash": "0xfin789",
-            "timestamp": datetime.utcnow().isoformat() + "Z",
-        }
+    mode = policy.get("mode", "monitor")
+    rules = policy.get("rules", [])
 
-    # Default allow
+    for rule in rules:
+        keywords = rule.get("match", {}).get("keywords", [])
+
+        for kw in keywords:
+            if kw.lower() in message.lower():
+                return {
+                    "decision": rule.get("action", "ALLOW"),
+                    "policy_id": rule.get("id"),
+                    "severity": rule.get("severity", "LOW"),
+                    "mode": mode,
+                    "policy_version": policy.get("version", "1.0.0"),
+                }
+
     return {
-        "blocked": False,
-        "policy": None,
-        "evidence_hash": None,
-        "timestamp": datetime.utcnow().isoformat() + "Z",
+        "decision": "ALLOW",
+        "policy_id": "allow_all",
+        "severity": "LOW",
+        "mode": mode,
+        "policy_version": policy.get("version", "1.0.0"),
     }

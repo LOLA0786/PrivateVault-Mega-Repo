@@ -12,6 +12,7 @@ from services.api.routes import (
     evidence,
     api_keys,
     usage,
+    chat, 
 )
 
 
@@ -39,10 +40,11 @@ def create_app() -> FastAPI:
     api.include_router(usage.router)
     from services.api.routes import usage
     api.include_router(usage.router)
-
+    api.include_router(chat.router)
     # API key management + usage
     api.include_router(api_keys.router)
     api.include_router(usage.router)
+    api.include_router(audit_policy.router)
 
     @api.get("/openapi.json")
     def openapi_spec():

@@ -1,0 +1,21 @@
+tenant_id: demo_summit
+policy_version: 1.0.0
+mode: strict
+
+rules:
+  - id: block_pii
+    description: Block PII in chat or AI output
+    match:
+      keywords:
+        - aadhaar
+        - ssn
+        - passport
+    action: BLOCK
+    severity: CRITICAL
+
+  - id: default_block
+    description: Block anything not explicitly allowed
+    match:
+      default: true
+    action: BLOCK
+    severity: HIGH

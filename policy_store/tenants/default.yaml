@@ -1,0 +1,4 @@
+policy_id: allow_all
+policy_version: 1.0.0
+mode: strict
+rules: []

@@ -13,3 +13,11 @@ def status():
 @router.get("/health", response_model=HealthResponse)
 def health():
     return {"status": "ok"}
+
+from services.api.governance.policy_loader import invalidate_policy_cache
+
+
+@router.post("/reload-policies")
+def reload_policies():
+    invalidate_policy_cache()
+    return {"status": "policy_cache_cleared"}
