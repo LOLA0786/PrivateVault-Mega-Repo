@@ -1,4 +1,12 @@
-policy_id: allow_all
-policy_version: 1.0.0
 mode: strict
-rules: []
+version: 1.0.0
+
+rules:
+  - id: block_bad_words
+    action: BLOCK
+    severity: HIGH
+    match:
+      keywords:
+        - hack
+        - exploit
+        - breach
