@@ -6,3 +6,4 @@ test_diagnostics_*
 policy_store/*.yaml
 services/api/governance/policy_store/
 _archive/
+data/
