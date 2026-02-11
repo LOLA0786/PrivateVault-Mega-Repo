@@ -1,5 +1,5 @@
 import jwt, time, uuid, redis
-from replay_protection import record_replay_attempt, is_blacklisted
+from replay_protection import check_replay
 
 SECRET = "uaal-secret"
 TTL = 300
@@ -19,7 +19,10 @@ def issue_jwt_cap(decision_id, action, principal):
 
 
 def verify_jwt_cap(token, action, principal):
-    payload = jwt.decode(token, SECRET, algorithms=["HS256"])
+    try:
+        payload = jwt.decode(token, SECRET, algorithms=["HS256"])
+    except Exception:
+        return False
 
     jti = payload["jti"]
 
