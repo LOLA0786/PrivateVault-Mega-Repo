@@ -1,0 +1,80 @@
+[
+  {
+    "id": "e2e-1",
+    "source": "salesforce",
+    "user_id": "demo-user",
+    "data": {
+      "customer_value": 100000,
+      "deal_stage": "negotiation",
+      "manager_approved": true
+    },
+    "policy_version": "v1.0",
+    "risk_profile": "medium",
+    "signature": "e0e5c33b75bdf715041f90a48da411e5929afab0654c1d889a1505f4e2c843f1"
+  },
+  {
+    "id": "e2e-1",
+    "source": "salesforce",
+    "user_id": "demo-user",
+    "data": {
+      "customer_value": 100000,
+      "deal_stage": "negotiation",
+      "manager_approved": true
+    },
+    "policy_version": "v1.0",
+    "risk_profile": "medium",
+    "signature": "e0e5c33b75bdf715041f90a48da411e5929afab0654c1d889a1505f4e2c843f1"
+  },
+  {
+    "id": "e2e-1",
+    "source": "salesforce",
+    "user_id": "demo-user",
+    "data": {
+      "customer_value": 100000,
+      "deal_stage": "negotiation",
+      "manager_approved": true
+    },
+    "policy_version": "v1.0",
+    "risk_profile": "medium",
+    "signature": "e0e5c33b75bdf715041f90a48da411e5929afab0654c1d889a1505f4e2c843f1"
+  },
+  {
+    "id": "e2e-1",
+    "source": "salesforce",
+    "user_id": "demo-user",
+    "data": {
+      "customer_value": 100000,
+      "deal_stage": "negotiation",
+      "manager_approved": true
+    },
+    "policy_version": "v1.0",
+    "risk_profile": "medium",
+    "signature": "e0e5c33b75bdf715041f90a48da411e5929afab0654c1d889a1505f4e2c843f1"
+  },
+  {
+    "id": "e2e-1",
+    "source": "salesforce",
+    "user_id": "demo-user",
+    "data": {
+      "customer_value": 100000,
+      "deal_stage": "negotiation",
+      "manager_approved": true
+    },
+    "policy_version": "v1.0",
+    "risk_profile": "medium",
+    "signature": "e0e5c33b75bdf715041f90a48da411e5929afab0654c1d889a1505f4e2c843f1"
+  },
+  {
+    "id": "e2e-1",
+    "source": "salesforce",
+    "user_id": "demo-user",
+    "data": {
+      "customer_value": 100000,
+      "deal_stage": "negotiation",
+      "manager_approved": true
+    },
+    "policy_version": "v1.0",
+    "risk_profile": "medium",
+    "signature": "e0e5c33b75bdf715041f90a48da411e5929afab0654c1d889a1505f4e2c843f1"
+  }
+]
