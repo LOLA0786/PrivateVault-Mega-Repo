@@ -1,15 +1,10 @@
 from pathlib import Path
 from services.api.governance.policy_loader import get_policy
 
-BASE_DIR = Path(__file__).resolve().parents[4]
+BASE_DIR = Path(__file__).resolve().parents[3]
 POLICY_DIR = BASE_DIR / "policy_store" / "tenants"
 
-
 def evaluate_policy(message: str, tenant_id: str = "default"):
-    """
-    Evaluates a message against tenant-specific policy.
-    Hot-reloads policy on YAML change.
-    """
 
     policy_path = POLICY_DIR / f"{tenant_id}.yaml"
 
@@ -23,7 +18,6 @@ def evaluate_policy(message: str, tenant_id: str = "default"):
 
     for rule in rules:
         keywords = rule.get("match", {}).get("keywords", [])
-
         for kw in keywords:
             if kw.lower() in message.lower():
                 return {

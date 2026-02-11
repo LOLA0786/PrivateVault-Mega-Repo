@@ -1,32 +1,8 @@
-# Python
 __pycache__/
-*.py[cod]
-*.pyo
-*.pyd
-.Python
+*.pyc
 .env
-.venv
-venv/
-
-# OS
-.DS_Store
-
-# Gunicorn / logs
 *.log
-
-# Runtime data (VERY IMPORTANT)
- /var/lib/privatevault/
-api_keys.json
-
-# TLS / certs
-/etc/letsencrypt/
-
-# Editor
-.vscode/
-.idea/
-
-# Systemd
-*.service
-
-# Archived legacy code
+test_diagnostics_*
+policy_store/*.yaml
+services/api/governance/policy_store/
 _archive/

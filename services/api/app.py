@@ -1,6 +1,8 @@
 from fastapi import FastAPI
+from services.gateway.routes import router as gateway_router
 
 from services.api.middleware.api_key import APIKeyMiddleware
+from services.gateway.admin import router as gateway_admin_router
 
 from services.api.routes import (
     status,
@@ -31,6 +33,8 @@ def create_app() -> FastAPI:
     # Keys + usage
     api.include_router(api_keys.router)
     api.include_router(usage.router)
+    api.include_router(gateway_router)
+    api.include_router(gateway_admin_router)
 
     # OpenAPI passthrough
     @api.get("/openapi.json")
