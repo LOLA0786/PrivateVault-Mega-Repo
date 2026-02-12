@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [ main, demo-fast, develop ]
+    branches: [ main, demo-fast ]
   pull_request:
     branches: [ main, demo-fast ]
 
@@ -13,8 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      - uses: actions/setup-python@v4
         with:
           python-version: '3.12'
 
@@ -23,8 +22,8 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           if [ -f requirements-test.txt ]; then pip install -r requirements-test.txt; fi
-          pip install -e .
 
       - name: Run tests
         run: |
+          export PYTHONPATH=$PWD
           pytest -q
