@@ -30,3 +30,6 @@ pytest-html
 httpx
 asyncpg
 pytest-asyncio
+pynacl
+deepdiff
+psutil

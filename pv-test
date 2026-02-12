@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+set -e
+
+CMD=$1
+
+case "$CMD" in
+  drift)
+    ./tests/drift_test.sh
+    ;;
+  policy)
+    ./tests/policy_test.sh
+    ;;
+  replay)
+    ./tests/replay_test.sh
+    ;;
+  tamper)
+    ./tests/tamper_test.sh
+    ;;
+  *)
+    echo "Usage: ./pv-test {drift|policy|replay|tamper}"
+    exit 1
+    ;;
+esac

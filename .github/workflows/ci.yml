@@ -1,30 +1,50 @@
-name: PrivateVault CI
+name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [ main, demo-fast ]
   pull_request:
+    branches: [ main ]
 
 jobs:
   test:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v3
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - name: Set up Python
+        uses: actions/setup-python@v4
         with:
           python-version: "3.12"
 
-      - name: Install deps
+      - name: Install dependencies
         run: |
-          pip install -r requirements.txt
-          pip install pytest pytest-asyncio
+          python -m pip install --upgrade pip
 
-      - name: Run Tests
-        env:
-          SKIP_TLS_TEST: 1
-          PYTEST_DISABLE_PLUGIN_AUTOLOAD: 1
-        run: |
-          pytest tests -q
+          # Core deps
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          fi
+
+          # Test deps
+          if [ -f requirements-test.txt ]; then
+            pip install -r requirements-test.txt
+          fi
+
+          # Force-install missing deps that CI needs
+          pip install \
+            pytest \
+            pytest-asyncio \
+            anyio \
+            psutil \
+            pynacl \
+            deepdiff \
+            pytest-timeout \
+            pytest-cov
+
+      - name: Set PYTHONPATH
+        run: echo "PYTHONPATH=$PWD" >> $GITHUB_ENV
+
+      - name: Run tests
+        run: pytest -q

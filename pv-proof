@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+set -e
+
+echo "=============================="
+echo "PRIVATEVAULT GOVERNANCE PROOF"
+echo "=============================="
+
+echo ""
+echo "1) DRIFT ANALYSIS"
+python3 drift_detection.py
+
+echo ""
+echo "2) POLICY ENFORCEMENT"
+python3 inspect_audit_log.py | tail -20
+
+echo ""
+echo "3) REPLAY VERIFICATION"
+python3 replay_protection.py
+
+echo ""
+echo "4) CRYPTOGRAPHIC INTEGRITY"
+python3 crypto_evidence.py
+
+echo ""
+echo "5) LINEAGE VERIFICATION"
+./verify.sh
+
+echo ""
+echo "PROOF COMPLETE"

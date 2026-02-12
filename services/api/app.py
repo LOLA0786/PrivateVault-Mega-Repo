@@ -1,9 +1,6 @@
 from fastapi import FastAPI
-from services.gateway.routes import router as gateway_router
 
 from services.api.middleware.api_key import APIKeyMiddleware
-from services.gateway.admin import router as gateway_admin_router
-
 from services.api.routes import (
     status,
     tenants,
@@ -11,37 +8,38 @@ from services.api.routes import (
     usage,
     chat,
     audit_policy,
+    quorum,
+    audit,
+    approvals,
+    evidence,
+    auth,
 )
 
-
 def create_app() -> FastAPI:
-    # Root app (public)
     app = FastAPI(title="PrivateVault Platform API")
 
-    # Versioned API (API key enforced)
     api = FastAPI(title="PrivateVault API v1", version="v1")
     api.add_middleware(APIKeyMiddleware)
 
-    # Core routes
+    # Core
     api.include_router(status.router)
+    api.include_router(auth.router)
     api.include_router(chat.router)
 
-    # Tenant & governance
+    # Governance
     api.include_router(tenants.router)
+    api.include_router(quorum.router)
+    api.include_router(audit.router)
+    api.include_router(approvals.router)
+    api.include_router(evidence.router)
     api.include_router(audit_policy.router)
 
     # Keys + usage
     api.include_router(api_keys.router)
     api.include_router(usage.router)
-    api.include_router(gateway_router)
-    api.include_router(gateway_admin_router)
-
-    # OpenAPI passthrough
-    @api.get("/openapi.json")
-    def openapi_spec():
-        return api.openapi()
 
     app.mount("/api/v1", api)
+
     return app
 
 
