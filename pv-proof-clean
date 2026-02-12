@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+set -e
+
+echo "=== PRIVATEVAULT GOVERNANCE PROOF ==="
+
+echo ""
+echo "1) INTERPRETATION DRIFT"
+python3 drift_detection.py | tail -40
+
+echo ""
+echo "2) SOVEREIGN SECURITY TEST"
+python3 sovereign_final_test.py
+
+echo ""
+echo "3) CRYPTOGRAPHIC EVIDENCE"
+cat proof.json | head -30
+
+echo ""
+echo "4) HISTORICAL TEST RECORDS"
+ls agent-logic-test-results-* | tail -3
+
+echo ""
+echo "PROOF COMPLETE"
