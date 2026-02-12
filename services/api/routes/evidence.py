@@ -4,8 +4,13 @@ from typing import List
 
 router = APIRouter(prefix="/evidence", tags=["evidence"])
 
+
 class EvidenceExportRequest(BaseModel):
-    pass
+    tenant_id: str
+    start: str
+    end: str
+    bundle_name: str
+
 
 class EvidenceItem(BaseModel):
     id: str
@@ -13,15 +18,19 @@ class EvidenceItem(BaseModel):
     hash: str
     timestamp: str
 
+
 class EvidenceExportResponse(BaseModel):
+    bundle_id: str
     tenant_id: str
     count: int
     evidence: List[EvidenceItem]
 
+
 @router.post("/export", response_model=EvidenceExportResponse)
-async def export_evidence(_: EvidenceExportRequest, request: Request):
+async def export_evidence(req: EvidenceExportRequest, request: Request):
     return {
-        "tenant_id": request.state.tenant_id,
+        "bundle_id": req.bundle_name,
+        "tenant_id": req.tenant_id,
         "count": 1,
         "evidence": [
             {
@@ -32,6 +41,7 @@ async def export_evidence(_: EvidenceExportRequest, request: Request):
             }
         ],
     }
+
 
 @router.get("/health")
 async def health():

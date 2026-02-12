@@ -1,8 +1,7 @@
 import json
 from datetime import datetime
 
-from fastapi import APIRouter, Depends, HTTPException
-
+from fastapi import APIRouter, HTTPException, Request
 from audit_logger import get_audit_log_paths
 from services.api.models import ApprovalRecord
 
@@ -48,23 +47,26 @@ def _filter(event: dict) -> dict:
 
 @router.get("/approvals", response_model=list[ApprovalRecord])
 def list_approvals(
+    request: Request,
     tenant_id: str | None = None,
     start: str | None = None,
     end: str | None = None,
 ):
-    if auth.tenant_id and tenant_id and tenant_id != auth.tenant_id:
+    caller_tenant = getattr(request.state, "tenant_id", None)
+
+    if caller_tenant and tenant_id and tenant_id != caller_tenant:
         raise HTTPException(status_code=403, detail="TENANT_SCOPE_VIOLATION")
 
     start_dt = _parse_iso(start) if start else None
     end_dt = _parse_iso(end) if end else None
 
-    approvals: list[dict] = []
+    approvals = []
+
     for path in get_audit_log_paths():
         try:
             with open(path, "r", encoding="utf-8") as f:
                 for line in f:
-                    line = line.strip()
-                    if not line:
+                    if not line.strip():
                         continue
                     try:
                         event = json.loads(line)
@@ -75,8 +77,10 @@ def list_approvals(
                     ts = event.get("timestamp")
                     if ts and not _in_range(ts, start_dt, end_dt):
                         continue
+
                     quorum = event.get("quorum") or {}
                     used = quorum.get("approvals_used") or []
+
                     for approval in used:
                         row = dict(approval)
                         row["rule_id"] = quorum.get("rule_id")
