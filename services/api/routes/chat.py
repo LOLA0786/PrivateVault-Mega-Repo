@@ -8,6 +8,7 @@ from services.api.security.cometchat_verify import verify_cometchat_signature
 from services.api.governance.policy_engine import evaluate_policy
 
 from services.api.governance.policy_loader import load_policy_for_tenant
+from services.ai_client import classify_message
 
 
 from fastapi import APIRouter, Request
@@ -16,6 +17,7 @@ from datetime import datetime
 
 from services.api.governance.normalizer import normalize
 from services.api.governance.policy_loader import load_policy
+from services.ai_client import classify_message
 from services.api.governance.policy_engine import evaluate_policy
 
 router = APIRouter(prefix="/chat", tags=["chat"])
@@ -32,6 +34,23 @@ def chat_respond(payload: ChatRequest, request: Request):
     Internal Chat API (used by UI, agents, tests)
     """
     tenant_id = getattr(request.state, "tenant_id", "default")
+
+    # --- AI Governance Layer (Pre-check) ---
+    try:
+        ai_result = classify_message(
+            message=payload.message or "",
+            tenant_id=tenant_id,
+            user_id="unknown"
+        )
+
+        if ai_result["governance"]["policy"]["action"] == "BLOCK":
+            return {
+                "message": "❌ BLOCKED by AI Governance Layer",
+                "ai_decision": ai_result
+            }
+    except Exception:
+        # Fail-open (AI outage should not break Mega)
+        pass
 
     normalized = normalize(payload.message or "")
     policy = load_policy(tenant_id)
@@ -63,6 +82,23 @@ async def cometchat_webhook(request: Request):
 
     text = body.get("data", {}).get("text", "")
     tenant_id = getattr(request.state, "tenant_id", "default")
+
+    # --- AI Governance Layer (Pre-check) ---
+    try:
+        ai_result = classify_message(
+            message=payload.message or "",
+            tenant_id=tenant_id,
+            user_id="unknown"
+        )
+
+        if ai_result["governance"]["policy"]["action"] == "BLOCK":
+            return {
+                "message": "❌ BLOCKED by AI Governance Layer",
+                "ai_decision": ai_result
+            }
+    except Exception:
+        # Fail-open (AI outage should not break Mega)
+        pass
 
     normalized = normalize(text)
     policy = load_policy(tenant_id)
@@ -194,6 +230,23 @@ async def cometchat_webhook(
 @router.post("/chat/respond")
 async def chat_respond(request: Request, payload: dict):
     tenant_id = getattr(request.state, "tenant_id", "default")
+
+    # --- AI Governance Layer (Pre-check) ---
+    try:
+        ai_result = classify_message(
+            message=payload.message or "",
+            tenant_id=tenant_id,
+            user_id="unknown"
+        )
+
+        if ai_result["governance"]["policy"]["action"] == "BLOCK":
+            return {
+                "message": "❌ BLOCKED by AI Governance Layer",
+                "ai_decision": ai_result
+            }
+    except Exception:
+        # Fail-open (AI outage should not break Mega)
+        pass
 
     policy = load_policy_for_tenant(tenant_id)
     decision = evaluate_policy(
