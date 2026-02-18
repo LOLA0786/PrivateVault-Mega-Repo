@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 import requests
 
+from control_plane.governance_guard import enforce_governance, GovernanceBlocked
+
 app = FastAPI(title="PrivateIntent OS")
 
 INTENT_ENGINE = "http://localhost:8000"
@@ -14,17 +16,24 @@ def health():
 
 @app.post("/execute")
 def execute(payload: dict):
-    decision = requests.post(f"{INTENT_ENGINE}/authorize-intent", json=payload).json()
+    decision = requests.post(
+        f"{INTENT_ENGINE}/api/emit/fintech",
+        json=payload,
+        timeout=10
+    ).json()
 
-    if not decision.get("allowed"):
+    if not decision.get("allowed", True):
         return {
             "status": "BLOCKED",
             "reason": decision.get("reason"),
-            "policy": decision.get("policy_version"),
             "evidence": decision.get("evidence_id"),
         }
 
-    result = requests.post(f"{PRIVATE_VAULT}/vault/secure-action", json=payload).json()
+    result = requests.post(
+        f"{PRIVATE_VAULT}/vault/secure-action",
+        json=payload,
+        timeout=10
+    ).json()
 
     return {
         "status": "EXECUTED",

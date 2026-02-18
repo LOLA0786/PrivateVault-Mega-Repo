@@ -1,0 +1,25 @@
+payment_release:
+  owner_role: FinanceController
+  delegates: [FinanceManager]
+  escalation_role: CFO
+  quorum_required: true
+  quorum_roles: [FinanceController, ComplianceOfficer]
+  jurisdiction: [SOX, SOC2]
+  risk_threshold: 80
+
+sensitive_data_export:
+  owner_role: DataProtectionOfficer
+  delegates: [SecurityLead]
+  escalation_role: LegalHead
+  quorum_required: true
+  quorum_roles: [DPO, SecurityLead, ComplianceOfficer]
+  jurisdiction: [GDPR, EU_AI_ACT]
+  risk_threshold: 60
+
+model_policy_override:
+  owner_role: ChiefRiskOfficer
+  escalation_role: CEO
+  quorum_required: true
+  quorum_roles: [CRO, SecurityHead]
+  jurisdiction: [SOC2, ISO27001, EU_AI_ACT]
+  risk_threshold: 90
